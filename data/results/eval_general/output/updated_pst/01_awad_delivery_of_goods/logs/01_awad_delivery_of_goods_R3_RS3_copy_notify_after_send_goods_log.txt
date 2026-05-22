@@ -1,0 +1,7 @@
+ChangeOperationValidator: SUCCESS (copy_after)
+{'type': 'copy_after', 'source_activity_label': 'notify customer', 'target_activity_label': 'send goods', 'copied_activity_label': 'notify customer'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Structural WARNING: WARNING: Duplicate label detected: notify customer
+Execution time (milliseconds): 3.17

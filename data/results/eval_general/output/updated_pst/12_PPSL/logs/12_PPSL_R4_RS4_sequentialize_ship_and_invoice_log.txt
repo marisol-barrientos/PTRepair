@@ -1,0 +1,6 @@
+ChangeOperationValidator: SUCCESS (sequentialize_parallel)
+{'type': 'sequentialize_parallel', 'first_activity_label': 'Ship', 'second_activity_label': 'Send Invoice'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Execution time (milliseconds): 3.44

@@ -1,0 +1,30 @@
+sequence
+  new customer arrives (write: customer_data)
+  provide customer brochurs (res: customer_advisor)
+  exclusive
+    sequence (cond: data.customer.status == "new")
+      conduct customer identification & legitimation (res: customer advisor, money laundering officer)
+      conclude custody account
+      send legitimation & custody account documents (res: Market support) (read: custody_account_contract)
+      open custody account (res: Market support)
+      conduct customer information
+      parallel (wait=-1, cancel=last)
+        execute plausibility check
+        obtain customer data
+    sequence (cond: not (data.customer.status == "new"))
+      update customer data
+  conduct risk disclosure
+  conduct investment advice (res: securities customer advisor)
+  create consultation protocol
+  ask for customer approval (write: approved)
+  exclusive
+    sequence (cond: data.approved)
+    sequence (cond: not (data.approved))
+      terminate
+  conclude securities purchase contract
+  hand out customer copies
+  parallel (wait=-1, cancel=last)
+    execute plausibility check
+    conduct customer order
+  send purchase invoice
+terminate

@@ -1,0 +1,26 @@
+[
+    {
+        "requirement_id": "R1",
+        "requirement": "recurring (tree, 'check for new document in DMS', '10518984 ') and activity_receives (tree, 'check for new document in DMS', 'checklist completed and signed by Tax Manager and Financial Controller')",
+        "assurance": 100,
+        "evidence": [
+            "Found Activity \"check for new document in DMS\" in loop \"check for new document in DMS\"",
+            "No timeout was found to enforce the recurring requirement",
+            "data object \"checklist completed and signed by Tax Manager and Financial Controller\" is not found in finalize of Activity \"check for new document in DMS\""
+        ]
+    },
+    {
+        "requirement_id": "R2",
+        "requirement": "leads_to (tree, 'create resolution proposal', 'analyse reports') and activity_receives (tree, 'create resolution proposal', 'resolution_proposal') and activity_receives (tree, 'generate consultative report', 'report_cb') and activity_receives (tree, 'generate legal report', 'report_ld') and exists (tree, 'analyse reports') and executed_by_return (tree, 'analyse reports') == executed_by_return (tree, 'create resolution proposal')",
+        "assurance": 100,
+        "evidence": [
+            "Activity \"create resolution proposal\" is before Activity \"analyse reports\"",
+            "Activity \"create resolution proposal\" is before \"analyse reports\" in the same execution path",
+            "data object \"resolution_proposal\" is not found in finalize of Activity \"create resolution proposal\"",
+            "data object \"report_cb\" is not found in finalize of Activity \"generate consultative report\"",
+            "data object \"report_ld\" is not found in finalize of Activity \"generate legal report\"",
+            "Activity \"analyse reports\" is executed by resource \"Tech. MD Position\"",
+            "Activity \"create resolution proposal\" is executed by resource \"Tech.MD Position\""
+        ]
+    }
+]

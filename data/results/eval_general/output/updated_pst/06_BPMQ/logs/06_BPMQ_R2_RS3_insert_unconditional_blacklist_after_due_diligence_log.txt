@@ -1,0 +1,7 @@
+ChangeOperationValidator: SUCCESS (insert_after)
+{'type': 'insert_after', 'target_activity': 'conduct due diligence study', 'new_activity': 'add respondent bank to blacklist'}
+BehavioralValidator WARNING: Behavioral risk: terminate inside parallel block may cause synchronization anomalies
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Structural WARNING: WARNING: Duplicate label detected: add respondent bank to blacklist
+Execution time (milliseconds): 4.39

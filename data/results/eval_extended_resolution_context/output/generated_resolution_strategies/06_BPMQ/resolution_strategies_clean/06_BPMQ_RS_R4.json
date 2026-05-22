@@ -1,0 +1,143 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_remove_self_write_of_evaluation_extra",
+      "change_operations": [
+        {
+          "operation": "remove_write",
+          "parameters": {
+            "target_activity_label": "conduct due diligence study",
+            "removed_variable_name": "evaluation_extra"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The detected violation is caused by the activity \"conduct due diligence study\" writing the same variable, data.evaluation_extra, that controls the loop condition. Removing this write prevents the activity from making the condition true after it has already executed, eliminating the self-triggering case in which the condition could become true without a later occurrence of the required activity."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The change is local to the due-diligence loop and does not affect the existence of \"obtain respondent bank annual report\" or \"analyze respondent bank annual report\". It also does not alter the risk-handling branch where data.risk directly leads to terminate."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one data-write statement is removed from a single activity."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The control-flow structure remains unchanged. No new branches, loops, or duplicate activities are introduced."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The modification is located in the initial respondent-bank assessment and due-diligence part of the process, before the annual-report analysis phase."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_modify_due_diligence_write_to_reset_evaluation_extra",
+      "change_operations": [
+        {
+          "operation": "modify_write",
+          "parameters": {
+            "target_activity_label": "conduct due diligence study",
+            "new_statement": "write: evaluation, evaluation_extra=false"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "By ensuring that \"conduct due diligence study\" does not leave data.evaluation_extra true after execution, the activity can no longer create a later state where the condition holds without being followed by another due-diligence execution. The condition-controlled loop can still be evaluated before the activity, but the problematic self-produced true value is removed."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy does not affect the annual-report activities required by R1 and does not alter the data.risk branch required by R3."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one write statement is modified. The change is slightly more involved than simply removing the write because it changes the value assigned to the loop-control variable."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The process structure is unchanged. The repair affects only the data state produced by one activity."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The modified activity appears in the initial due-diligence section before the later annual-report and account-opening phases."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_wrap_due_diligence_in_post_condition_loop",
+      "change_operations": [
+        {
+          "operation": "embed_post_loop",
+          "parameters": {
+            "start_activity_label": "conduct due diligence study",
+            "end_activity_label": "conduct due diligence study",
+            "condition": "data.evaluation_extra"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "substantial",
+          "reason": "Wrapping the activity in a post-condition loop means that if \"conduct due diligence study\" causes data.evaluation_extra to become true, the activity is executed again in the following loop iteration. This mitigates the self-triggering violation while preserving the activity's ability to write evaluation_extra. However, because the process already contains a pre-condition loop on the same condition, the exact compliance effect depends on the execution semantics of nested loops."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The change is confined to the due-diligence fragment. It does not remove or reorder the annual-report activities and does not modify the risk branch where data.risk directly leads to terminate."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "Only one operation is required, but it introduces an additional loop structure around an existing activity."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The strategy adds a nested loop inside an existing loop. This preserves behavior better than removing the data write, but it increases structural complexity and may make the process harder to understand."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The change is made in the due-diligence portion of the process before the annual-report analysis and account-opening decision."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_insert_follow_up_due_diligence_after_current_activity",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "conduct due diligence study",
+            "new_activity_label": "conduct due diligence study"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "partial",
+          "reason": "Adding another occurrence of \"conduct due diligence study\" immediately after the existing one can ensure that if the first occurrence makes data.evaluation_extra true, a matching due-diligence activity follows. However, this introduces a duplicate activity with the same label, and if the inserted activity is interpreted as having the same data effects, it may reproduce the same violation after the second occurrence."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The annual-report and risk-handling requirements are not directly affected. However, the duplicate activity may alter the intended due-diligence behavior and could introduce ambiguity in later compliance checks that refer to the same activity label."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The strategy requires only one insertion operation."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The process remains structurally simple, but duplicate labels reduce model clarity and may make future activity references ambiguous."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The inserted activity is placed in the early due-diligence part of the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_remove_self_write_of_evaluation_extra",
+  "best_resolution_reason": "RS1 is the recommended strategy because it directly addresses the root cause identified in the violation evidence: \"conduct due diligence study\" writes data.evaluation_extra even though that variable controls whether the activity must occur. Removing this write is the most localized and lowest-cost repair, preserves the existing control-flow structure, and does not interfere with the currently satisfied context requirements R1 and R3."
+}

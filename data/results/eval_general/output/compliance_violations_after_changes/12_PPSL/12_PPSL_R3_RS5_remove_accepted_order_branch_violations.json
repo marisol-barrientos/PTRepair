@@ -1,0 +1,27 @@
+[
+    {
+        "requirement_id": "R3",
+        "requirement": "precedence (tree, 'Close Bill', 'Report Payment') or precedence (tree, 'Close Bill', 'Report Rejected Order') and leads_to (tree, 'Receive Payment', 'Report Payment')",
+        "assurance": 100,
+        "evidence": [
+            "Activity \"Report Payment\" existence was checked but not found",
+            "Activity \"Close Bill\" was found but Activity \"Report Payment\" was not found, so precedence \"Close Bill\" requires \"Report Payment\" before it is false",
+            "Activity \"Report Rejected Order\" was found before \"Close Bill\". Ensuring that \"Report Rejected Order\" is not on an exclusive branch which could lead to violations in some traces",
+            "Activity \"Report Rejected Order\" was found before \"Close Bill\", but it is in a different exclusive branch, so precedence can not be guaranteed in every trace",
+            "Activity \"Receive Payment\" existence was checked but not found",
+            "Activity \"Report Payment\" existence was checked but not found",
+            "Activity \"Receive Payment\" is not found in the tree"
+        ]
+    },
+    {
+        "requirement_id": "R4",
+        "requirement": "leads_to (tree, 'Fill Order', 'Ship') and leads_to (tree, 'Fill Order', 'Send Invoice')",
+        "assurance": 100,
+        "evidence": [
+            "Activity \"Fill Order\" is before Activity \"Ship\"",
+            "Activity \"Ship\" does not occur in all exclusive branches",
+            "Activity \"Send Invoice\" existence was checked but not found",
+            "Activity \"Send Invoice\" is not found in the tree"
+        ]
+    }
+]

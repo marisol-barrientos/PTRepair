@@ -1,0 +1,3 @@
+{
+    "R6": "data_value_alternative_eventually_follows('assessment_status == \"rejected\"', 'inform of rejection') and directly_follows('inform of rejection', 'terminate')"
+}

@@ -1,0 +1,122 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_insert_before_and_parallelize",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "Check Credit Worthiness",
+            "new_activity_label": "send automated email"
+          }
+        },
+        {
+          "operation": "parallelize",
+          "parameters": {
+            "first_activity_label": "send automated email",
+            "second_activity_label": "Check Credit Worthiness"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The missing activity \"send automated email\" is added and then placed in a parallel branch with \"Check Credit Worthiness\", directly satisfying the required parallel relationship."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The repair is localized to the point where credit worthiness is checked. Sending an automated email in parallel with the credit check is contextually plausible and does not affect the surrounding loan-decision logic."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only two localized operations are required: one insertion and one structural transformation into parallel branches."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The strategy introduces a simple parallel block around two activities without changing conditions, loops, terminations, or downstream decision logic."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The modification occurs inside the valid bank-information branch, around the credit assessment portion of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_insert_after_and_parallelize",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "Check Credit Worthiness",
+            "new_activity_label": "send automated email"
+          }
+        },
+        {
+          "operation": "parallelize",
+          "parameters": {
+            "first_activity_label": "Check Credit Worthiness",
+            "second_activity_label": "send automated email"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The missing activity is introduced immediately after \"Check Credit Worthiness\" and the two consecutive activities are transformed into parallel branches, satisfying the parallel compliance pattern."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The change keeps the new email activity tightly coupled to the credit-worthiness check and avoids modifying unrelated branches."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The repair requires only an insertion and a parallelization operation."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The resulting structure remains simple and block-structured, with a small parallel fragment replacing a sequential pair."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is located in the middle of the loan evaluation path, immediately around the credit-worthiness check."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_insert_only_partial",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "Check Credit Worthiness",
+            "new_activity_label": "send automated email"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "partial",
+          "reason": "This strategy resolves the missing activity aspect of the violation, but it does not establish that \"send automated email\" and \"Check Credit Worthiness\" execute in parallel branches."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The activity is inserted at a relevant location near the credit check, but the required parallel execution semantics are still missing."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one insertion operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The process remains purely sequential at this point and no additional control-flow structure is introduced."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change occurs around the credit-worthiness check in the middle of the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_insert_before_and_parallelize",
+  "best_resolution_reason": "RS1 is recommended because it fully restores compliance with minimal localized change. It adds the missing \"send automated email\" activity and immediately parallelizes it with \"Check Credit Worthiness\" without affecting unrelated branches, conditions, resources, or termination behavior."
+}

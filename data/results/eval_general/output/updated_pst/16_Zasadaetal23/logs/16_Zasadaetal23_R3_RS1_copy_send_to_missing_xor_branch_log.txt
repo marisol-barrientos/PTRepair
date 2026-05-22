@@ -1,0 +1,8 @@
+ChangeOperationValidator: SUCCESS (copy_after)
+{'type': 'copy_after', 'source_activity_label': 'send legitimation & custody account documents', 'target_activity_label': 'update customer data', 'copied_activity_label': 'send legitimation & custody account documents'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Structural WARNING: WARNING: Duplicate label detected: execute plausibility check
+Structural WARNING: WARNING: Duplicate label detected: send legitimation & custody account documents
+Execution time (milliseconds): 6.25

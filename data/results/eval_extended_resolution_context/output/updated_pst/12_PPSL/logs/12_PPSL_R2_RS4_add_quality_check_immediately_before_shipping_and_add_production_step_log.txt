@@ -1,0 +1,12 @@
+ChangeOperationValidator: SUCCESS (insert_after)
+{'type': 'insert_after', 'target_activity': 'Produce Part 2', 'new_activity': 'production step'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+ChangeOperationValidator: SUCCESS (copy_before)
+{'type': 'copy_before', 'source_activity_label': 'Test Quality', 'target_activity_label': 'Ship', 'new_node': 'Test Quality'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Structural WARNING: WARNING: Duplicate label detected: Test Quality
+Execution time (milliseconds): 9.1

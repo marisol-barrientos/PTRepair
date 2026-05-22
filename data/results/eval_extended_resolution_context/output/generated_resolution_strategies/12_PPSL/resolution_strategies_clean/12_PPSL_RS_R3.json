@@ -1,0 +1,181 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_add_report_payment_to_rejected_branch",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "Report Rejected Order",
+            "new_activity_label": "Report Payment"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Adding Report Payment to the rejected-order branch makes Report Payment occur before Close Bill in every XOR outcome. The existing accepted-order branch already has Receive Payment followed by Report Payment, so leads_to('Receive Payment','Report Payment') remains satisfied."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The existing Report Order activity remains before Close Bill, so R1 precedence('Close Bill','Report Order') is preserved. The accepted-order behavior is not changed."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one localized insertion is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The XOR structure is preserved and no additional gateways or nesting are introduced. The only drawback is that Report Payment is now present in both exclusive branches."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is made inside the rejected-order branch of the central exclusive choice, before the final Close Bill activity."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_move_report_payment_before_close_bill",
+      "change_operations": [
+        {
+          "operation": "move_before",
+          "parameters": {
+            "source_activity_label": "Report Payment",
+            "target_activity_label": "Close Bill"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Moving Report Payment outside the exclusive branch and directly before Close Bill ensures that every execution reaching Close Bill has Report Payment before it. Receive Payment still eventually leads to Report Payment in the accepted-order path."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "Report Order remains before Close Bill, so R1 is preserved. No context requirement is directly weakened."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one move operation is required, but it relocates an activity across structural boundaries from inside the accepted branch to the common suffix."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process remains structured and avoids duplicate Report Payment activities. However, the timing of Report Payment in the accepted-order branch changes because it is delayed until after the XOR structure rejoins."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The target location of the repair is immediately before the final Close Bill activity."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_insert_common_report_payment_before_close_bill",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "Close Bill",
+            "new_activity_label": "Report Payment"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The inserted common Report Payment activity occurs before Close Bill in all traces. The original accepted-order Report Payment remains after Receive Payment, so leads_to('Receive Payment','Report Payment') is still satisfied."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "R1 remains satisfied because Report Order is still before Close Bill. Existing branch behavior is preserved and only a common additional reporting activity is added."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one insertion is required."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The structure remains simple, but the accepted-order path will contain two Report Payment activities, which may introduce redundancy or ambiguity."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The change is made immediately before Close Bill near the end of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_rename_rejected_report_to_report_payment",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Report Rejected Order",
+            "new_activity_label": "Report Payment"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "After the rename, Report Payment exists in both exclusive branches before Close Bill. The accepted-order branch still contains Receive Payment followed by Report Payment."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "R1 remains satisfied, but the explicit rejected-order reporting activity is lost, which may weaken the intended rejected-order semantics."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one rename operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The process structure is unchanged."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change affects the rejected-order branch inside the central exclusive choice."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS5_add_rejected_report_to_accepted_branch",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "Report Payment",
+            "new_activity_label": "Report Rejected Order"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Adding Report Rejected Order to the accepted-order branch means Report Rejected Order occurs before Close Bill in every XOR outcome. The existing Receive Payment to Report Payment relation is preserved."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "R1 remains satisfied, but adding a rejected-order report to the accepted-order path may conflict with the intended meaning of the branch."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one localized insertion is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process remains structurally simple, but the added activity may be semantically misleading in the accepted-order branch."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is made inside the accepted-order branch before the process rejoins and reaches Close Bill."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_add_report_payment_to_rejected_branch",
+  "best_resolution_reason": "RS1 is recommended because it fully restores the violated precedence requirement with a single, localized insertion while preserving the existing accepted-order behavior and the context requirement R1. It directly addresses the evidence that Report Payment does not occur in all exclusive branches, without relocating existing activities or duplicating Report Payment in the accepted-order path.",
+  "alternative_suggestion": {
+    "reason": "The intended business rule appears to be branch-dependent: Close Bill should be allowed after Report Payment in the accepted-order branch or after Report Rejected Order in the rejected-order branch. The available compliance patterns and repair operations do not directly express this trace-local disjunction without adding or moving activities.",
+    "conceptual_solution": "Refine the compliance rule into a branch-aware or condition-aware constraint, for example: if data.order.status is true, Close Bill must be preceded by Report Payment; if not data.order.status is true, Close Bill must be preceded by Report Rejected Order. This would preserve the current process behavior without requiring artificial reporting activities in the opposite branch.",
+    "expected_compliance_impact": "This would likely restore compliance conceptually while avoiding unnecessary process changes, but it is outside the supported process change operations."
+  }
+}

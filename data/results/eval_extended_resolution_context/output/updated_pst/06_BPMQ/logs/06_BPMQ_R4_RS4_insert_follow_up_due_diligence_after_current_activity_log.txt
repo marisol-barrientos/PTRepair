@@ -1,0 +1,7 @@
+ChangeOperationValidator: SUCCESS (insert_after)
+{'type': 'insert_after', 'target_activity': 'conduct due diligence study', 'new_activity': 'conduct due diligence study'}
+BehavioralValidator WARNING: Behavioral risk: terminate inside parallel block may cause synchronization anomalies
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Structural WARNING: WARNING: Duplicate label detected: conduct due diligence study
+Execution time (milliseconds): 4.45

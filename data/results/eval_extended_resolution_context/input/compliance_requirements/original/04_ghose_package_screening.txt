@@ -1,0 +1,1 @@
+R1: Packages known to be held by a regulatory authority must not be routed by a sort officer until the package is known to be cleared by the regulatory authority

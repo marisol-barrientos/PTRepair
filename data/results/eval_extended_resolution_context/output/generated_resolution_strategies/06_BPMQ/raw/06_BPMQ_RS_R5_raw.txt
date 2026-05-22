@@ -1,0 +1,21 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_direct_termination_before_rejection_handler",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "handle rejection",
+            "new_activity_label": "terminate"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The inserted terminate activity is placed inside the exclusive branch guarded by condition data.respondent_bank_rating == \"rejected\" and directly before handle rejection. Therefore, whenever the rejected-rating condition is selected, terminate is guaranteed to occur afterwards."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy does not delete or move obtain respondent

@@ -1,0 +1,7 @@
+ChangeOperationValidator: SUCCESS (rename)
+{'type': 'rename', 'target_activity_label': 'Report Rejected Order', 'new_activity_label': 'Report Payment'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Structural WARNING: WARNING: Duplicate label detected: Report Payment
+Execution time (milliseconds): 3.33

@@ -1,0 +1,5 @@
+{
+  "R1": "absence('ask to recheck')",
+  "R2": "precedence('predict risk', 'ask for updates')",
+  "R3": "precedence('check medical history', 'ask for updates')"
+}

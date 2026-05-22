@@ -1,0 +1,6 @@
+ChangeOperationValidator: SUCCESS (embed_post_loop)
+{'type': 'embed_post_loop', 'start_activity_label': 'conduct due diligence study', 'end_activity_label': 'conduct due diligence study', 'condition': 'data.evaluation_extra'}
+BehavioralValidator WARNING: Behavioral risk: terminate inside parallel block may cause synchronization anomalies
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Execution time (milliseconds): 4.39

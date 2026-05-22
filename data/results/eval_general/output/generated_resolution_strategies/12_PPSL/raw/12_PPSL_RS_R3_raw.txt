@@ -1,0 +1,199 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_add_report_payment_to_rejected_branch",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "Report Rejected Order",
+            "new_activity_label": "Report Payment"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "After this change, every execution path reaching \"Close Bill\" contains \"Report Payment\" before it. The accepted branch already contains \"Receive Payment\" followed by \"Report Payment\", and the rejected branch would now also contain \"Report Payment\" before \"Close Bill\". The leads_to requirement from \"Receive Payment\" to \"Report Payment\" remains satisfied."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The change is structurally simple but semantically sensitive: reporting a payment in a rejected-order branch may be acceptable only if \"Report Payment\" can represent a no-payment, cancelled-payment, or zero-balance report. If it strictly means that an actual payment was received, the change weakens business meaning."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one localized insertion is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The existing sequence, XOR structure, and parallel structure remain unchanged. The only impact is one additional activity in the rejected branch."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The change is located near the end of the process, immediately before the common closing activity."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_add_report_rejected_order_to_accepted_branch",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "Report Payment",
+            "new_activity_label": "Report Rejected Order"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "After this change, every path reaching \"Close Bill\" contains \"Report Rejected Order\" before it. The rejected branch already contains it, and the accepted branch would contain it after \"Report Payment\". The leads_to relation from \"Receive Payment\" to \"Report Payment\" remains satisfied."
+        },
+        "resolution_context_consistency": {
+          "value": "low",
+          "reason": "Although the compliance pattern can be satisfied, inserting \"Report Rejected Order\" into the accepted order branch is likely semantically incorrect because accepted and paid orders should not normally be reported as rejected."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one activity insertion is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process structure is preserved, with only one additional activity added to an existing branch."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The change occurs in the payment/reporting part of the accepted branch, close to the final \"Close Bill\" activity."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_move_close_bill_into_outcome_branches",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Close Bill",
+            "new_activity_label": "Close Bill Common"
+          }
+        },
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "Report Payment",
+            "new_activity_label": "Close Bill"
+          }
+        },
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "Report Rejected Order",
+            "new_activity_label": "Close Bill"
+          }
+        },
+        {
+          "operation": "delete",
+          "parameters": {
+            "target_activity_label": "Close Bill Common"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "substantial",
+          "reason": "This makes \"Close Bill\" occur locally inside each XOR outcome branch after the corresponding reporting activity: after \"Report Payment\" in the accepted branch and after \"Report Rejected Order\" in the rejected branch. This better reflects the intended disjunctive precedence rule. However, because the accepted branch contains a parallel block, inserting \"Close Bill\" directly after \"Report Payment\" may place it inside one parallel branch rather than after the whole parallel block, so full structural equivalence to the original closing point is not guaranteed."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy preserves the business distinction between accepted and rejected orders: accepted orders are closed after payment reporting, and rejected orders are closed after rejection reporting. It avoids adding semantically inappropriate reporting activities to the wrong branch."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "Four operations are required: one rename, two insertions, and one deletion."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The common post-XOR closing activity is replaced by branch-specific closing activities. This may improve branch-local compliance but duplicates \"Close Bill\" and may affect synchronization with the accepted branch's parallel activities."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "All modifications occur near the reporting and billing closure portion of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_remove_rejected_order_branch",
+      "change_operations": [
+        {
+          "operation": "remove_branch",
+          "parameters": {
+            "target_activity_label": "Report Rejected Order"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Removing the rejected-order branch leaves only the accepted-order path, where \"Receive Payment\" is followed by \"Report Payment\" and \"Report Payment\" occurs before \"Close Bill\"."
+        },
+        "resolution_context_consistency": {
+          "value": "low",
+          "reason": "The process would no longer handle rejected orders, which is likely an essential business scenario."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "Only one operation is needed, but it removes an entire behavioral branch rather than adding or relocating a single activity."
+        },
+        "structural_quality_impact": {
+          "value": "high",
+          "reason": "The XOR structure is significantly weakened or potentially made redundant because one of its branches is removed."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The removed branch is part of the central exclusive decision structure based on order status."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS5_remove_accepted_order_branch",
+      "change_operations": [
+        {
+          "operation": "remove_branch",
+          "parameters": {
+            "target_activity_label": "Receive Payment"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Removing the accepted-order branch leaves only the rejected-order path, where \"Report Rejected Order\" occurs before \"Close Bill\". The leads_to requirement from \"Receive Payment\" to \"Report Payment\" becomes vacuously satisfied because \"Receive Payment\" no longer occurs."
+        },
+        "resolution_context_consistency": {
+          "value": "low",
+          "reason": "This eliminates the normal order fulfillment and payment path, which is likely the primary business scenario."
+        },
+        "change_cost": {
+          "value": "high",
+          "reason": "Although expressed as one operation, it removes a large and important branch containing fulfillment, invoicing, payment, and reporting activities."
+        },
+        "structural_quality_impact": {
+          "value": "high",
+          "reason": "The main accepted-order behavior and the parallel production/payment structure are removed, substantially degrading the process model."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change affects the main XOR branch selected after the order-status decision."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_add_report_payment_to_rejected_branch",
+  "best_resolution_reason": "RS1 is the recommended strategy because it fully restores the detected compliance requirement with the smallest and most localized change. It preserves the existing XOR and parallel structures and does not remove any business path. Its main caveat is semantic: \"Report Payment\" in the rejected branch should be interpreted as reporting payment status, no payment due, or zero-balance closure rather than reporting an actual received payment.",
+  "alternative_suggestion": {
+    "reason": "The ideal repair would place a single common \"Close Bill\" after the XOR while explicitly expressing that either \"Report Payment\" or \"Report Rejected Order\" is sufficient as a branch-dependent prerequisite. The provided operations do not support adding a declarative disjunctive guard or annotating an activity with alternative branch-specific preconditions.",
+    "conceptual_solution": "Introduce an explicit branch-aware rule or gateway condition before \"Close Bill\" stating that billing may close only if either the accepted branch completed with \"Report Payment\" or the rejected branch completed with \"Report Rejected Order\". Alternatively, refine the compliance checker to recognize that the existing XOR branches jointly satisfy the disjunctive precedence requirement per trace.",
+    "expected_compliance_impact": "This would preserve the current process behavior and should fully satisfy the intended compliance semantics without adding semantically questionable activities."
+  }
+}

@@ -1,0 +1,6 @@
+ChangeOperationValidator: SUCCESS (remove_branch_by_condition)
+{'type': 'remove_branch_by_condition', 'target_condition': 'data.conflicts == "true"'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Execution time (milliseconds): 2.12

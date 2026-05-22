@@ -1,0 +1,6 @@
+ChangeOperationValidator: SUCCESS (swap)
+{'type': 'swap', 'first_activity_label': 'Enter New Customer Information', 'second_activity_label': 'Identity Check'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Execution time (milliseconds): 3.67

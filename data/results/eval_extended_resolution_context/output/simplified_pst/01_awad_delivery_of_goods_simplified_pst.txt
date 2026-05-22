@@ -1,0 +1,16 @@
+sequence
+  go to checkout
+  parallel (wait=-1, cancel=last)
+    exclusive
+      sequence (cond: payment_type == "bank transfer")
+        provide bank data
+        pay by bank transfer
+      sequence (cond: not (payment_type == "bank transfer"))
+        provide credit card data
+        pay by credit card
+        notify customer
+    sequence
+      provide shipping address
+      pack goods
+  send goods
+terminate

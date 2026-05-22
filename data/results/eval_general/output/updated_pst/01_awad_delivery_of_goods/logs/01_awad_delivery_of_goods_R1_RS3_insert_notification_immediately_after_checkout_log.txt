@@ -1,0 +1,7 @@
+ChangeOperationValidator: SUCCESS (insert_after)
+{'type': 'insert_after', 'target_activity': 'go to checkout', 'new_activity': 'notify customer'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Structural WARNING: WARNING: Duplicate label detected: notify customer
+Execution time (milliseconds): 3.04

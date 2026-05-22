@@ -1,0 +1,3 @@
+ChangeOperationValidator: SUCCESS (remove_branch_by_condition)
+APPLICATION FAILED: No alternative found with target_condition 'not (not data.evaluation)'
+Execution time (milliseconds): 0.26

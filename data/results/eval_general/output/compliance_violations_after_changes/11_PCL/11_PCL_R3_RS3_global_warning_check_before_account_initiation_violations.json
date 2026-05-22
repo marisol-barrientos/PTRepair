@@ -1,0 +1,38 @@
+[
+    {
+        "requirement_id": "R1",
+        "requirement": "condition_eventually_follows (tree, 'data.state == \"new\"', 'identity check')",
+        "assurance": 90,
+        "evidence": [
+            "Activity \"identity check\" was found on branch following condition \"data.state == \"new\"\"",
+            "Found 2 calls that influence condition \"data.state == \"new\"\". Checking if both are prior to branch",
+            "Found a call \"send warning\" that is not prior to the identified branch, so compliance can be violated if said call can cause the condition to evaluate to true"
+        ]
+    },
+    {
+        "requirement_id": "R3",
+        "requirement": "condition_directly_follows (tree, 'data.balance < 0 and not data.special_allowance', 'send warning')",
+        "assurance": 100,
+        "evidence": [
+            "Activity \"Accept Initial Deposit\" does not directly follow \"Customer Request Arrives\"",
+            "Activity \"send warning\" directly follows Activity \"Accept Initial Deposit\" is True",
+            "Found 2 calls that influence condition \"data.balance < 0 and not data.special_allowance\". Checking for a directly following branch for each",
+            "Branch was found which matches to data.balance<0andnotdata.special_allowance",
+            "Found no branch which matches to data.balance<0andnotdata.special_allowance",
+            "Checking for all data impact and branch pairs",
+            "Pair 0:",
+            "Pair 1:",
+            "If we got here something went wrong in condition_directly_follows"
+        ]
+    },
+    {
+        "requirement_id": "R4",
+        "requirement": "condition_eventually_follows (tree, 'data.special_allowance', 'Accept Empty Initial Balance')",
+        "assurance": 90,
+        "evidence": [
+            "Activity \"Accept Empty Initial Balance\" was found on branch following condition \"data.special_allowance\"",
+            "Found 2 calls that influence condition \"data.special_allowance\". Checking if both are prior to branch",
+            "Found a call \"send warning\" that is not prior to the identified branch, so compliance can be violated if said call can cause the condition to evaluate to true"
+        ]
+    }
+]

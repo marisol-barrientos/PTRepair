@@ -1,0 +1,74 @@
+scenario,requirement_id,strategy_id,strategy_applied,validation_status,warnings_detected,change_operation_validator,behavioral_validator,pst_validator,structural_validator,applied_operations,execution_time_ms,failure_message
+16_Zasadaetal23,R2,RS1_add_customer_brochures_write_to_existing_activity,YES,WARNING,YES,SUCCESS,SUCCESS,SUCCESS,SUCCESS,add_write,5.5,
+16_Zasadaetal23,R2,RS2_rename_and_add_customer_brochures_write,YES,WARNING,YES,SUCCESS,SUCCESS,SUCCESS,SUCCESS,rename | add_write,10.61,
+16_Zasadaetal23,R2,RS3_insert_explicit_send_customer_brochures_activity,YES,WARNING,YES,SUCCESS,SUCCESS,SUCCESS,SUCCESS,insert_after | modify_resource | add_write,18.41,
+16_Zasadaetal23,R2,RS4_partial_rename_only,YES,WARNING,YES,SUCCESS,SUCCESS,SUCCESS,SUCCESS,rename,5.86,
+16_Zasadaetal23,R3,RS1_copy_send_to_existing_customer_branch,YES,WARNING,YES,SUCCESS,SUCCESS,SUCCESS,SUCCESS,copy_after,6.3,
+16_Zasadaetal23,R3,RS2_move_send_after_customer_status_xor,YES,WARNING,YES,SUCCESS,SUCCESS,SUCCESS,SUCCESS,move_before,5.71,
+16_Zasadaetal23,R3,RS3_remove_existing_customer_branch,YES,WARNING,YES,SUCCESS,SUCCESS,SUCCESS,SUCCESS,remove_branch,5.63,
+16_Zasadaetal23,R5,RS1_conditional_common_path_legitimation,YES,WARNING,YES,SUCCESS,SUCCESS,SUCCESS,SUCCESS,insert_before | modify_resource | embed_activity_in_xor,18.94,
+16_Zasadaetal23,R5,RS2_unconditional_before_custody_account,YES,WARNING,YES,SUCCESS,SUCCESS,SUCCESS,SUCCESS,insert_before | modify_resource,11.91,
+16_Zasadaetal23,R5,RS3_conditional_before_custody_account,YES,WARNING,YES,SUCCESS,SUCCESS,SUCCESS,SUCCESS,insert_before | modify_resource | embed_activity_in_xor,16.9,
+07_CRL,R1,RS1_insert_email_before_credit_check_and_parallelize,YES,SUCCESS,NO,SUCCESS,SUCCESS,SUCCESS,SUCCESS,insert_before | parallelize,10.81,
+07_CRL,R1,RS2_insert_email_after_credit_check_and_parallelize,YES,SUCCESS,NO,SUCCESS,SUCCESS,SUCCESS,SUCCESS,insert_after | parallelize,11.3,
+07_CRL,R1,RS3_insert_email_before_risk_evaluation_then_move_and_parallelize,YES,SUCCESS,NO,SUCCESS,SUCCESS,SUCCESS,SUCCESS,insert_before | move_before | parallelize,18.11,
+07_CRL,R3,RS1_rename_bank_privilege_check,YES,SUCCESS,NO,SUCCESS,SUCCESS,SUCCESS,SUCCESS,rename,5.35,
+07_CRL,R3,RS2_insert_standardized_bank_privilege_check_alias,YES,SUCCESS,NO,SUCCESS,SUCCESS,SUCCESS,SUCCESS,insert_after | modify_resource,11.55,
+07_CRL,R3,RS3_replace_bank_privilege_check_with_standardized_activity,YES,SUCCESS,NO,SUCCESS,SUCCESS,SUCCESS,SUCCESS,insert_before | modify_resource | add_write | delete,23.47,
+07_CRL,R4,RS1_minimal_rename_and_resource_alignment,YES,SUCCESS,NO,SUCCESS,SUCCESS,SUCCESS,SUCCESS,rename | modify_resource | rename,25.02,
+07_CRL,R4,RS2_context_preserving_conditional_manager_review,YES,SUCCESS,NO,SUCCESS,SUCCESS,SUCCESS,SUCCESS,insert_after | modify_resource | embed_activity_in_xor | rename,34.84,
+07_CRL,R4,RS3_partial_resource_and_signing_fix_without_risk_label_change,YES,SUCCESS,NO,SUCCESS,SUCCESS,SUCCESS,SUCCESS,modify_resource | rename,11.34,
+07_CRL,R6,RS1_rename_existing_activity_to_required_label,NO,ERROR,NO,SUCCESS,NOT_EXECUTED,NOT_EXECUTED,NOT_EXECUTED,,0.65,No node found with label 'Assign post processing to supervisor'
+07_CRL,R6,RS2_insert_required_activity_after_existing_assignment_then_delete_old_label,NO,ERROR,NO,SUCCESS,NOT_EXECUTED,NOT_EXECUTED,NOT_EXECUTED,,0.55,No node found with label 'Assign post processing to supervisor'
+07_CRL,R6,RS3_insert_required_activity_before_credit_worthiness_check,YES,SUCCESS,NO,SUCCESS,SUCCESS,SUCCESS,SUCCESS,insert_before,5.61,
+11_PCL,R3,RS1_local_conditional_warning_after_initial_deposit,YES,SUCCESS,NO,SUCCESS,SUCCESS,SUCCESS,SUCCESS,insert_after | embed_activity_in_xor,6.98,
+11_PCL,R3,RS2_conditional_warning_before_account_initiation,YES,SUCCESS,NO,SUCCESS,SUCCESS,SUCCESS,SUCCESS,insert_before | embed_activity_in_xor,9.04,
+11_PCL,R3,RS3_split_initial_balance_branch_with_warning_alternative,NO,ERROR,NO,SUCCESS,NOT_EXECUTED,NOT_EXECUTED,NOT_EXECUTED,,0.52,No enclosing <alternative> found for 'Accept Initial Deposit'
+11_PCL,R3,RS4_preserve_initial_deposit_after_warning_in_negative_balance_case,NO,ERROR,NO,SUCCESS,NOT_EXECUTED,NOT_EXECUTED,NOT_EXECUTED,,0.46,No enclosing <alternative> found for 'Accept Initial Deposit'
+11_PCL,R3,RS5_add_warning_branch_without_disambiguating_existing_branch,NO,ERROR,NO,SUCCESS,NOT_EXECUTED,NOT_EXECUTED,NOT_EXECUTED,,0.27,No XOR found containing condition 'not (data.special_allowance)'
+11_PCL,R4,RS1_relocate_special_allowance_write,YES,SUCCESS,NO,SUCCESS,SUCCESS,SUCCESS,SUCCESS,remove_write | add_write,6.41,
+11_PCL,R4,RS2_move_accept_empty_balance_before_state_choice,YES,SUCCESS,NO,SUCCESS,SUCCESS,SUCCESS,SUCCESS,move_after | embed_activity_in_xor,6.63,
+11_PCL,R4,RS3_remove_early_special_allowance_write_only,YES,SUCCESS,NO,SUCCESS,SUCCESS,SUCCESS,SUCCESS,remove_write,3.12,
+06_BPMQ,R2,RS1_copy_blacklist_after_failed_due_diligence_lookup,YES,WARNING,YES,SUCCESS,WARNING,SUCCESS,SUCCESS,copy_after,4.56,
+06_BPMQ,R2,RS2_copy_blacklist_immediately_after_due_diligence,YES,WARNING,YES,SUCCESS,WARNING,SUCCESS,SUCCESS,copy_after,4.97,
+06_BPMQ,R2,RS3_make_blacklisting_unconditional_after_initial_screening,NO,ERROR,NO,SUCCESS,NOT_EXECUTED,NOT_EXECUTED,NOT_EXECUTED,,0.26,No alternative found with target_condition 'not (not data.evaluation)'
+06_BPMQ,R2,RS4_remove_evaluation_write_from_due_diligence,YES,WARNING,YES,SUCCESS,WARNING,SUCCESS,SUCCESS,remove_write,3.96,
+06_BPMQ,R4,RS1_remove_self_write_of_evaluation_extra,YES,WARNING,YES,SUCCESS,WARNING,SUCCESS,SUCCESS,remove_write,3.82,
+06_BPMQ,R4,RS2_modify_due_diligence_write_to_reset_evaluation_extra,YES,WARNING,YES,SUCCESS,WARNING,SUCCESS,SUCCESS,modify_write,4.47,
+06_BPMQ,R4,RS3_wrap_due_diligence_in_post_condition_loop,YES,WARNING,YES,SUCCESS,WARNING,SUCCESS,SUCCESS,embed_post_loop,4.39,
+06_BPMQ,R4,RS4_insert_follow_up_due_diligence_after_current_activity,YES,WARNING,YES,SUCCESS,WARNING,SUCCESS,SUCCESS,insert_after,4.45,
+06_BPMQ,R6,RS1_move_certificate_check_before_exclusive,YES,WARNING,YES,SUCCESS,WARNING,SUCCESS,SUCCESS,move_after,4.62,
+06_BPMQ,R6,RS2_copy_certificate_check_before_open_account,YES,WARNING,YES,SUCCESS,WARNING,SUCCESS,SUCCESS,copy_before,4.49,
+06_BPMQ,R6,RS3_restrict_open_account_to_certificate_checked_path,YES,WARNING,YES,SUCCESS,WARNING,SUCCESS,SUCCESS,modify_condition,3.91,
+06_BPMQ,R6,RS4_copy_certificate_check_after_identification,YES,WARNING,YES,SUCCESS,WARNING,SUCCESS,SUCCESS,copy_after,4.62,
+12_PPSL,R2,RS1_insert_production_step_before_quality_check,YES,SUCCESS,NO,SUCCESS,SUCCESS,SUCCESS,SUCCESS,insert_after,3.78,
+12_PPSL,R2,RS2_insert_production_step_directly_before_test_quality,YES,SUCCESS,NO,SUCCESS,SUCCESS,SUCCESS,SUCCESS,insert_before,3.64,
+12_PPSL,R2,RS3_rename_existing_production_activity,YES,SUCCESS,NO,SUCCESS,SUCCESS,SUCCESS,SUCCESS,rename,3.41,
+12_PPSL,R2,RS4_add_quality_check_immediately_before_shipping_and_add_production_step,YES,WARNING,YES,SUCCESS,SUCCESS,SUCCESS,SUCCESS,insert_after | copy_before,9.1,
+12_PPSL,R3,RS1_add_report_payment_to_rejected_branch,YES,WARNING,YES,SUCCESS,SUCCESS,SUCCESS,SUCCESS,insert_after,3.99,
+12_PPSL,R3,RS2_move_report_payment_before_close_bill,YES,SUCCESS,NO,SUCCESS,SUCCESS,SUCCESS,SUCCESS,move_before,3.98,
+12_PPSL,R3,RS3_insert_common_report_payment_before_close_bill,YES,WARNING,YES,SUCCESS,SUCCESS,SUCCESS,SUCCESS,insert_before,3.77,
+12_PPSL,R3,RS4_rename_rejected_report_to_report_payment,YES,WARNING,YES,SUCCESS,SUCCESS,SUCCESS,SUCCESS,rename,3.33,
+12_PPSL,R3,RS5_add_rejected_report_to_accepted_branch,YES,WARNING,YES,SUCCESS,SUCCESS,SUCCESS,SUCCESS,insert_after,3.61,
+12_PPSL,R4,RS1_remove_rejected_branch,YES,SUCCESS,NO,SUCCESS,SUCCESS,SUCCESS,SUCCESS,remove_branch,3.36,
+12_PPSL,R4,RS2_remove_rejected_branch_by_condition,NO,ERROR,NO,SUCCESS,NOT_EXECUTED,NOT_EXECUTED,NOT_EXECUTED,,0.28,No alternative found with target_condition 'not (data.order.status)'
+12_PPSL,R4,RS3_move_ship_and_invoice_after_exclusive,YES,SUCCESS,NO,SUCCESS,SUCCESS,SUCCESS,SUCCESS,move_before | move_before,7.78,
+12_PPSL,R4,RS4_disable_rejected_branch_condition,NO,ERROR,NO,SUCCESS,NOT_EXECUTED,NOT_EXECUTED,NOT_EXECUTED,,0.57,No enclosing <alternative> found for 'Report Rejected Order'
+08_DCR,R2,RS1_insert_generic_diagnosis_after_verify_symptoms,YES,SUCCESS,NO,SUCCESS,SUCCESS,SUCCESS,SUCCESS,insert_after,2.92,
+08_DCR,R2,RS2_insert_diagnosis_in_each_main_branch,NO,ERROR,NO,SUCCESS,SUCCESS,SUCCESS,SUCCESS,insert_before,3.26,No node found with label 'terminate'
+08_DCR,R2,RS3_rename_existing_specific_diagnoses,YES,WARNING,YES,SUCCESS,SUCCESS,SUCCESS,SUCCESS,rename | rename,5.35,
+05_loebbecke_blood_collection,R6,RS1_preserve_rejection_in_direct_questions,YES,WARNING,YES,SUCCESS,WARNING,SUCCESS,SUCCESS,modify_write,3.36,
+05_loebbecke_blood_collection,R6,RS2_prevent_conduct_interview_from_setting_rejected,YES,WARNING,YES,SUCCESS,WARNING,SUCCESS,SUCCESS,modify_write,3.66,
+05_loebbecke_blood_collection,R6,RS3_separate_preliminary_and_final_assessment_status,YES,WARNING,YES,SUCCESS,WARNING,SUCCESS,SUCCESS,modify_write,3.7,
+05_loebbecke_blood_collection,R6,RS4_skip_direct_questions_when_rejection_already_exists,YES,WARNING,YES,SUCCESS,WARNING,SUCCESS,SUCCESS,embed_activity_in_xor,3.94,
+05_loebbecke_blood_collection,R6,RS5_remove_assessment_status_write_from_conduct_interview,YES,WARNING,YES,SUCCESS,WARNING,SUCCESS,SUCCESS,remove_write,3.81,
+09_HaarmannetAL2021,R1,RS1_modify_default_rejection_branch,NO,ERROR,NO,SUCCESS,NOT_EXECUTED,NOT_EXECUTED,NOT_EXECUTED,,0.37,No node found with label 'terminate'
+09_HaarmannetAL2021,R1,RS2_explicit_rejection_and_preserve_other_nonaccepted,NO,ERROR,NO,SUCCESS,NOT_EXECUTED,NOT_EXECUTED,NOT_EXECUTED,,0.32,No node found with label 'terminate'
+09_HaarmannetAL2021,R1,RS3_add_rejection_branch_only,YES,SUCCESS,NO,SUCCESS,SUCCESS,SUCCESS,SUCCESS,add_xor_branch,3.27,
+09_HaarmannetAL2021,R1,RS4_add_rejection_branch_and_remove_generic_nonaccepted_branch,NO,ERROR,NO,SUCCESS,SUCCESS,SUCCESS,SUCCESS,add_xor_branch,3.49,"No alternative found with target_condition 'not (data.status == ""accepted"")'"
+15_WinteretAlER,R2,RS1_rename_existing_activity_to_required_label,YES,SUCCESS,NO,SUCCESS,SUCCESS,SUCCESS,SUCCESS,rename,2.27,
+15_WinteretAlER,R2,RS2_insert_required_activity_after_existing_screen_lock,YES,SUCCESS,NO,SUCCESS,SUCCESS,SUCCESS,SUCCESS,insert_after,2.26,
+15_WinteretAlER,R2,RS3_insert_required_activity_before_access_requested,YES,SUCCESS,NO,SUCCESS,SUCCESS,SUCCESS,SUCCESS,insert_before,2.52,
+15_WinteretAlER,R3,RS1_rename_wait_for_user_input,YES,SUCCESS,NO,SUCCESS,SUCCESS,SUCCESS,SUCCESS,rename,2.17,
+15_WinteretAlER,R3,RS2_insert_user_input_after_wait,YES,SUCCESS,NO,SUCCESS,SUCCESS,SUCCESS,SUCCESS,insert_after,2.58,
+15_WinteretAlER,R3,RS3_copy_wait_for_user_input_after_timeout_branch,NO,ERROR,YES,SUCCESS,SUCCESS,SUCCESS,SUCCESS,copy_after,2.87,"Ambiguous label 'wait for user input' found in nodes ['a8', 'n_4160cf']"

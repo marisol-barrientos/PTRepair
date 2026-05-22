@@ -1,0 +1,136 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_insert_email_before_credit_check_and_parallelize",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "Check Credit Worthiness",
+            "new_activity_label": "send automated email"
+          }
+        },
+        {
+          "operation": "parallelize",
+          "parameters": {
+            "first_activity_label": "send automated email",
+            "second_activity_label": "Check Credit Worthiness"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The missing activity \"send automated email\" is introduced and then placed in a parallel branch with \"Check Credit Worthiness\", directly satisfying the required parallel relationship."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The repair is localized around \"Check Credit Worthiness\" and does not change the ordering between \"Check Customer Bank Privilege\", \"Check Credit Worthiness\", and \"Evaluate LoanRisk\". Therefore, the existing precedence and leads-to requirements remain preserved."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only two localized operations are required: inserting the missing activity and parallelizing it with the existing credit-worthiness check."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The strategy introduces a small parallel block at the exact location required by the violation. It adds limited structural complexity but does not affect unrelated branches."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The modification occurs in the valid bank-information branch, around the credit-worthiness evaluation stage, which is in the middle of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_insert_email_after_credit_check_and_parallelize",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "Check Credit Worthiness",
+            "new_activity_label": "send automated email"
+          }
+        },
+        {
+          "operation": "parallelize",
+          "parameters": {
+            "first_activity_label": "Check Credit Worthiness",
+            "second_activity_label": "send automated email"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The missing \"send automated email\" activity is added and transformed into a parallel branch with \"Check Credit Worthiness\", satisfying the parallel compliance requirement."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The change preserves the required order that \"Evaluate LoanRisk\" occurs after \"Check Credit Worthiness\" and after the customer bank privilege check. It also does not introduce the prohibited condition-related behavior from the context requirements."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The strategy requires two simple operations and affects only the immediate neighborhood of the violated activity."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "A small parallel block is introduced. The surrounding sequence and decision logic remain unchanged."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The modification is made in the credit assessment section, which is located in the middle of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_insert_email_before_risk_evaluation_then_move_and_parallelize",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "Evaluate LoanRisk",
+            "new_activity_label": "send automated email"
+          }
+        },
+        {
+          "operation": "move_before",
+          "parameters": {
+            "source_activity_label": "send automated email",
+            "target_activity_label": "Check Credit Worthiness"
+          }
+        },
+        {
+          "operation": "parallelize",
+          "parameters": {
+            "first_activity_label": "send automated email",
+            "second_activity_label": "Check Credit Worthiness"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "After insertion, relocation, and parallelization, \"send automated email\" executes in parallel with \"Check Credit Worthiness\"."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "Although the strategy performs an additional movement, the final placement still keeps \"Check Credit Worthiness\" after the customer bank privilege check and before \"Evaluate LoanRisk\". The context requirements are preserved."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "This strategy uses three operations instead of the two needed by more direct repairs, making it more costly."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The final structure is still a localized parallel block around the credit-worthiness check. However, the intermediate move operation makes it less direct than the simpler alternatives."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "All changes occur in the middle credit assessment and risk evaluation portion of the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_insert_email_before_credit_check_and_parallelize",
+  "best_resolution_reason": "RS1 is recommended because it fully restores compliance with the parallel requirement using only two localized operations. It introduces the missing activity directly adjacent to \"Check Credit Worthiness\" and then parallelizes the two activities, while preserving the existing precedence and leads-to context requirements."
+}

@@ -1,0 +1,6 @@
+ChangeOperationValidator: SUCCESS (rename)
+{'type': 'rename', 'target_activity_label': 'wait for user input', 'new_activity_label': 'user input'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Execution time (milliseconds): 1.99

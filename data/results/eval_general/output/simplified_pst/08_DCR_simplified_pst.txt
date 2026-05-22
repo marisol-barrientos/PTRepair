@@ -1,0 +1,18 @@
+loop (cond: status == bad) (mode=pre_test, cond=status == bad)
+  consult
+  verify symptoms (write: cough, fever, throat)
+  exclusive
+    sequence (cond: data.throat)
+      exclusive
+        sequence (cond: data.cough)
+          diagnosis: cold
+          treatment: paracetamol
+        sequence (cond: not (data.cough))
+          exclusive
+            sequence (cond: data.fever)
+              diagnosis: strep throat
+              treatment: amoxicilin
+            sequence (cond: not (data.fever))
+      Wait for Patient Callback or Timeout (write: status)
+    sequence (cond: not (data.throat))
+terminate

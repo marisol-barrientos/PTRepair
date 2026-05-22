@@ -1,0 +1,19 @@
+{
+    "scenario_name": "12_PPSL",
+    "pst_file": "12_PPSL_R4_RS1_remove_rejected_branch.xml",
+    "verified_violation_requirements": [
+        "R2",
+        "R3",
+        "R4"
+    ],
+    "verified_resolution_context_requirements": [
+        "R1"
+    ],
+    "all_verified_requirements": [
+        "R2",
+        "R3",
+        "R4",
+        "R1"
+    ],
+    "violation_report": []
+}

@@ -1,0 +1,17 @@
+{
+    "scenario_name": "08_DCR",
+    "pst_file": "08_DCR_R2_RS1_insert_generic_diagnosis_after_verify_symptoms.xml",
+    "verified_violation_requirements": [
+        "R2"
+    ],
+    "verified_resolution_context_requirements": [
+        "R1",
+        "R3"
+    ],
+    "all_verified_requirements": [
+        "R2",
+        "R1",
+        "R3"
+    ],
+    "violation_report": []
+}

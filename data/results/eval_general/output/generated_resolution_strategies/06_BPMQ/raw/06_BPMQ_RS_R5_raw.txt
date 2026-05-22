@@ -1,0 +1,169 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_explicit_final_rejection_gate",
+      "change_operations": [
+        {
+          "operation": "remove_branch_by_condition",
+          "parameters": {
+            "target_condition": "not (data.record or (data.eval and data.rating))"
+          }
+        },
+        {
+          "operation": "modify_condition",
+          "parameters": {
+            "target_activity_label": "open bank account",
+            "new_condition": "not (data.respondent_bank_rating == \"rejected\") and (data.record or (data.eval and data.rating))"
+          }
+        },
+        {
+          "operation": "add_xor_branch",
+          "parameters": {
+            "existing_branch_condition": "not (data.respondent_bank_rating == \"rejected\") and (data.record or (data.eval and data.rating))",
+            "new_branch_condition": "data.respondent_bank_rating == \"rejected\"",
+            "new_activity_label": "terminate"
+          }
+        },
+        {
+          "operation": "add_xor_branch",
+          "parameters": {
+            "existing_branch_condition": "not (data.respondent_bank_rating == \"rejected\") and (data.record or (data.eval and data.rating))",
+            "new_branch_condition": "not (data.respondent_bank_rating == \"rejected\") and not (data.record or (data.eval and data.rating))",
+            "new_activity_label": "terminate"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The final account-opening decision is made mutually exclusive with the rejected-rating condition. If data.respondent_bank_rating == \"rejected\" holds after the rating review, the process is explicitly routed to terminate, ensuring that terminate eventually follows the rejected condition."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The repair is consistent with the existing business logic: a rejected respondent bank rating should prevent account opening and lead to termination. The existing non-eligible termination behavior is preserved in a separate branch."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "The strategy requires four localized control-flow changes in the final XOR decision. It is more costly than simply adding one branch, but it avoids overlapping XOR conditions and preserves structural correctness."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The strategy keeps the process structured and only refines the final exclusive decision. It introduces one additional explicit rejection branch but avoids ambiguity by making the XOR conditions mutually exclusive."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The modifications are applied near the final decision point after the annual-report analysis and rating review."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_add_rejection_termination_branch_only",
+      "change_operations": [
+        {
+          "operation": "add_xor_branch",
+          "parameters": {
+            "existing_branch_condition": "data.record or (data.eval and data.rating)",
+            "new_branch_condition": "data.respondent_bank_rating == \"rejected\"",
+            "new_activity_label": "terminate"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "substantial",
+          "reason": "The strategy adds an explicit branch that terminates the process when the rejected-rating condition holds. However, because the existing open-account condition is not modified, there may still be overlapping XOR conditions if data.record or the positive evaluation condition is also true."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The added branch is semantically appropriate, but the final XOR may become ambiguous when multiple conditions evaluate to true."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one process change operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The repair is simple but may introduce overlapping XOR branch conditions, reducing the clarity and determinism of the decision structure."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The change is applied at the final account-opening decision point."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_sequentialize_rating_review_after_analysis",
+      "change_operations": [
+        {
+          "operation": "sequentialize_parallel",
+          "parameters": {
+            "first_activity_label": "analyze respondent bank annual report",
+            "second_activity_label": "Review Respondent Bank rating"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "substantial",
+          "reason": "Sequentializing the annual-report analysis and rating review removes the parallel context that may cause the rejected condition and the terminating branch to be interpreted as not reliably ordered. The existing rejected-rating branch still contains handle rejection followed by terminate."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The repair keeps the existing rejection-handling logic intact, but it changes the execution semantics by removing parallelism between report analysis and rating review."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one structural operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The process remains structured, but the removal of parallelism may reduce efficiency and alter the intended timing of the annual-report analysis and rating review."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is applied in the annual-report assessment fragment, before the final account-opening decision."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_remove_intermediate_rejection_handling",
+      "change_operations": [
+        {
+          "operation": "delete",
+          "parameters": {
+            "target_activity_label": "handle rejection"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "partial",
+          "reason": "Deleting handle rejection makes terminate occur immediately in the rejected branch, which may help satisfy a stricter interpretation of eventual termination after the rejected condition. However, it does not address the broader ordering concern noted in the violation evidence and removes a meaningful business activity."
+        },
+        "resolution_context_consistency": {
+          "value": "low",
+          "reason": "The repair weakens the business process by eliminating rejection handling, which is likely required before termination."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one activity deletion is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process structure remains simple, but the business semantics are degraded because rejection handling is lost."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is applied inside the rating-review rejection branch."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_explicit_final_rejection_gate",
+  "best_resolution_reason": "RS1 is recommended because it provides the strongest compliance restoration while preserving the intended business semantics. It explicitly prevents account opening when the respondent bank rating is rejected and guarantees a terminating path after the rejected condition. Although it requires more operations than the simpler alternatives, it keeps the XOR decision structurally clean by avoiding overlapping branch conditions.",
+  "alternative_suggestion": {
+    "reason": "The provided operations do not support adding a formal boundary error event, escalation event, or explicit timeout/exception handler attached directly to the rating-review decision.",
+    "conceptual_solution": "Introduce a dedicated rejection-end event or exception transition directly associated with the rating-review XOR gateway, ensuring that whenever data.respondent_bank_rating == \"rejected\" becomes true, the process immediately follows a mandatory rejection-handling and termination path.",
+    "expected_compliance_impact": "This would fully satisfy the condition_eventually_follows requirement and make the compliance intent explicit at the modeling level."
+  }
+}

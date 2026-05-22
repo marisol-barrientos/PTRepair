@@ -1,0 +1,16 @@
+ChangeOperationValidator: SUCCESS (insert_before)
+{'type': 'insert_before', 'target_activity': 'Evaluate LoanRisk', 'new_activity': 'send automated email'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+ChangeOperationValidator: SUCCESS (move_before)
+{'type': 'move_before', 'source_activity_label': 'send automated email', 'target_activity_label': 'Check Credit Worthiness'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+ChangeOperationValidator: SUCCESS (parallelize)
+{'type': 'parallelize', 'first_activity_label': 'send automated email', 'second_activity_label': 'Check Credit Worthiness'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Execution time (milliseconds): 18.11

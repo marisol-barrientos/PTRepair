@@ -1,0 +1,6 @@
+ChangeOperationValidator: SUCCESS (move_before)
+{'type': 'move_before', 'source_activity_label': 'Report Payment', 'target_activity_label': 'Close Bill'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Execution time (milliseconds): 3.98

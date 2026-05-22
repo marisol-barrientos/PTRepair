@@ -1,0 +1,35 @@
+{
+    "scenario_name": "15_WinteretAlER",
+    "pst_file": "15_WinteretAlER_R3_RS3_copy_wait_for_user_input_after_timeout_branch.xml",
+    "verified_violation_requirements": [
+        "R2",
+        "R3"
+    ],
+    "verified_resolution_context_requirements": [
+        "R1"
+    ],
+    "all_verified_requirements": [
+        "R2",
+        "R3",
+        "R1"
+    ],
+    "violation_report": [
+        {
+            "requirement_id": "R2",
+            "requirement": "exists (tree, 'activate screeen lock')",
+            "assurance": 100,
+            "evidence": [
+                "Activity \"activate screeen lock\" existence was checked but not found"
+            ]
+        },
+        {
+            "requirement_id": "R3",
+            "requirement": "exists (tree, 'automatic screen lock') and timed_alternative (tree, 'automatic screen lock', 'user input', 60)",
+            "assurance": 100,
+            "evidence": [
+                "Activity \"user input\" existence was checked but not found",
+                "Activity \"user input\" is missing so the timed_alternative relationship is False"
+            ]
+        }
+    ]
+}

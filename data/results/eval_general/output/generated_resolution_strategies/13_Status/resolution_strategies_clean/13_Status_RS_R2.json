@@ -1,0 +1,203 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_add_missing_data_and_align_analyse_resource",
+      "change_operations": [
+        {
+          "operation": "add_write",
+          "parameters": {
+            "target_activity_label": "Create resolution proposal",
+            "added_statement": "resolution_proposal"
+          }
+        },
+        {
+          "operation": "add_write",
+          "parameters": {
+            "target_activity_label": "Generate consultative report",
+            "added_statement": "report_cb"
+          }
+        },
+        {
+          "operation": "add_write",
+          "parameters": {
+            "target_activity_label": "generate legal report",
+            "added_statement": "report_ld"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "Analyse reports",
+            "new_resource": "Tech.MD Position"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The already-satisfied ordering and existence constraints are preserved. The missing data objects are added to the relevant activities, and the resource of 'Analyse reports' is aligned with 'Create resolution proposal'."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy preserves the original control-flow structure and only corrects missing data outputs and an apparent resource-label inconsistency between 'Tech. MD Position' and 'Tech.MD Position'."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "Four localized attribute-level changes are required, but no activity is moved, deleted, or structurally reorganized."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The process structure remains unchanged; only data write annotations and one resource assignment are modified."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The changes affect the initial proposal activity, the two parallel report-generation activities, and the subsequent analysis activity, with most changes concentrated around the reporting and analysis segment."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_add_missing_data_and_align_create_resource",
+      "change_operations": [
+        {
+          "operation": "add_write",
+          "parameters": {
+            "target_activity_label": "Create resolution proposal",
+            "added_statement": "resolution_proposal"
+          }
+        },
+        {
+          "operation": "add_write",
+          "parameters": {
+            "target_activity_label": "Generate consultative report",
+            "added_statement": "report_cb"
+          }
+        },
+        {
+          "operation": "add_write",
+          "parameters": {
+            "target_activity_label": "generate legal report",
+            "added_statement": "report_ld"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "Create resolution proposal",
+            "new_resource": "Tech. MD Position"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The missing data objects are added and the resource equality between 'Create resolution proposal' and 'Analyse reports' is restored by changing the resource of the proposal-creation activity."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "Although this restores formal compliance, changing the resource of the initial proposal activity may be less contextually appropriate because the later review activity also references 'Tech.MD', suggesting that 'Tech.MD Position' may be the intended role label."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "Four localized changes are required. The cost is comparable to RS1, but the resource change affects the first activity in the process."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "No control-flow or block-structure changes are introduced."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The resource change is applied to the first activity, and one of the data corrections also occurs at the start of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_add_missing_data_only",
+      "change_operations": [
+        {
+          "operation": "add_write",
+          "parameters": {
+            "target_activity_label": "Create resolution proposal",
+            "added_statement": "resolution_proposal"
+          }
+        },
+        {
+          "operation": "add_write",
+          "parameters": {
+            "target_activity_label": "Generate consultative report",
+            "added_statement": "report_cb"
+          }
+        },
+        {
+          "operation": "add_write",
+          "parameters": {
+            "target_activity_label": "generate legal report",
+            "added_statement": "report_ld"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "substantial",
+          "reason": "This resolves all detected missing data-object issues while preserving the already-satisfied control-flow requirements, but it does not fix the resource mismatch between 'Create resolution proposal' and 'Analyse reports'."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "Adding the expected data objects to the activities that logically create or finalize them is consistent with the activity names and the process context."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only three annotation-level changes are required, with no resource or structural modification."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The process tree and execution order are unchanged."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The changes are located around the proposal and report-generation portion of the process, before the analysis activity."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_align_analyse_resource_only",
+      "change_operations": [
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "Analyse reports",
+            "new_resource": "Tech.MD Position"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "partial",
+          "reason": "This restores the required equality of resources between 'Create resolution proposal' and 'Analyse reports', but the three required data-object issues remain unresolved."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The modification appears to normalize a minor role-label inconsistency and does not alter process behavior."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one resource assignment is changed."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "No control-flow or structural change is made."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The affected activity, 'Analyse reports', occurs after the parallel report-generation block and before the exclusive decision."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_add_missing_data_and_align_analyse_resource",
+  "best_resolution_reason": "RS1 is recommended because it fully restores compliance with minimal and localized changes. It preserves the existing process structure, adds only the missing data-object annotations, and resolves the resource mismatch by aligning 'Analyse reports' with the resource label already used for 'Create resolution proposal'. This is likely preferable to changing the resource of the first activity because 'Tech.MD Position' also appears elsewhere in the process context.",
+  "alternative_suggestion": {
+    "reason": "If the compliance engine interprets activity_receives strictly as an input/read requirement rather than a finalized output/write requirement, the provided operations do not include a direct add_read operation. The available modify_read operation requires an existing read variable to replace, but no such existing read variable is shown in the process tree.",
+    "conceptual_solution": "Add explicit input/read data bindings so that 'Create resolution proposal' receives 'resolution_proposal', 'Generate consultative report' receives 'report_cb', and 'generate legal report' receives 'report_ld', while also aligning the resource of 'Analyse reports' with 'Create resolution proposal'.",
+    "expected_compliance_impact": "This would fully restore compliance under a strict input-consumption interpretation of activity_receives."
+  }
+}

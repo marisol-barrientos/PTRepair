@@ -1,0 +1,24 @@
+sequence
+  receive job
+  process job
+  exclusive
+    sequence (cond: data.status == "accepted")
+      exclusive
+        sequence (cond: data.type = "manual")
+          create segments
+          loop (cond: data.segments.lenght > 0) (mode=pre_test, cond=data.segments.lenght > 0)
+            translate segment
+          Finalize Translation
+        sequence (cond: data.type = "automatic")
+          automatic translation
+        sequence (cond: not ((data.type = "manual") or (data.type = "automatic")))
+          terminate
+      do alignment
+      exclusive
+        sequence (cond: data.alignment.status == "verified")
+          update translation memory automatically
+        sequence (cond: not (data.alignment.status == "verified"))
+          update translation memory manually
+    sequence (cond: not (data.status == "accepted"))
+      terminate
+terminate

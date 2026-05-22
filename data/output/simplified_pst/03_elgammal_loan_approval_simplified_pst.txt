@@ -1,0 +1,37 @@
+sequence
+  receive loan request
+  access portal
+  exclusive
+    sequence (cond: loan.status == "approved")
+      a5
+      exclusive
+        sequence (cond: load.conditions == "satisfied")
+          exclusive
+            sequence (cond: loan.amount == "lower equal 1M")
+              check credit worthiness
+              exclusive
+                sequence (cond: loan.credit == "good")
+                  evaluate loan risk
+                  initialize loan contract
+                  sign officially loan contract
+                  send loan contract
+                  notify customer
+                sequence (cond: not (loan.credit == "good"))
+                  decline due to bad credit worthiness
+            sequence (cond: not (loan.amount == "lower equal 1M"))
+              delegate to supervisor
+              judge high risk loan
+              exclusive
+                sequence (cond: loan.status == "approved")
+                  initialize loan contract
+                  sign officially loan contract
+                  send loan contract
+                  notify customer
+                sequence (cond: not (loan.status == "approved"))
+        sequence (cond: not (load.conditions == "satisfied"))
+          decline due to unsatisfied conditions
+    sequence (cond: not (loan.status == "approved"))
+      decline due to suspended privileges
+  receive signed contract
+  perform loan settlement
+terminate

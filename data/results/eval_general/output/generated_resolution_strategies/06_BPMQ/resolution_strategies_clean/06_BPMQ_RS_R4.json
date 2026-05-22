@@ -1,0 +1,163 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_modify_due_diligence_write_to_clear_condition",
+      "change_operations": [
+        {
+          "operation": "modify_write",
+          "parameters": {
+            "target_activity_label": "conduct due diligence study",
+            "new_statement": "write: evaluation; evaluation_extra = false"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The violation is caused by the activity 'conduct due diligence study' writing the same variable that controls the condition 'data.evaluation_extra'. If the activity no longer makes 'data.evaluation_extra' true and instead clears it after execution, the process no longer creates a situation where the condition becomes true without a later due diligence activity."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The change is localized to the activity that causes the problematic data dependency and preserves the existing loop and branch structure."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one data-write statement is modified."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "No control-flow structure is changed; only the data effect of one activity is adjusted."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The change occurs in the initial respondent-bank evaluation part of the process, before annual-report handling and account opening."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_insert_follow_up_due_diligence_after_condition_writer",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "conduct due diligence study",
+            "new_activity_label": "conduct due diligence study"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "substantial",
+          "reason": "If the original 'conduct due diligence study' activity makes 'data.evaluation_extra' true, the inserted second occurrence of the same required activity follows immediately afterwards. This mitigates the violation by ensuring a later occurrence exists after the condition may become true."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The change is local, but it introduces a duplicate activity with the same label, which may be semantically redundant unless the second due diligence step is intended as a confirmation or follow-up check."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one activity is inserted."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The control-flow structure remains unchanged, but the process contains an additional due diligence execution that may increase operational effort."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The inserted activity is placed in the initial evaluation phase, directly after the existing due diligence activity."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_convert_due_diligence_to_post_condition_loop",
+      "change_operations": [
+        {
+          "operation": "remove_loop",
+          "parameters": {
+            "target_activity_label": "conduct due diligence study"
+          }
+        },
+        {
+          "operation": "embed_post_loop",
+          "parameters": {
+            "start_activity_label": "conduct due diligence study",
+            "end_activity_label": "conduct due diligence study",
+            "condition": "data.evaluation_extra"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "A post-condition loop ensures that after 'conduct due diligence study' writes or updates 'data.evaluation_extra', the condition is evaluated after the activity and, if true, another execution of the activity follows. This directly addresses the self-dependency that caused the violation."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The strategy preserves the idea that due diligence may repeat while extra evaluation is required, but it changes the loop from pre-test behavior to post-test behavior, meaning the activity may execute at least once even when the condition was initially false."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "Two structural operations are needed: removing the existing surrounding loop and embedding the activity in a new post-condition loop."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The loop structure is changed. The resulting process is still structured, but the execution semantics of the due diligence step are altered."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The modification is located in the initial respondent-bank evaluation and due-diligence part of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_explicitly_initialize_extra_evaluation_before_screening_and_clear_after_due_diligence",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "Identify Respondent Bank",
+            "new_activity_label": "Determine need for extra due diligence"
+          }
+        },
+        {
+          "operation": "add_write",
+          "parameters": {
+            "target_activity_label": "Determine need for extra due diligence",
+            "added_statement": "evaluation_extra = extra_due_diligence_required"
+          }
+        },
+        {
+          "operation": "modify_write",
+          "parameters": {
+            "target_activity_label": "conduct due diligence study",
+            "new_statement": "write: evaluation; evaluation_extra = false"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The condition 'data.evaluation_extra' is established before the due-diligence loop can be reached, and the due-diligence activity clears the condition after execution. Therefore, whenever the condition is true, the existing loop can execute the required due diligence activity, and the activity no longer creates a new unresolved true condition."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The added decision activity makes the source of 'evaluation_extra' explicit before the screening branch, and the due-diligence activity remains responsible for completing and clearing the extra evaluation."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "The strategy requires inserting one activity, adding a write statement to it, and modifying the write behavior of the due-diligence activity."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process remains sequential and structured. The added activity clarifies the data dependency rather than adding complex branching."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The inserted decision is placed immediately after respondent-bank identification, before the initial record-checking and due-diligence logic."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_modify_due_diligence_write_to_clear_condition",
+  "best_resolution_reason": "RS1 is the recommended strategy because it directly removes the problematic self-triggering data dependency with a single localized data-write modification. It restores compliance without changing the control-flow structure, has the lowest cost, and avoids introducing duplicate activities or altered loop semantics."
+}

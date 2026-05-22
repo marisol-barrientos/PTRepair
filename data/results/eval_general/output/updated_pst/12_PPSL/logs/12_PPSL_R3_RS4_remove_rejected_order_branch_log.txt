@@ -1,0 +1,6 @@
+ChangeOperationValidator: SUCCESS (remove_branch)
+{'type': 'remove_branch', 'target_activity_label': 'Report Rejected Order', 'removed_branch_type': 'otherwise'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Execution time (milliseconds): 3.58

@@ -1,0 +1,12 @@
+ChangeOperationValidator: SUCCESS (move_after)
+{'type': 'move_after', 'source_activity_label': 'pack goods', 'target_activity_label': 'pay by credit card'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+ChangeOperationValidator: SUCCESS (copy_after)
+{'type': 'copy_after', 'source_activity_label': 'pack goods', 'target_activity_label': 'pay by bank transfer', 'copied_activity_label': 'pack goods'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Structural WARNING: WARNING: Duplicate label detected: pack goods
+Execution time (milliseconds): 5.71

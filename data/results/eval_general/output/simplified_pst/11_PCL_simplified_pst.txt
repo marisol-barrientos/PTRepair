@@ -1,0 +1,20 @@
+sequence
+  Customer Request Arrives (write: customer_information, special_allowance, state)
+  exclusive
+    sequence (cond: data.state == "new")
+      Enter New Customer Information
+      Identity Check
+    sequence (cond: data.state == "existing")
+      Login for Existing Customer
+    sequence (cond: not ((data.state == "new") or (data.state == "existing")))
+  Approve Account Opening
+  Open Account
+  Apply Account Policy
+  exclusive
+    sequence (cond: data.special_allowance)
+      Accept Empty Initial Balance
+    sequence (cond: not (data.special_allowance))
+      Accept Initial Deposit
+  Initiate Account
+  Notify Customer and Close Case
+terminate

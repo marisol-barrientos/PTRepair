@@ -1,0 +1,11 @@
+ChangeOperationValidator: SUCCESS (insert_after)
+{'type': 'insert_after', 'target_activity': 'Accept Initial Deposit', 'new_activity': 'send warning'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+ChangeOperationValidator: SUCCESS (embed_activity_in_xor)
+{'type': 'embed_activity_in_xor', 'target_activity_label': 'send warning', 'condition': 'data.balance < 0 and not data.special_allowance', 'mode': 'skip'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Execution time (milliseconds): 6.98

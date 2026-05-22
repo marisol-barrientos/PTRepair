@@ -1,0 +1,114 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_rename_existing_activity_to_required_label",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Assign post processing to supervisor",
+            "new_activity_label": "assign post processing to supervisor"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The required activity already occurs on the branch guarded by condition data.loan_amount > 1000000, but its label differs in capitalization. Renaming it to the exact required label makes the condition_eventually_follows requirement satisfied."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy does not change control flow, data flow, resources, or ordering. It preserves the satisfied precedence and leads_to relationships involving customer bank privilege check, check credit worthiness, and evaluate loan risk, and it does not introduce any new condition involving gold customers or loan amounts below 1000000."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one localized label change is required."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The process structure remains unchanged; only the activity label is normalized to the required compliance label."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The changed activity is located in the middle part of the process, inside the valid bank-information branch and before credit worthiness and loan-risk evaluation."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_insert_required_activity_after_existing_assignment_then_delete_old_label",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "Assign post processing to supervisor",
+            "new_activity_label": "assign post processing to supervisor"
+          }
+        },
+        {
+          "operation": "delete",
+          "parameters": {
+            "target_activity_label": "Assign post processing to supervisor"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "After inserting the correctly labeled activity after the existing assignment activity and deleting the old label, the branch for data.loan_amount > 1000000 contains the required activity before continuing to credit worthiness checking."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The activity remains in the same branch and at effectively the same point in the process. The ordering of customer bank privilege check, check credit worthiness, and evaluate loan risk is preserved, and no new branch condition related to gold customers or loan amounts below 1000000 is introduced."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Two simple localized operations are required. This is slightly more costly than a direct rename but still limited in scope."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The final structure is almost equivalent to the original structure, although the two-step repair is operationally less direct than renaming."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "Both operations affect the loan-amount-dependent branch in the middle of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_insert_required_activity_before_credit_worthiness_check",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "Check Credit Worthiness",
+            "new_activity_label": "assign post processing to supervisor"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The inserted activity will eventually occur after the condition data.loan_amount > 1000000 because Check Credit Worthiness is reached after the loan-amount branch rejoins. Therefore, the detected condition_eventually_follows violation is resolved."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The satisfied ordering requirements are preserved, since evaluate loan risk still occurs after check credit worthiness and after customer bank privilege checking. However, the new assignment also executes for loan amounts not greater than 1000000 within the same valid-bank-information path, which introduces broader behavior than strictly required."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one insertion is needed, but it adds an additional activity instead of reusing or correcting the existing one."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The strategy adds redundant or potentially unnecessary execution for cases where data.loan_amount <= 1000000, reducing behavioral precision."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The insertion is made in the middle of the process immediately before the credit worthiness check."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_rename_existing_activity_to_required_label",
+  "best_resolution_reason": "RS1 is the best strategy because it fully restores compliance with the smallest possible change. The process already contains the intended activity on the correct branch; the violation is caused by a label mismatch. A single rename preserves control flow, data flow, and all stated resolution context requirements without adding redundant behavior or structural complexity."
+}

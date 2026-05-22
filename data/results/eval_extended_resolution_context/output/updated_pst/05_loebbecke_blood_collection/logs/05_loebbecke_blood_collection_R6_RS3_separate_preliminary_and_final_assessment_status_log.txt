@@ -1,0 +1,6 @@
+ChangeOperationValidator: SUCCESS (modify_write)
+{'type': 'modify_write', 'target_activity_label': 'conduct interview and questionnaire', 'old_statement': 'data.assessment_status = result["result"]', 'new_statement': 'preliminary_assessment_status := <interview and questionnaire result>'}
+BehavioralValidator WARNING: Behavioral risk: terminate inside parallel block may cause synchronization anomalies
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Execution time (milliseconds): 3.7

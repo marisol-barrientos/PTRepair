@@ -1,0 +1,13 @@
+{
+  "model": "openai/gpt-5.5",
+  "requirement_id": "R4",
+  "output_prefix": "01_awad_delivery_of_goods_RS_R4",
+  "execution_time_seconds": 20.55,
+  "problems_detected": [],
+  "usage": {
+    "prompt_tokens": 2739,
+    "completion_tokens": 1451,
+    "total_tokens": 4190,
+    "reasoning_tokens": null
+  }
+}

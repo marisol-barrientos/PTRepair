@@ -1,0 +1,16 @@
+[
+    {
+        "requirement_id": "R6",
+        "requirement": "data_value_alternative_eventually_follows (tree, 'assessment_status == \"rejected\"', 'inform of rejection') and directly_follows (tree, 'inform of rejection', 'terminate')",
+        "assurance": 80,
+        "evidence": [
+            "Condition mapped via in compared to ==, lower assurances",
+            "Activity \"inform of rejection\" was found on branch following condition \"assessment_status == \"rejected\"\"",
+            "Found 2 calls that influence condition \"assessment_status == \"rejected\"\". Checking if both are prior to branch",
+            "Activity \"conduct interview and questionnaire\" is before Activity \"inform of rejection\"",
+            "Activity \"inform of rejection\" does not occur in all exclusive branches",
+            "Found a call \"conduct interview and questionnaire\" that is not prior to the identified branch, so compliance can be violated if said call can cause the condition to evaluate to true",
+            "Found a terminate that directly follows \"inform of rejection\""
+        ]
+    }
+]

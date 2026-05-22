@@ -1,0 +1,6 @@
+ChangeOperationValidator: SUCCESS (merge)
+{'type': 'merge', 'first_activity_label': 'conduct interview and questionnaire', 'second_activity_label': 'direct questions', 'merged_activity_label': 'conduct interview and questionnaire and direct questions', 'keep_position': 'first'}
+BehavioralValidator WARNING: Behavioral risk: terminate inside parallel block may cause synchronization anomalies
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Execution time (milliseconds): 4.26

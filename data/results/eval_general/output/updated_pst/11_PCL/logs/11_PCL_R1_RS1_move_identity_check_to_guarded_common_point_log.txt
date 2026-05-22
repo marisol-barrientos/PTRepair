@@ -1,0 +1,11 @@
+ChangeOperationValidator: SUCCESS (move_before)
+{'type': 'move_before', 'source_activity_label': 'Identity Check', 'target_activity_label': 'Approve Account Opening'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+ChangeOperationValidator: SUCCESS (embed_activity_in_xor)
+{'type': 'embed_activity_in_xor', 'target_activity_label': 'Identity Check', 'condition': 'data.state == "new"', 'mode': 'skip'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Execution time (milliseconds): 10.13

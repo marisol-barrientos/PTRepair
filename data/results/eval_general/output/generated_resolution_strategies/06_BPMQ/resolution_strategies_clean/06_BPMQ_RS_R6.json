@@ -1,0 +1,142 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_insert_certificate_immediately_before_open",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "open bank account",
+            "new_activity_label": "check respondent bank certificate"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Every trace that executes \"open bank account\" will execute \"check respondent bank certificate\" immediately before it, satisfying the precedence requirement."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The added certificate check is placed directly in the account-opening branch, which is the exact context where the compliance requirement must hold."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one localized insertion is required and no existing activity or branch structure needs to be changed."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process structure remains essentially unchanged. The only drawback is that some traces may perform a certificate check earlier and again immediately before opening the account."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The modification is applied in the final decision branch that contains \"open bank account\"."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_insert_common_certificate_check_before_annual_report",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "obtain respondent bank annual report",
+            "new_activity_label": "check respondent bank certificate"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The inserted certificate check is placed on the common sequence path before the later account-opening decision, so any trace that eventually opens the account must have performed the certificate check first."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The repair guarantees compliance, but it introduces a certificate check for all traces continuing to the annual report stage, including traces that may later be rejected and never open an account."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The strategy requires a single insertion at a common control-flow point."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The structured tree remains simple and sequential at the insertion point, but the certificate check may be duplicated for traces where it already occurred in the earlier \"!data.record\" branch."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The modification is applied after the initial record-check branch and before the annual report and rating analysis section."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_move_existing_certificate_check_before_open",
+      "change_operations": [
+        {
+          "operation": "move_before",
+          "parameters": {
+            "source_activity_label": "check respondent bank certificate",
+            "target_activity_label": "open bank account"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The existing certificate check is relocated so that it occurs before \"open bank account\" in the account-opening branch, ensuring the required precedence whenever the account is opened."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The compliance requirement is satisfied without adding a duplicate check, but the activity is removed from its original early parallel assessment context, which may change the intended evaluation flow."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "Although only one operation is used, moving an activity across nested parallel and exclusive structures is more invasive than inserting a new localized check."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The move may alter the balance and semantics of the original parallel block where the certificate check was paired with risk assessment and due diligence."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The relocated activity is placed in the late-stage account-opening branch, although the source activity originates from an earlier part of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_restrict_opening_to_paths_with_prior_certificate_check",
+      "change_operations": [
+        {
+          "operation": "modify_condition",
+          "parameters": {
+            "target_activity_label": "open bank account",
+            "new_condition": "(!data.record) and (data.eval and data.rating)"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "By disallowing account opening on the \"data.record\" path, the account can only be opened on paths that pass through the earlier \"!data.record\" branch where \"check respondent bank certificate\" is executed."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The strategy restores compliance by restricting account opening rather than adding the missing certificate check. This may be acceptable if existing records should not bypass certification, but it may also block legitimate openings."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only the condition of the branch containing \"open bank account\" is modified."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "No structural control-flow changes are introduced; only the branch condition is changed."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The change is applied at the final exclusive decision containing \"open bank account\"."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_insert_certificate_immediately_before_open",
+  "best_resolution_reason": "RS1 is the recommended strategy because it fully restores compliance with a single localized change at the exact point of violation. It preserves the existing process structure and avoids blocking valid account-opening cases. Although it may duplicate the certificate check on some traces, it is less disruptive than moving the existing activity or restricting the account-opening condition."
+}

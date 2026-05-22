@@ -1,0 +1,16 @@
+ChangeOperationValidator: SUCCESS (insert_after)
+{'type': 'insert_after', 'target_activity': 'Produce Part 2', 'new_activity': 'production step'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+ChangeOperationValidator: SUCCESS (rename)
+{'type': 'rename', 'target_activity_label': 'Test Quality', 'new_activity_label': 'Quality Review'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+ChangeOperationValidator: SUCCESS (insert_before)
+{'type': 'insert_before', 'target_activity': 'Ship', 'new_activity': 'Test Quality'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Execution time (milliseconds): 12.98

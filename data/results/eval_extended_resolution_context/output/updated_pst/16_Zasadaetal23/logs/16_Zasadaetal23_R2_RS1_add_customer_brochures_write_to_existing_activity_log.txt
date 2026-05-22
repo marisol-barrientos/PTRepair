@@ -1,0 +1,7 @@
+ChangeOperationValidator: SUCCESS (add_write)
+{'type': 'add_write', 'target_activity_label': 'provide customer brochurs', 'added_statement': 'customer_brochures'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Structural WARNING: WARNING: Duplicate label detected: execute plausibility check
+Execution time (milliseconds): 5.5

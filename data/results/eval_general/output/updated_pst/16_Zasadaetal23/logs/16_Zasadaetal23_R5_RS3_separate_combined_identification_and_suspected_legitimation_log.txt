@@ -1,0 +1,25 @@
+ChangeOperationValidator: SUCCESS (rename)
+{'type': 'rename', 'target_activity_label': 'conduct customer identification & legitimation', 'new_activity_label': 'legitimiation of suspected customer'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Structural WARNING: WARNING: Duplicate label detected: execute plausibility check
+ChangeOperationValidator: SUCCESS (modify_resource)
+{'type': 'modify_resource', 'target_activity_label': 'legitimiation of suspected customer', 'old_resource': 'customer advisor, money laundering officer', 'new_resource': 'money laundering officer'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Structural WARNING: WARNING: Duplicate label detected: execute plausibility check
+ChangeOperationValidator: SUCCESS (insert_before)
+{'type': 'insert_before', 'target_activity': 'legitimiation of suspected customer', 'new_activity': 'conduct customer identification & legitimation'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Structural WARNING: WARNING: Duplicate label detected: execute plausibility check
+ChangeOperationValidator: SUCCESS (modify_resource)
+{'type': 'modify_resource', 'target_activity_label': 'conduct customer identification & legitimation', 'old_resource': None, 'new_resource': 'customer advisor'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Structural WARNING: WARNING: Duplicate label detected: execute plausibility check
+Execution time (milliseconds): 22.2

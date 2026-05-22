@@ -1,0 +1,6 @@
+{
+	"R2": "precedence('close case', 'finalize translation')",
+	"R3": "not condition_eventually_follows('data.alignment.status == \"unverified\"', 'update translation memory automatically')",
+	"R4": "leads_to_absence('translate segment', 'create segments')",
+	"R5": "condition_eventually_follows('data.status ==\"accepted\"', 'update translation memory manually', 'global') or condition_eventually_follows('data.status == \"accepted\"','update_translation memory automatically', 'global')"
+}

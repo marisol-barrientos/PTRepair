@@ -1,0 +1,152 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_remove_rejected_branch",
+      "change_operations": [
+        {
+          "operation": "remove_branch",
+          "parameters": {
+            "target_activity_label": "Report Rejected Order"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Removing the rejected-order XOR branch leaves only the branch in which Fill Order is followed by both Ship and Send Invoice. Therefore, whenever Fill Order occurs, both required successor activities occur afterwards."
+        },
+        "resolution_context_consistency": {
+          "value": "low",
+          "reason": "Although the compliance violation is structurally resolved, the process loses its explicit handling of rejected orders, which is likely an important business case."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one localized branch-removal operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The XOR structure is simplified, but an entire alternative path is removed, reducing behavioral completeness."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is applied inside the central exclusive decision after Report Order."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_copy_missing_successors_to_rejected_branch",
+      "change_operations": [
+        {
+          "operation": "copy_after",
+          "parameters": {
+            "source_activity_label": "Ship",
+            "target_activity_label": "Report Rejected Order"
+          }
+        },
+        {
+          "operation": "copy_after",
+          "parameters": {
+            "source_activity_label": "Send Invoice",
+            "target_activity_label": "Report Rejected Order"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Both Ship and Send Invoice are added to the rejected-order branch, so the consequent activities are present after the exclusive decision in all branches considered by the violation evidence."
+        },
+        "resolution_context_consistency": {
+          "value": "low",
+          "reason": "Shipping and invoicing a rejected order is semantically questionable and may conflict with the intended business meaning of the rejection path."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "Two copy operations are required and the process gains duplicate occurrences of existing activities."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The XOR branch remains structurally valid, but duplicated activities introduce redundancy and may make the process harder to maintain."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The changes are applied inside the rejected branch of the central exclusive decision."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_delete_fill_order_trigger",
+      "change_operations": [
+        {
+          "operation": "delete",
+          "parameters": {
+            "target_activity_label": "Fill Order"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The leads_to requirement is satisfied vacuously because the triggering activity Fill Order no longer occurs."
+        },
+        "resolution_context_consistency": {
+          "value": "low",
+          "reason": "Deleting Fill Order removes a core fulfillment activity and is unlikely to preserve the intended business behavior."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only a single delete operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The tree structure remains simple, but the business semantics of the fulfillment branch are significantly weakened."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The affected activity is located in the main accepted-order branch inside the central XOR structure."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_sequentialize_ship_and_invoice",
+      "change_operations": [
+        {
+          "operation": "sequentialize_parallel",
+          "parameters": {
+            "first_activity_label": "Ship",
+            "second_activity_label": "Send Invoice"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "partial",
+          "reason": "This strategy mitigates ambiguity caused by Ship and Send Invoice being located in different parallel branches after Fill Order. However, it may not fully resolve the reported evidence that these activities do not occur in all exclusive branches."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The accepted-order path remains meaningful: the order is filled, then shipping and invoicing are guaranteed in a single sequential flow."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one localized structural transformation is required."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The parallel structure is reduced, which may lower process concurrency, but the resulting flow is simpler and easier to reason about."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is applied within the fulfillment subprocess after Fill Order."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_remove_rejected_branch",
+  "best_resolution_reason": "RS1 is the minimal full-compliance repair expressible with the available operations. It directly removes the branch responsible for the reported missing Ship and Send Invoice successors. However, it has low business-context consistency because rejected-order handling is lost. If preserving rejected-order behavior is mandatory, RS4 is the safer mitigation even though it only provides partial compliance for the reported violation.",
+  "alternative_suggestion": {
+    "reason": "The most business-consistent repair cannot be represented directly with the provided operations because it would require refining the compliance rule or the checker semantics rather than changing the process tree.",
+    "conceptual_solution": "Interpret or encode the requirement conditionally: if Fill Order occurs in the accepted-order branch, then Ship and Send Invoice must eventually occur in that same branch. Under this interpretation, the rejected-order branch should not be required to contain Ship or Send Invoice because Fill Order never occurs there.",
+    "expected_compliance_impact": "This would preserve the intended business behavior and should fully satisfy the intended leads_to requirement without forcing shipping or invoicing of rejected orders."
+  }
+}

@@ -1,0 +1,156 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_minimal_rename_and_resource_alignment",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Evaluate LoanRisk",
+            "new_activity_label": "evaluate loan risk"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "evaluate loan risk",
+            "new_resource": "Manager"
+          }
+        },
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Sign officially Loan Contract",
+            "new_activity_label": "officially sign loan contract"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The existing risk evaluation activity is renamed to the required label and assigned to Manager. The existing contract-signing activity is renamed to the required label and already remains assigned to Manager."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The precedence context requirement is preserved because the renamed risk evaluation still occurs after customer bank privilege checking and after credit worthiness checking. However, renaming the existing risk evaluation activity may activate the context requirement concerning the gold-customer and low-loan-amount condition, because that activity may still occur on such paths."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only two renames and one resource assignment are required. No control-flow restructuring is needed."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The control-flow structure is unchanged. The strategy only corrects labels and resource assignment."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The main correction concerns the risk evaluation activity in the middle of the process; the signing label correction occurs later but is non-structural."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_context_preserving_conditional_manager_review",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "Check Credit Worthiness",
+            "new_activity_label": "evaluate loan risk"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "evaluate loan risk",
+            "new_resource": "Manager"
+          }
+        },
+        {
+          "operation": "embed_activity_in_xor",
+          "parameters": {
+            "target_activity_label": "evaluate loan risk",
+            "condition": "data.credit_worthiness && not (data.customer_status == gold && data.loan_amount < 1000000)",
+            "mode": "skip"
+          }
+        },
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Sign officially Loan Contract",
+            "new_activity_label": "officially sign loan contract"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "A correctly labeled activity 'evaluate loan risk' is introduced and assigned to Manager. The signing activity is renamed to the required label while preserving its Manager assignment."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The new 'evaluate loan risk' activity is placed after both customer bank privilege checking and credit worthiness checking, preserving the precedence context. It is conditionally skipped when the gold-customer and loan-amount condition holds, reducing the risk of violating the context requirement that this condition must not eventually lead to 'evaluate loan risk'."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "The strategy requires insertion, resource assignment, conditional embedding, and one rename. This is more costly than simple relabeling but remains localized."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The strategy adds a small XOR wrapper and a new Manager review activity, which increases structural complexity and creates a semantic overlap with the existing 'Evaluate LoanRisk' activity. However, it avoids changing the existing data-producing risk evaluation logic."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The substantive process change is located immediately after credit worthiness checking in the middle of the process. The late signing rename is only a label correction."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_partial_resource_and_signing_fix_without_risk_label_change",
+      "change_operations": [
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "Evaluate LoanRisk",
+            "new_resource": "Manager"
+          }
+        },
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Sign officially Loan Contract",
+            "new_activity_label": "officially sign loan contract"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "partial",
+          "reason": "The signing part of the requirement is repaired and the semantically corresponding risk evaluation task is assigned to Manager. However, the exact required activity label 'evaluate loan risk' is still not present, so the detected missing-activity violation may remain."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "Because the risk evaluation activity is not renamed to the context-sensitive required label, this strategy avoids introducing a new path where 'evaluate loan risk' follows the prohibited gold-customer and low-loan-amount condition. Existing control flow and precedence remain unchanged."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one resource assignment and one rename are required."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "No structural changes are made to the process tree."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The most relevant change is the resource assignment of the risk evaluation activity in the middle of the process; the signing rename occurs later but does not affect structure."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS2_context_preserving_conditional_manager_review",
+  "best_resolution_reason": "RS2 is recommended because it fully resolves the detected R4 violation while best preserving the currently satisfied resolution context requirements. Unlike the minimal rename strategy, it avoids making the required 'evaluate loan risk' activity executable under the prohibited gold-customer and low-loan-amount condition. Although it introduces a small conditional structure and an additional activity, the modification is localized and preserves the existing data-producing risk evaluation behavior.",
+  "alternative_suggestion": {
+    "reason": "This cannot be represented directly using the provided process change operations because it requires changing the compliance checking vocabulary or label-matching configuration rather than modifying the process tree.",
+    "conceptual_solution": "Introduce activity-label aliases or normalization rules so that 'Evaluate LoanRisk' is recognized as 'evaluate loan risk' and 'Sign officially Loan Contract' is recognized as 'officially sign loan contract'. Then only the resource assignment of the existing risk evaluation task would need to be checked or corrected.",
+    "expected_compliance_impact": "This would likely restore compliance with minimal or no process-structure changes, provided the compliance engine supports semantic label equivalence and recognizes the existing Manager assignment on the signing activity."
+  }
+}

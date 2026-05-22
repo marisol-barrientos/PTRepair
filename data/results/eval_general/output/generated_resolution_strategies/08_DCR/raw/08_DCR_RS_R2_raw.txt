@@ -1,0 +1,156 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_insert_generic_diagnosis_after_verify_symptoms",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "verify symptoms",
+            "new_activity_label": "diagnosis"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The required activity label \"diagnosis\" is inserted immediately after \"verify symptoms\". Therefore, whenever \"verify symptoms\" occurs, \"diagnosis\" necessarily occurs afterwards on all subsequent paths."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The inserted diagnosis step is contextually consistent because symptom verification is immediately followed by diagnosis determination. It also preserves the existing specialized diagnosis branches as downstream refinement or treatment-selection logic."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one localized insertion is required and no existing activity, branch, loop, condition, or resource assignment is changed."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process structure remains simple. The change adds one sequential activity without modifying the existing loop or XOR structure."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The change is placed immediately after the early activity \"verify symptoms\" within the loop, before the diagnostic branching logic."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_rename_existing_cold_diagnosis_and_insert_missing_general_diagnosis",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "diagnosis: cold",
+            "new_activity_label": "diagnosis"
+          }
+        },
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "verify symptoms",
+            "new_activity_label": "diagnosis"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The inserted generic \"diagnosis\" after \"verify symptoms\" guarantees that the required activity occurs after symptom verification on every path. Renaming one existing diagnosis activity also aligns an existing branch with the required activity name."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The strategy resolves the naming mismatch and guarantees compliance, but renaming \"diagnosis: cold\" to the more generic \"diagnosis\" may remove useful clinical specificity from that branch."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "Two operations are required: one rename and one insertion. The insertion is localized, but the rename changes an existing domain-specific activity label."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The tree structure remains essentially unchanged apart from one added sequential activity. However, having both a generic diagnosis step and remaining specialized diagnosis labels may create some semantic redundancy."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The compliance-guaranteeing insertion occurs immediately after \"verify symptoms\", which is early in the loop body."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_rename_all_existing_specific_diagnoses",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "diagnosis: cold",
+            "new_activity_label": "diagnosis"
+          }
+        },
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "diagnosis: strep throat",
+            "new_activity_label": "diagnosis"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "partial",
+          "reason": "This creates activities with the required label \"diagnosis\" on the cold and strep-throat branches. However, the path where data.throat is false and the path where data.throat is true, data.cough is false, and data.fever is false still do not contain a diagnosis after \"verify symptoms\"."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The renamed activities are genuine diagnosis activities, so the repair is semantically plausible. However, it removes useful distinction between cold and strep-throat diagnoses and does not cover all branches."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "Two rename operations are required. No structural changes are made, but existing activity labels are modified."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The structured tree topology is not changed. Only labels are changed."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The changes occur inside the diagnostic XOR branching region after symptom verification."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_insert_diagnosis_before_process_termination",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "terminate",
+            "new_activity_label": "diagnosis"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "substantial",
+          "reason": "A diagnosis activity would occur before final termination, so many completed executions that pass through \"verify symptoms\" would eventually reach \"diagnosis\". However, because \"verify symptoms\" is inside a pre-test loop, repeated loop iterations or non-terminating behavior may delay or prevent reaching the inserted diagnosis step."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "Adding diagnosis before termination may ensure a final diagnostic step, but it is less clinically natural than diagnosing immediately after symptom verification or within the diagnostic branches."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one insertion is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The change adds a single sequential activity before termination and does not alter the loop or branching structure."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The inserted activity is placed near the end of the process, immediately before \"terminate\"."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_insert_generic_diagnosis_after_verify_symptoms",
+  "best_resolution_reason": "RS1 is the best strategy because it fully restores compliance with the leads_to requirement using a single localized operation. It guarantees that every occurrence of \"verify symptoms\" is followed by an activity exactly labeled \"diagnosis\", while preserving the existing diagnostic branch structure and avoiding unnecessary relabeling or structural complexity."
+}

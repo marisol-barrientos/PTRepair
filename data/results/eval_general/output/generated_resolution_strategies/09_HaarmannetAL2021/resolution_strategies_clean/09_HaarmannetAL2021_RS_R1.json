@@ -1,0 +1,124 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_add_explicit_rejected_branch",
+      "change_operations": [
+        {
+          "operation": "add_xor_branch",
+          "parameters": {
+            "existing_branch_condition": "data.status == \"accepted\"",
+            "new_branch_condition": "data.status == \"rejected\"",
+            "new_activity_label": "terminate"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "An explicit XOR branch with condition data.status == \"rejected\" is added, and the branch directly executes terminate, satisfying condition_directly_follows."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The repair is localized and directly addresses the missing condition, but the existing branch condition not (data.status == \"accepted\") may overlap with data.status == \"rejected\", creating a potential XOR condition overlap."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one process change operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The existing XOR structure is preserved and only one additional branch is added. However, the overlapping branch condition slightly reduces structural clarity."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The change is made in the first status-based exclusive decision after process job."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_replace_default_nonaccepted_branch_with_explicit_rejected_and_other_branches",
+      "change_operations": [
+        {
+          "operation": "remove_branch_by_condition",
+          "parameters": {
+            "target_condition": "not (data.status == \"accepted\")"
+          }
+        },
+        {
+          "operation": "add_xor_branch",
+          "parameters": {
+            "existing_branch_condition": "data.status == \"accepted\"",
+            "new_branch_condition": "data.status == \"rejected\"",
+            "new_activity_label": "terminate"
+          }
+        },
+        {
+          "operation": "add_xor_branch",
+          "parameters": {
+            "existing_branch_condition": "data.status == \"accepted\"",
+            "new_branch_condition": "not ((data.status == \"accepted\") or (data.status == \"rejected\"))",
+            "new_activity_label": "terminate"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The process receives an explicit data.status == \"rejected\" branch that directly executes terminate. The original non-accepted behavior is preserved through a separate residual branch for statuses that are neither accepted nor rejected."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The top-level XOR becomes conditionally cleaner because the rejected case is separated from the general non-accepted case, avoiding overlapping XOR branch conditions."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "Three operations are required: removing the broad fallback branch and adding two more specific replacement branches."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process remains a simple XOR over status values. The added explicitness improves understandability, although it slightly increases the number of branches."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "All changes are applied at the initial status-based decision point, immediately after process job."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_narrow_existing_nonaccepted_branch_to_rejected_only",
+      "change_operations": [
+        {
+          "operation": "modify_condition",
+          "parameters": {
+            "target_activity_label": "terminate",
+            "new_condition": "data.status == \"rejected\""
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "If applied to the top-level non-accepted branch, the condition becomes data.status == \"rejected\" and terminate directly follows that condition."
+        },
+        "resolution_context_consistency": {
+          "value": "low",
+          "reason": "The process contains multiple activities labeled terminate, so the target is ambiguous when using only activity labels. In addition, non-accepted statuses other than rejected would no longer be handled by this branch."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one condition modification is required."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "No activities or control-flow blocks are added or removed."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The intended modification is located at the initial status-based exclusive split."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS2_replace_default_nonaccepted_branch_with_explicit_rejected_and_other_branches",
+  "best_resolution_reason": "RS2 is recommended because it fully restores compliance while preserving the original handling of other non-accepted statuses and avoiding overlapping XOR branch conditions. Although it costs more than simply adding one branch, it provides the best balance of compliance, structural clarity, and behavioral consistency."
+}

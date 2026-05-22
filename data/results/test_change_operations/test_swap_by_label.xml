@@ -1,0 +1,266 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<testset xmlns="http://cpee.org/ns/properties/2.0">
+
+  <executionhandler>ruby</executionhandler>
+
+  <description>
+
+    <description xmlns="http://cpee.org/ns/description/1.0">
+
+      <call id="a2" endpoint="">
+        <parameters>
+          <label>B</label>
+          <method>:post</method>
+          <arguments/>
+        </parameters>
+      </call>
+
+      <call id="a1" endpoint="">
+        <parameters>
+          <label>A</label>
+          <method>:post</method>
+          <arguments/>
+        </parameters>
+
+        <code>
+          <finalize output="result">
+            data.x = result["result"]
+          </finalize>
+        </code>
+
+        <annotations>
+          <_generic>
+            <Resource>R1</Resource>
+          </_generic>
+        </annotations>
+      </call>
+
+      <call id="a3" endpoint="">
+        <parameters>
+          <label>C</label>
+          <method>:post</method>
+          <arguments/>
+        </parameters>
+      </call>
+
+      <choose mode="exclusive">
+
+        <alternative condition="data.condition1">
+
+          <call id="a4" endpoint="">
+            <parameters>
+              <label>D</label>
+              <method>:post</method>
+              <arguments/>
+            </parameters>
+          </call>
+
+        </alternative>
+
+        <alternative condition="data.condition2">
+
+          <call id="a5" endpoint="">
+            <label>E</label>
+            <method>:post</method>
+            <arguments/>
+          </call>
+
+        </alternative>
+
+        <otherwise>
+
+          <call id="a6" endpoint="">
+            <parameters>
+              <label>F</label>
+              <method>:post</method>
+              <arguments/>
+            </parameters>
+          </call>
+
+        </otherwise>
+
+      </choose>
+
+
+      <parallel wait="-1" cancel="last">
+
+        <parallel_branch>
+
+          <call id="a7" endpoint="">
+            <parameters>
+              <label>G</label>
+              <method>:post</method>
+              <arguments/>
+            </parameters>
+          </call>
+
+        </parallel_branch>
+
+        <parallel_branch>
+
+          <call id="a8" endpoint="">
+            <parameters>
+              <label>H</label>
+              <method>:post</method>
+              <arguments/>
+            </parameters>
+          </call>
+
+        </parallel_branch>
+
+      </parallel>
+
+
+      <parallel wait="1" cancel="first">
+
+        <parallel_branch>
+
+          <call id="a9" endpoint="">
+            <parameters>
+              <label>I</label>
+              <method>:post</method>
+              <arguments/>
+            </parameters>
+          </call>
+
+        </parallel_branch>
+
+        <parallel_branch>
+
+          <call id="a10" endpoint="">
+            <parameters>
+              <label>J</label>
+              <method>:post</method>
+              <arguments/>
+            </parameters>
+          </call>
+
+          <call id="a11" endpoint="">
+            <parameters>
+              <label>K</label>
+              <method>:post</method>
+              <arguments/>
+            </parameters>
+          </call>
+
+        </parallel_branch>
+
+        <parallel_branch>
+
+          <call id="a12" endpoint="">
+            <parameters>
+              <label>L</label>
+              <method>:post</method>
+              <arguments/>
+            </parameters>
+          </call>
+
+        </parallel_branch>
+
+      </parallel>
+
+
+      <loop mode="pre_test" condition="data.pre_loop">
+
+        <call id="a13" endpoint="">
+          <parameters>
+            <label>M</label>
+            <method>:post</method>
+            <arguments/>
+          </parameters>
+        </call>
+
+        <call id="a14" endpoint="">
+          <parameters>
+            <label>N</label>
+            <method>:post</method>
+            <arguments/>
+          </parameters>
+        </call>
+
+      </loop>
+
+      <loop mode="post_test" condition="data.post_loop">
+
+        <call id="a15" endpoint="">
+          <parameters>
+            <label>O</label>
+            <method>:post</method>
+            <arguments/>
+          </parameters>
+        </call>
+
+        <call id="a16" endpoint="">
+          <parameters>
+            <label>P</label>
+            <method>:post</method>
+            <arguments/>
+          </parameters>
+        </call>
+
+      </loop>
+
+
+      <call id="a17" endpoint="timeout">
+
+        <parameters>
+
+          <label>Q</label>
+
+          <method>:post</method>
+
+          <arguments>
+            <timeout>900</timeout>
+          </arguments>
+
+        </parameters>
+
+      </call>
+
+
+      <call id="a18" endpoint="">
+        <parameters>
+          <label>R</label>
+          <method>:post</method>
+          <arguments/>
+        </parameters>
+      </call>
+
+      <call id="a19" endpoint="">
+        <parameters>
+          <label>T</label>
+          <method>:post</method>
+          <arguments/>
+        </parameters>
+      </call>
+
+
+      <call id="a20" endpoint="">
+        <parameters>
+          <label>U and V</label>
+          <method>:post</method>
+          <arguments/>
+        </parameters>
+      </call>
+
+      <call id="a21" endpoint="">
+        <parameters>
+          <label>W</label>
+          <method>:post</method>
+          <arguments/>
+        </parameters>
+      </call>
+
+      <call id="a22" endpoint="">
+        <parameters>
+          <label>X</label>
+          <method>:post</method>
+          <arguments/>
+        </parameters>
+      </call>
+
+    </description>
+
+  </description>
+
+</testset>

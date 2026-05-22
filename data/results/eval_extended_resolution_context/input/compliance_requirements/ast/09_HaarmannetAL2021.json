@@ -1,0 +1,3 @@
+{
+	"R1": "condition_directly_follows('data.status == \"rejected\"', 'terminate')"
+}

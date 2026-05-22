@@ -1,0 +1,141 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_copy_notification_to_bank_transfer_branch",
+      "change_operations": [
+        {
+          "operation": "copy_after",
+          "parameters": {
+            "source_activity_label": "notify customer",
+            "target_activity_label": "pay by bank transfer"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "After copying \"notify customer\" into the bank transfer branch, every execution path following \"go to checkout\" contains a later occurrence of \"notify customer\". The leads_to requirement is therefore satisfied for both exclusive payment branches."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The repair preserves the existing process logic and only adds the missing customer notification to the payment branch where it is absent. The notification remains close to payment completion, consistent with the existing credit card branch."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one localized change operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The existing structured tree is preserved. The only impact is that the same activity label appears in both XOR branches, which is acceptable for aligning alternative branches."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is applied inside the payment-handling portion of the process, after checkout and before sending goods."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_move_notification_after_payment_parallel_block",
+      "change_operations": [
+        {
+          "operation": "move_before",
+          "parameters": {
+            "source_activity_label": "notify customer",
+            "target_activity_label": "send goods"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Moving \"notify customer\" before \"send goods\" places it after the parallel payment and shipping block. Since all executions after \"go to checkout\" must pass through this point, \"notify customer\" eventually occurs in every path."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The repair avoids duplicate notifications and guarantees notification for all customers, but it changes the timing of the existing credit card notification by moving it later in the process."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one move operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The strategy simplifies the behavioral guarantee by placing the notification in the common sequential path. However, it moves an activity across structural scopes, from an XOR branch to the main sequence."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The notification is relocated to the point immediately before \"send goods\", near the end of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_insert_notification_immediately_after_checkout",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "go to checkout",
+            "new_activity_label": "notify customer"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Inserting \"notify customer\" immediately after \"go to checkout\" ensures that the required activity always occurs after checkout, regardless of the later payment branch selected."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The strategy satisfies the control-flow requirement but may notify the customer before payment or shipping information is complete. In the credit card branch, the customer may also be notified twice because the existing notification remains."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one insertion is needed."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The structured tree remains simple, but the process may contain redundant customer notification behavior on the credit card path."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The change is applied directly after the initial checkout activity."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_remove_bank_transfer_branch",
+      "change_operations": [
+        {
+          "operation": "remove_branch",
+          "parameters": {
+            "target_activity_label": "pay by bank transfer"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Removing the bank transfer branch eliminates the execution path that lacks \"notify customer\". The remaining credit card branch already contains the required notification after checkout."
+        },
+        "resolution_context_consistency": {
+          "value": "low",
+          "reason": "Although the compliance violation is removed, the repair achieves this by deleting a valid payment option, which is likely undesirable from a business perspective."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "The operation itself is simple, but it removes an entire branch of business functionality."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The XOR structure is simplified, but at the cost of eliminating an alternative process path."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change affects the payment-choice section of the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_copy_notification_to_bank_transfer_branch",
+  "best_resolution_reason": "RS1 is the best strategy because it fully restores compliance with the leads_to requirement while making a minimal, localized change. It preserves both payment alternatives and keeps the notification behavior aligned across the exclusive branches without changing the timing of the existing credit card path."
+}

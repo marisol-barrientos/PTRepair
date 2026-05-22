@@ -1,0 +1,140 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_rename_bank_privilege_check",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Check Customer Bank Privilege",
+            "new_activity_label": "customer bank privilege check"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The violated requirement can be satisfied through the first disjunct: the activity named 'customer bank privilege check' exists and remains executed by Credit Broker. The existing activity already has the required resource assignment, so only the label mismatch is repaired."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The activity remains in the same position before credit-worthiness checking and before loan-risk evaluation. This preserves the currently satisfied precedence and leads-to context requirements and does not affect the condition involving gold customers."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one localized rename operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The control-flow structure, resources, data writes, and branching logic are unchanged."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The modified activity is located near the beginning of the process, before the main eligibility and credit-risk assessment branches."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_insert_standardized_bank_privilege_check_alias",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "Check Customer Bank Privilege",
+            "new_activity_label": "customer bank privilege check"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "customer bank privilege check",
+            "new_resource": "Credit Broker"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The required activity label 'customer bank privilege check' is introduced and assigned to Credit Broker, satisfying the first disjunct of the violated requirement."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The new activity is placed immediately after the existing bank-privilege check and still before credit-worthiness checking and loan-risk evaluation. However, it introduces a second semantically similar activity, which may create ambiguity even though the existing compliant ordering is mostly preserved."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Two localized operations are required: inserting the missing activity and assigning its resource."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The strategy avoids renaming the original activity but adds a potentially redundant duplicate check, increasing process complexity and semantic ambiguity."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The change is made directly after the existing customer bank privilege check, early in the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_replace_bank_privilege_check_with_standardized_activity",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "Check Customer Bank Privilege",
+            "new_activity_label": "customer bank privilege check"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "customer bank privilege check",
+            "new_resource": "Credit Broker"
+          }
+        },
+        {
+          "operation": "add_write",
+          "parameters": {
+            "target_activity_label": "customer bank privilege check",
+            "added_statement": "bank_privilege_suspended"
+          }
+        },
+        {
+          "operation": "delete",
+          "parameters": {
+            "target_activity_label": "Check Customer Bank Privilege"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The original bank privilege check is replaced by an activity with the exact required label, the required Credit Broker resource, and the same relevant data write. This satisfies the first disjunct of the violated requirement while preserving the data needed by the following branch condition."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The standardized replacement remains in the same control-flow position as the original activity, before credit-worthiness checking and loan-risk evaluation. The existing context requirements should remain satisfied."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "Four operations are required, making this more expensive than a direct rename."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The final process structure remains essentially equivalent to the original, but the multi-step replacement is more invasive than a simple rename."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The replacement affects the early customer bank privilege checking step."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_rename_bank_privilege_check",
+  "best_resolution_reason": "RS1 is the recommended strategy because it fully restores compliance with the violated requirement using a single localized rename. It preserves the existing resource assignment, data writes, control-flow structure, and the already satisfied resolution context requirements. Compared with the alternatives, it has the lowest change cost and no structural quality impact.",
+  "alternative_suggestion": {
+    "reason": "The violation evidence also references both 'check credit worthiness' and 'credit worthiness check', suggesting inconsistent activity naming in the compliance requirement or checker. The provided operations can rename or duplicate activities, but they cannot define semantic aliases without changing the process model.",
+    "conceptual_solution": "Introduce label normalization or activity aliases in the compliance checking layer so that semantically equivalent labels such as 'Check Credit Worthiness', 'check credit worthiness', and 'credit worthiness check' are treated consistently.",
+    "expected_compliance_impact": "This would reduce false violations caused by naming mismatches and may avoid unnecessary process changes."
+  }
+}

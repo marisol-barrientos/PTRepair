@@ -1,0 +1,12 @@
+ChangeOperationValidator: SUCCESS (rename)
+{'type': 'rename', 'target_activity_label': 'diagnosis: cold', 'new_activity_label': 'diagnosis'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+ChangeOperationValidator: SUCCESS (insert_after)
+{'type': 'insert_after', 'target_activity': 'verify symptoms', 'new_activity': 'diagnosis'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Structural WARNING: WARNING: Duplicate label detected: diagnosis
+Execution time (milliseconds): 5.64

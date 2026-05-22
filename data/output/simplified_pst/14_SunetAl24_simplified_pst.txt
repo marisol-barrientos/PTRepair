@@ -1,0 +1,20 @@
+sequence
+  Request personal data
+  Ask portability
+  exclusive
+    sequence
+      Ask old number
+      Ask portability third party
+      exclusive
+        sequence
+        terminate
+    Assign new number
+  Sign contract
+  parallel (wait=-1, cancel=last)
+    Handle Payment
+    sequence
+      Store Data
+      Ask for permission
+  Send Sim card
+  Activate Sim Card
+terminate

@@ -1,0 +1,149 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_insert_required_predecessor_before_check_medical_history",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "check medical history",
+            "new_activity_label": "ask for updates"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "A new occurrence of \"ask for updates\" is inserted immediately before \"check medical history\" in the same execution branch. Therefore, whenever \"check medical history\" occurs, an \"ask for updates\" activity has occurred before it."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The change is localized near the violating activity and preserves the existing process structure. It also makes contextual sense if updated applicant information is needed before checking medical history."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one insertion operation is required, and no existing activity or control-flow structure is modified."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process structure remains almost unchanged. The only side effect is that there are now two activities labeled \"ask for updates\", which may introduce some redundancy but does not break the structured tree."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The change is applied inside the loan risk assessment branch, close to \"check medical history\", which occurs in the later part of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_move_check_medical_history_after_existing_ask_for_updates",
+      "change_operations": [
+        {
+          "operation": "move_after",
+          "parameters": {
+            "source_activity_label": "check medical history",
+            "target_activity_label": "ask for updates"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "\"check medical history\" is moved so that it occurs after the existing \"ask for updates\" activity. As a result, every remaining occurrence of \"check medical history\" is preceded by \"ask for updates\"."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The precedence requirement is satisfied, but the medical history check is moved out of the original loan risk assessment branch and into the application update path, which may weaken the original business logic."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one move operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The operation changes the intended grouping of risk assessment activities. The inner parallel block originally containing \"check medical history\" and \"check career\" may become less meaningful if only \"check career\" remains there."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The target location is in the branch following \"check application\", before the later loan risk prediction activities."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_sequentialize_main_branches_and_insert_mandatory_update_request",
+      "change_operations": [
+        {
+          "operation": "sequentialize_parallel",
+          "parameters": {
+            "first_activity_label": "check application",
+            "second_activity_label": "retrieve data"
+          }
+        },
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "check application",
+            "new_activity_label": "ask for updates"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The top-level parallel branches are transformed into sequential execution with the application-checking branch before the data retrieval and risk assessment branch. A mandatory \"ask for updates\" activity is then inserted after \"check application\", ensuring it occurs before \"check medical history\"."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The strategy ensures the required ordering and places the update request early enough to affect downstream risk assessment. However, it removes the original top-level parallelism, which may reduce intended concurrency."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "Two operations are required: one structural control-flow change and one activity insertion."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The process remains structured, but the top-level parallel structure is replaced with sequential execution, reducing concurrency and potentially increasing process duration."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The changes affect the beginning of the process, around \"check application\" and before the loan risk assessment branch starts."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_partial_sequentialize_main_parallel_branches",
+      "change_operations": [
+        {
+          "operation": "sequentialize_parallel",
+          "parameters": {
+            "first_activity_label": "check application",
+            "second_activity_label": "retrieve data"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "partial",
+          "reason": "Sequentializing the top-level parallel branches removes the incomparability between \"ask for updates\" and \"check medical history\". However, \"ask for updates\" is still inside an XOR branch and only occurs when the condition \"not (data.conflicts == true)\" holds. If the other branch is taken, \"check medical history\" can still occur without a prior \"ask for updates\"."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy preserves all existing activities and branch conditions while imposing a clearer order between application checking and loan risk assessment."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one structural operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The process remains structured, but the top-level parallelism is removed, which may reduce efficiency and change the intended concurrent execution semantics."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The change affects the top-level process structure near the start of the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_insert_required_predecessor_before_check_medical_history",
+  "best_resolution_reason": "RS1 is the recommended strategy because it fully restores compliance with the precedence requirement using a single localized operation. It avoids changing the broader process structure, preserves existing parallelism, and directly ensures that \"ask for updates\" occurs before \"check medical history\" whenever the latter is executed."
+}

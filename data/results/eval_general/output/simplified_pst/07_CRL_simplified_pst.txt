@@ -1,0 +1,40 @@
+sequence
+  Receive Loan Request (write: loan_amount, loan_file)
+  Create Loan File
+  Check Customer Bank Privilege (res: Credit Broker) (write: bank_privilege_suspended)
+  exclusive
+    sequence (cond: !data.bank_privilege_suspended)
+      Request Bank Information (res: Credit Broker)
+      exclusive
+        sequence (cond: data.bank_information_valid)
+          exclusive
+            sequence (cond: data.loan_amount > 1000000)
+              Assign post processing to supervisor (write: post_processing_resource)
+            sequence (cond: not (data.loan_amount > 1000000))
+          Check Credit Worthiness (write: credit_worthiness, risk_report)
+          exclusive
+            sequence (cond: data.credit_worthiness)
+            sequence (cond: not (data.credit_worthiness))
+              Decline due to bad credit worthniness (res: data.post_processing_resource)
+              terminate
+          Evaluate LoanRisk (write: low_risk)
+          exclusive
+            sequence (cond: !data.low_risk)
+              Judge High-Risk Loan (res: Manager) (write: approved)
+            sequence (cond: not (!data.low_risk))
+              Approve Loan Contract due to low risk (write: approved)
+          exclusive
+            sequence (cond: data.approved)
+              Initialize Loan Contract
+              Sign officially Loan Contract (res: Manager)
+              parallel (wait=-1, cancel=first)
+                Perform Loan Settlement
+                timeout (604800)
+            sequence (cond: not (data.approved))
+              Decline due to high risk (res: Manager)
+        sequence (cond: not (data.bank_information_valid))
+          Decline due to unsatisfied Condition (res: Credit Broker)
+    sequence (cond: not (!data.bank_privilege_suspended))
+      Decline due to suspended Privilege (res: Credit Broker)
+  Notify Customer
+terminate

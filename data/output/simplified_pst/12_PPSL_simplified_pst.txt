@@ -1,0 +1,20 @@
+sequence
+  Receive order (write: order)
+  Report Order (read: order) (write: order)
+  exclusive
+    sequence (cond: data.order.status)
+      Fill Order
+      parallel (wait=-1, cancel=last)
+        sequence
+          Produce Part 1
+          Produce Part 2
+          Test Quality
+          Ship
+        sequence
+          Send Invoice
+          Receive Payment
+          Report Payment
+    sequence (cond: not (data.order.status))
+      Report Rejected Order
+  Close Bill
+terminate

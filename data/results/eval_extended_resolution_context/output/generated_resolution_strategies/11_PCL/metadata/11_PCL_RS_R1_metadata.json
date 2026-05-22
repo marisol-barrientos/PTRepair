@@ -1,0 +1,17 @@
+{
+  "model": "openai/gpt-5.5",
+  "scenario_name": "11_PCL",
+  "requirement_id": "R1",
+  "output_prefix": "11_PCL_RS_R1",
+  "execution_time_milliseconds": 113528.39,
+  "resolution_context_requirements": 1,
+  "problems_detected": [
+    "Model output is not valid JSON"
+  ],
+  "usage": {
+    "prompt_tokens": 0,
+    "completion_tokens": 0,
+    "total_tokens": 0,
+    "reasoning_tokens": null
+  }
+}

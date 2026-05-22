@@ -1,0 +1,11 @@
+ChangeOperationValidator: SUCCESS (move_after)
+{'type': 'move_after', 'source_activity_label': 'Accept Empty Initial Balance', 'target_activity_label': 'Customer Request Arrives'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+ChangeOperationValidator: SUCCESS (embed_activity_in_xor)
+{'type': 'embed_activity_in_xor', 'target_activity_label': 'Accept Empty Initial Balance', 'condition': 'data.special_allowance', 'mode': 'skip'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Execution time (milliseconds): 6.63

@@ -1,0 +1,4 @@
+{
+  "R1": "exists('obtain respondent bank annual report') and exists('analyze respondent bank annual report')",
+  "R3": "condition_directly_follows('data.risk', 'terminate')"
+}

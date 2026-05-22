@@ -1,0 +1,11 @@
+sequence
+  Create resolution proposal (res: Tech.MD Position)
+  parallel (wait=-1, cancel=last)
+    Generate consultative report (res: Assistant CB (Position))
+    generate legal report (res: Assistant LD (Position))
+  Analyse reports (res: Tech. MD Position)
+  exclusive
+    External Resolution (res: Secretary MD (Position))
+    Review Resolution Proposal (res: Tech.MD (Position), Tech. CB (Position), Tech. LD (Position))
+  Sign, store, and notify resolution (res: Secretary (Position))
+terminate

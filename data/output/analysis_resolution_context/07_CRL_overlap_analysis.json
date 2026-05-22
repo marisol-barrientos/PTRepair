@@ -1,0 +1,12 @@
+{
+    "activities": [
+        "'check credit worthiness'",
+        "customer bank privilege check",
+        "evaluate loan risk"
+    ],
+    "resources": [],
+    "data": [],
+    "temporal": [
+        "condition_eventually_follows"
+    ]
+}

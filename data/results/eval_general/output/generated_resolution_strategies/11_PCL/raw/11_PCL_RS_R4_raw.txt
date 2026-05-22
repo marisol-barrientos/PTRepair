@@ -1,0 +1,183 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_relocate_special_allowance_write_before_relevant_xor",
+      "change_operations": [
+        {
+          "operation": "remove_write",
+          "parameters": {
+            "target_activity_label": "Customer Request Arrives",
+            "removed_variable_name": "special_allowance"
+          }
+        },
+        {
+          "operation": "add_write",
+          "parameters": {
+            "target_activity_label": "Apply Account Policy",
+            "added_statement": "special_allowance := determine_special_allowance(customer_information)"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The condition data.special_allowance is no longer produced at the start of the process, before unrelated exclusive branches. Instead, it is produced immediately before the exclusive choice where Accept Empty Initial Balance is executed on the data.special_allowance branch. Therefore, when the condition becomes true, Accept Empty Initial Balance eventually follows."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The variable special_allowance is not used before Apply Account Policy, and determining or confirming the allowance during policy application is contextually plausible. The existing initial-balance choice remains unchanged."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only two data-write changes are required. No activities are moved, inserted, or deleted, and the control-flow structure remains intact."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The process tree structure is not modified. Only the data production point of special_allowance is changed."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "Although one write is removed from the early activity Customer Request Arrives, the compliance-relevant repair is localized around Apply Account Policy, directly before the violated special-allowance branch."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_move_accept_empty_before_allowance_choice_and_guard_it",
+      "change_operations": [
+        {
+          "operation": "move_after",
+          "parameters": {
+            "source_activity_label": "Accept Empty Initial Balance",
+            "target_activity_label": "Apply Account Policy"
+          }
+        },
+        {
+          "operation": "embed_activity_in_xor",
+          "parameters": {
+            "target_activity_label": "Accept Empty Initial Balance",
+            "condition": "data.special_allowance",
+            "mode": "skip"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Accept Empty Initial Balance is moved to occur immediately after Apply Account Policy and is guarded by data.special_allowance. If data.special_allowance is true, the activity is executed before the later initial-balance branch is reached."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The activity remains conditional on data.special_allowance, but it is extracted from its original exclusive branch. This preserves the intended special-allowance behavior but separates it from the original alternative with Accept Initial Deposit."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The strategy requires only one move and one wrapping operation."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The original data.special_allowance branch in the later exclusive structure may become empty, creating some redundancy. However, the process remains structurally valid."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is localized around Apply Account Policy and the initial-balance handling section, where the violation occurs."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_insert_new_guarded_accept_empty_activity_and_remove_old_branch_activity",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Accept Empty Initial Balance",
+            "new_activity_label": "Accept Empty Initial Balance (legacy branch)"
+          }
+        },
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "Apply Account Policy",
+            "new_activity_label": "Accept Empty Initial Balance"
+          }
+        },
+        {
+          "operation": "embed_activity_in_xor",
+          "parameters": {
+            "target_activity_label": "Accept Empty Initial Balance",
+            "condition": "data.special_allowance",
+            "mode": "skip"
+          }
+        },
+        {
+          "operation": "delete",
+          "parameters": {
+            "target_activity_label": "Accept Empty Initial Balance (legacy branch)"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "A new guarded Accept Empty Initial Balance activity is introduced immediately after Apply Account Policy. When data.special_allowance is true, this activity eventually executes. The old branch-specific copy is removed to avoid duplicate execution."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The special-allowance activity remains conditional and near its original location. However, the repair introduces a replacement activity rather than directly reusing the existing one."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "Four operations are required: rename, insert, embed, and delete. This is more costly than moving the existing activity or relocating the write."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The original special-allowance branch may become empty after deleting the legacy activity, and an additional XOR wrapper is introduced."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The repair is applied around Apply Account Policy and the initial-balance decision, which is the local context of the violation."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_make_accept_empty_branch_unconditional",
+      "change_operations": [
+        {
+          "operation": "modify_condition",
+          "parameters": {
+            "target_activity_label": "Accept Empty Initial Balance",
+            "new_condition": "true"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Accept Empty Initial Balance would always be selected in the initial-balance exclusive choice, so it would eventually occur whenever data.special_allowance has become true earlier in the process."
+        },
+        "resolution_context_consistency": {
+          "value": "low",
+          "reason": "This over-satisfies the compliance rule by executing Accept Empty Initial Balance even when data.special_allowance is false. It may prevent Accept Initial Deposit from being selected and therefore conflicts with the intended business distinction."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one condition modification is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The tree structure is not changed, but the exclusive branch logic becomes semantically poor because one branch is effectively always selected."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is applied directly to the existing initial-balance decision where Accept Empty Initial Balance appears."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_relocate_special_allowance_write_before_relevant_xor",
+  "best_resolution_reason": "RS1 is the best option because it directly addresses the cause of the violation: data.special_allowance is produced too early, before process paths where Accept Empty Initial Balance is not guaranteed. By producing the condition immediately before the relevant exclusive branch, the rule condition_eventually_follows(data.special_allowance, Accept Empty Initial Balance) is satisfied without changing the control-flow structure or introducing redundant branches. It has low cost, high context consistency, and no structural quality impact.",
+  "alternative_suggestion": {
+    "reason": "The available operations do not provide a dedicated operation for annotating a condition trigger or refactoring an exclusive gateway while preserving both branches without leaving empty branches.",
+    "conceptual_solution": "Model the special-allowance decision as an explicit condition event or gateway trigger immediately before the initial-balance choice, so that data.special_allowance is considered to become relevant only at that point. Alternatively, refactor the initial-balance XOR into a clean if-then-else construct where the true branch contains Accept Empty Initial Balance and the false branch contains Accept Initial Deposit.",
+    "expected_compliance_impact": "This would fully restore compliance while preserving the intended business semantics and producing a cleaner process model than strategies that leave empty branches."
+  }
+}

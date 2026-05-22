@@ -1,0 +1,6 @@
+ChangeOperationValidator: SUCCESS (insert_before)
+{'type': 'insert_before', 'target_activity': 'Access requested', 'new_activity': 'activate screeen lock'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Execution time (milliseconds): 2.4

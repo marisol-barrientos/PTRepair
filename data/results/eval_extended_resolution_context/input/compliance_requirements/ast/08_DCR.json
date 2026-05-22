@@ -1,0 +1,3 @@
+{
+	"R2": "leads_to('verify symptoms', 'diagnosis')"
+}

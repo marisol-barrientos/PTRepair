@@ -1,0 +1,4 @@
+{
+	"R2": "precedence('evaluate loan risk', 'customer bank privilege check') and precedence('evaluate loan risk', 'check credit worthiness') and leads_to('customer bank privilege check', 'check credit worthiness')",
+	"R7": "not condition_eventually_follows('data.customer_status == gold && data.loan_amount < 1000000','evaluate loan risk','global')"
+}

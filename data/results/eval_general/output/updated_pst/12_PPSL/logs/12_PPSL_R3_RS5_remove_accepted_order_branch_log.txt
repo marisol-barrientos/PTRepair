@@ -1,0 +1,6 @@
+ChangeOperationValidator: SUCCESS (remove_branch)
+{'type': 'remove_branch', 'target_activity_label': 'Receive Payment', 'removed_branch_type': 'parallel_branch'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Execution time (milliseconds): 2.96

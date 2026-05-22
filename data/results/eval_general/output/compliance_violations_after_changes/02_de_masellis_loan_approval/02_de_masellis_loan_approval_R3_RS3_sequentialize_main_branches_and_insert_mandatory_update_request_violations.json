@@ -1,0 +1,10 @@
+[
+    {
+        "requirement_id": "R1",
+        "requirement": "absence (tree, 'ask to recheck')",
+        "assurance": 100,
+        "evidence": [
+            "Activity \"ask to recheck\" exists in the process"
+        ]
+    }
+]

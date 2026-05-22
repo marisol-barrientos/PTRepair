@@ -1,0 +1,6 @@
+ChangeOperationValidator: SUCCESS (remove_write)
+{'type': 'remove_write', 'target_activity_label': 'direct questions', 'removed_variable_name': 'assessment_status'}
+BehavioralValidator WARNING: Behavioral risk: terminate inside parallel block may cause synchronization anomalies
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Execution time (milliseconds): 3.66

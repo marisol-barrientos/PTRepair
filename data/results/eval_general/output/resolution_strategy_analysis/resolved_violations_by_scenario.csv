@@ -1,0 +1,16 @@
+scenario,total_violated_requirements,resolved_requirements,unresolved_requirements,resolution_rate_percent
+01_awad_delivery_of_goods,4,3,1,75.0
+02_de_masellis_loan_approval,3,3,0,100.0
+03_elgammal_loan_approval,2,2,0,100.0
+04_ghose_package_screening,1,1,0,100.0
+05_loebbecke_blood_collection,1,1,0,100.0
+06_BPMQ,4,4,0,100.0
+07_CRL,5,4,1,80.0
+08_DCR,1,1,0,100.0
+09_HaarmannetAL2021,1,0,1,0.0
+11_PCL,3,2,1,66.67
+12_PPSL,3,2,1,66.67
+13_Status,2,0,2,0.0
+14_SunetAl24,4,2,2,50.0
+15_WinteretAlER,2,1,1,50.0
+16_Zasadaetal23,3,2,1,66.67

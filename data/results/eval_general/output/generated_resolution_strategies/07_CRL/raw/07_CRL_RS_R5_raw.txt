@@ -1,0 +1,114 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_rename_sign_activity",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Sign officially Loan Contract",
+            "new_activity_label": "officially sign loan contract"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The detected violation is caused by the required source activity label not being found. The existing activity is semantically equivalent but named differently. Renaming it to the required label restores the activity reference, and the process already executes loan settlement immediately after the signing step within the existing timeout structure of 604800 seconds."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The change preserves the intended loan-contract signing semantics and aligns the activity name with the compliance requirement without altering control flow, data flow, resources, or branching behavior."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one localized rename operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The process structure remains unchanged. No additional branches, loops, parallel blocks, or activities are introduced."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The affected activity occurs late in the positive approval path, immediately before loan settlement and customer notification."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_insert_required_signing_activity_and_delete_mislabeled_activity",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "Perform Loan Settlement",
+            "new_activity_label": "officially sign loan contract"
+          }
+        },
+        {
+          "operation": "delete",
+          "parameters": {
+            "target_activity_label": "Sign officially Loan Contract"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The required activity is explicitly inserted immediately before loan settlement, ensuring that the source activity exists and that settlement follows within the required time boundary. The old mislabeled signing activity is removed to avoid duplicate signing."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The strategy preserves the functional intent, but it changes the exact placement of the signing activity by placing it directly before settlement rather than before the parallel timeout construct. This is still consistent with the compliance requirement but slightly less conservative than a rename."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Two simple operations are required: one insertion and one deletion."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process remains structurally simple, but the signing activity is relocated into closer proximity with settlement, which may slightly affect the interpretation of the timeout structure."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "Both changes occur in the late contract execution segment after loan approval."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_insert_required_activity_after_existing_signing_activity",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "Sign officially Loan Contract",
+            "new_activity_label": "officially sign loan contract"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "substantial",
+          "reason": "The required activity label is added before loan settlement, so the compliance monitor can detect the required source activity. However, the original signing activity remains, creating a duplicated signing step. Compliance is likely restored with respect to the missing activity, but the process semantics may become redundant."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The inserted activity is placed in a logically appropriate location, immediately after the existing signing activity and before settlement. However, retaining both activities may imply that the loan contract is signed twice."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one insertion operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The control-flow structure is not changed, but an additional redundant activity is introduced."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The insertion occurs in the late approved-loan execution path before settlement."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_rename_sign_activity",
+  "best_resolution_reason": "RS1 is the best strategy because the violation is caused by a naming mismatch: the process already contains a semantically equivalent signing activity, but its label does not match the compliance requirement. A single rename restores compliance with minimal cost, no structural impact, and no risk of duplicate or relocated signing behavior."
+}

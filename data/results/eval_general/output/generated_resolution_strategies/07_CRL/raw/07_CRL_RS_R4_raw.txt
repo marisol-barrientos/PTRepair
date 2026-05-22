@@ -1,0 +1,148 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_canonical_rename_and_assign_manager",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Evaluate LoanRisk",
+            "new_activity_label": "evaluate loan risk"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "evaluate loan risk",
+            "new_resource": "Manager"
+          }
+        },
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Sign officially Loan Contract",
+            "new_activity_label": "officially sign loan contract"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The semantically matching risk evaluation activity is renamed to the required label and assigned to Manager. The signing activity is also renamed to the required label and already has Manager as its resource."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The changes use existing activities that already represent the required business steps, avoiding artificial duplicate activities."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only two renames and one resource assignment are required. No control-flow restructuring is needed."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process structure remains unchanged. The only impact is label normalization and resource completion for the risk evaluation step."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The primary correction is in the loan evaluation and approval section. The strategy also touches the later contract-signing step, but no structural change is introduced there."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_insert_required_labeled_manager_activities",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "Evaluate LoanRisk",
+            "new_activity_label": "evaluate loan risk"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "evaluate loan risk",
+            "new_resource": "Manager"
+          }
+        },
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "Sign officially Loan Contract",
+            "new_activity_label": "officially sign loan contract"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "officially sign loan contract",
+            "new_resource": "Manager"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The exact required activities are added and assigned to Manager, so the executed_by requirements can be satisfied."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The added activities correspond to the required compliance labels, but they duplicate existing semantically similar activities, which may create ambiguity."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "Four operations are required, and two new activities are introduced into the process."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The control-flow structure is preserved, but duplicate risk evaluation and contract-signing activities increase process complexity."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The strategy modifies the evaluation section and the later signing section. The main added compliance activity is placed in the middle of the approval path."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_assign_manager_to_existing_semantic_activity_only",
+      "change_operations": [
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "Evaluate LoanRisk",
+            "new_resource": "Manager"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "partial",
+          "reason": "The resource issue for the existing semantic equivalent of evaluate loan risk is corrected, and the existing signing activity is already performed by Manager. However, the exact required activity labels are still missing, so a strict compliance checker would still report the violation."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The change is semantically meaningful and localized, but it does not resolve the label mismatch identified in the evidence."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one resource assignment is changed."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The process structure and activity ordering remain unchanged."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is applied to the risk evaluation activity in the middle of the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_canonical_rename_and_assign_manager",
+  "best_resolution_reason": "RS1 is the preferred strategy because it fully restores compliance with minimal localized changes. It reuses the existing semantically correct activities, avoids duplicate work, preserves the current control-flow structure, and only normalizes labels while assigning the missing Manager resource to the risk evaluation activity.",
+  "alternative_suggestion": {
+    "reason": "A non-structural compliance repair cannot be represented by the provided process change operations.",
+    "conceptual_solution": "Introduce a compliance vocabulary or synonym mapping so that 'Evaluate LoanRisk' is recognized as 'evaluate loan risk' and 'Sign officially Loan Contract' is recognized as 'officially sign loan contract'. This should be combined with assigning Manager to the risk evaluation activity.",
+    "expected_compliance_impact": "This could eliminate false-positive label-matching violations while preserving the original process labels, but it depends on support in the compliance checking mechanism rather than a process-tree change."
+  }
+}

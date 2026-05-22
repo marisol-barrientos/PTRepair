@@ -1,0 +1,3 @@
+ChangeOperationValidator: SUCCESS (modify_condition)
+APPLICATION FAILED: No enclosing <alternative> found for 'Report Rejected Order'
+Execution time (milliseconds): 0.57

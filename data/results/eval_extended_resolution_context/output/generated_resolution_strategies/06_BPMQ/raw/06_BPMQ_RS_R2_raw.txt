@@ -1,0 +1,148 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_copy_blacklist_after_failed_due_diligence_lookup",
+      "change_operations": [
+        {
+          "operation": "copy_after",
+          "parameters": {
+            "source_activity_label": "add respondent bank to blacklist",
+            "target_activity_label": "Lookup Partner Banks"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The violating case arises because the condition equivalent to not data.evaluation can become true inside the due diligence loop before the later blacklist branch is guaranteed. Copying the blacklist activity after Lookup Partner Banks ensures that when the failed-evaluation branch is taken, add respondent bank to blacklist eventually occurs in that same local branch. The existing later blacklist branch is preserved for cases where not data.evaluation is evaluated after the parallel block."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy does not modify obtain respondent bank annual report or analyze respondent bank annual report, so R1 remains satisfied. It also does not modify the data.risk branch or the directly following terminate activity, so R3 remains satisfied."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one localized copy operation is required. No existing activity is deleted or reordered."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The change introduces a duplicate blacklist activity, but it is placed directly in the branch where the failed evaluation is detected. The overall control-flow structure remains unchanged."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The change is applied in the initial respondent-bank screening and due-diligence part of the process, before the annual-report analysis and account-opening decision."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_copy_blacklist_immediately_after_due_diligence",
+      "change_operations": [
+        {
+          "operation": "copy_after",
+          "parameters": {
+            "source_activity_label": "add respondent bank to blacklist",
+            "target_activity_label": "conduct due diligence study"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Whenever conduct due diligence study produces data that makes not data.evaluation true, the copied blacklist activity is executed immediately afterward. The existing later blacklist branch still covers cases where the condition is evaluated after the parallel block."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy does not affect the annual-report activities required by R1 and does not change the risk-rejection branch required by R3."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only a single copy operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "Although structurally simple, this strategy may blacklist a respondent bank immediately after every due diligence study, even before the evaluation outcome is checked. This can over-enforce the compliance rule and may reduce behavioral precision."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The change is located in the due-diligence section of the initial screening subprocess."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_make_blacklisting_unconditional_after_initial_screening",
+      "change_operations": [
+        {
+          "operation": "remove_branch_by_condition",
+          "parameters": {
+            "target_condition": "not (not data.evaluation)"
+          }
+        },
+        {
+          "operation": "modify_condition",
+          "parameters": {
+            "target_activity_label": "add respondent bank to blacklist",
+            "new_condition": "true"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "substantial",
+          "reason": "This makes add respondent bank to blacklist execute after the initial screening block regardless of the evaluation value, so cases where not data.evaluation holds after the block are covered. However, if not data.evaluation becomes true inside the loop and the loop does not terminate, eventual blacklisting is still not guaranteed inside that loop."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy does not remove or rename the annual-report activities required by R1 and does not alter the data.risk branch where terminate must directly follow, so R3 remains satisfied."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "Two control-flow changes are required: removing the alternative branch and changing the blacklist branch condition."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The XOR structure becomes effectively unconditional and may be structurally less meaningful. The strategy also changes business behavior by blacklisting banks even when evaluation is positive."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The changes are applied to the blacklist decision immediately after the initial screening block."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_remove_evaluation_write_from_due_diligence",
+      "change_operations": [
+        {
+          "operation": "remove_write",
+          "parameters": {
+            "target_activity_label": "conduct due diligence study",
+            "removed_variable_name": "evaluation"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "partial",
+          "reason": "This removes the identified write that can make not data.evaluation true before the later blacklist branch is guaranteed. However, it does not positively ensure that every future occurrence of not data.evaluation is followed by add respondent bank to blacklist, and it weakens the process by removing the explicit evaluation result."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy does not affect the annual-report activities required by R1 and does not modify the data.risk-to-terminate behavior required by R3."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one data-write removal is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The control-flow structure is unchanged, but the data-flow quality is reduced because due diligence no longer produces the evaluation value used by later decisions."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The change is applied in the due-diligence part of the initial screening subprocess."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_copy_blacklist_after_failed_due_diligence_lookup",
+  "best_resolution_reason": "RS1 is recommended because it directly repairs the missing blacklist action in the failed-evaluation branch where the violation can arise. It is localized, requires only one operation, preserves the existing later blacklist behavior, avoids modifying the annual-report and risk-termination requirements, and does not over-enforce blacklisting for successful due-diligence outcomes."
+}

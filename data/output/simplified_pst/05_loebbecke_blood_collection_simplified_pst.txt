@@ -1,0 +1,28 @@
+sequence
+  provide information
+  obtain consent (write: consented)
+  a13
+  exclusive
+    sequence (cond: data.consented)
+      parallel (wait=1, cancel=last)
+        sequence
+          retract consent
+          terminate
+        sequence
+          conduct interview and questionnaire (res: physician, trained assistant) (write: assessment_status)
+          direct questions (res: physician) (write: assessment_status)
+          exclusive
+            sequence (cond: data.assessment_status == "rejected")
+              inform of rejection
+              terminate
+            sequence (cond: not (data.assessment_status == "rejected"))
+              prepare for venepuncture (res: data.assigned_resource)
+              venepuncture (res: data.assigned_resource)
+              collect blood
+              parallel (wait=1, cancel=first)
+                monitor patient
+                sequence
+                  timeout (900)
+                  assess donor (res: physician)
+    sequence (cond: not (data.consented))
+      terminate

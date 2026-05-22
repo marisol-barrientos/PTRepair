@@ -1,0 +1,40 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "Unique identifier of the resolution strategy.",
+
+      "change_operations": "Reference to change_operations schema.",
+
+      "evaluation": {
+        "compliance_degree": {
+          "value": "none | partial | substantial | full",
+          "reason": "Explanation of why this compliance degree was assigned."
+        },
+
+        "resolution_context_consistency": {
+          "value": "low | medium | high",
+          "reason": "Explanation of why this consistency level was assigned."
+        },
+
+        "change_cost": {
+          "value": "very_low | low | medium | high | very_high",
+          "reason": "Explanation of why this cost level was assigned."
+        },
+
+        "structural_quality_impact": {
+          "value": "none | low | medium | high",
+          "reason": "Explanation of how the strategy affects process structure."
+        },
+
+        "change_location": {
+          "value": "early | middle | late",
+          "reason": "Explanation of why this location category was assigned."
+        }
+      }
+    }
+  ],
+
+  "best_resolution_strategy_id": "Identifier of the recommended resolution strategy.",
+
+  "best_resolution_reason": "Explanation of why the strategy was selected as the best option."
+}

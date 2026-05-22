@@ -1,0 +1,8 @@
+ChangeOperationValidator: SUCCESS (add_xor_branch)
+{'type': 'add_xor_branch', 'existing_branch_condition': 'data.status == "accepted"', 'new_branch_condition': 'data.status == "rejected"', 'new_activity_label': 'terminate'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+ChangeOperationValidator: SUCCESS (remove_branch_by_condition)
+APPLICATION FAILED: No alternative found with target_condition 'not (data.status == "accepted")'
+Execution time (milliseconds): 3.49

@@ -1,0 +1,6 @@
+ChangeOperationValidator: SUCCESS (remove_write)
+{'type': 'remove_write', 'target_activity_label': 'Customer Request Arrives', 'removed_variable_name': 'special_allowance'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Execution time (milliseconds): 3.12

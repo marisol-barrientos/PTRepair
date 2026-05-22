@@ -1,0 +1,6 @@
+ChangeOperationValidator: SUCCESS (modify_resource)
+{'type': 'modify_resource', 'target_activity_label': 'Evaluate LoanRisk', 'old_resource': None, 'new_resource': 'Manager'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Execution time (milliseconds): 4.76

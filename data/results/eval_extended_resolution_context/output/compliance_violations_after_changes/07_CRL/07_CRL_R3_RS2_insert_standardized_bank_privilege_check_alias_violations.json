@@ -1,0 +1,66 @@
+{
+    "scenario_name": "07_CRL",
+    "pst_file": "07_CRL_R3_RS2_insert_standardized_bank_privilege_check_alias.xml",
+    "verified_violation_requirements": [
+        "R1",
+        "R3",
+        "R4",
+        "R6"
+    ],
+    "verified_resolution_context_requirements": [
+        "R2",
+        "R7"
+    ],
+    "all_verified_requirements": [
+        "R1",
+        "R3",
+        "R4",
+        "R6",
+        "R2",
+        "R7"
+    ],
+    "violation_report": [
+        {
+            "requirement_id": "R1",
+            "requirement": "parallel (tree, 'send automated email', 'check credit worthiness')",
+            "assurance": 100,
+            "evidence": [
+                "Activity \"send automated email\" existence was checked but not found",
+                "Activity \"send automated email\" is missing in the process"
+            ]
+        },
+        {
+            "requirement_id": "R4",
+            "requirement": "executed_by (tree, 'evaluate loan risk', 'manager') and executed_by (tree, 'officially sign loan contract', 'manager')",
+            "assurance": 100,
+            "evidence": [
+                "Activity \"evaluate loan risk\" existence was checked but not found",
+                "Activity \"evaluate loan risk\" is missing in the process",
+                "Activity \"officially sign loan contract\" existence was checked but not found",
+                "Activity \"officially sign loan contract\" is missing in the process"
+            ]
+        },
+        {
+            "requirement_id": "R6",
+            "requirement": "condition_eventually_follows (tree, 'data.loan_amount > 1000000', 'assign post processing to supervisor')",
+            "assurance": 100,
+            "evidence": [
+                "Found no branch which matches to data.loan_amount>1000000",
+                "No branch with condition \"data.loan_amount > 1000000\" was found"
+            ]
+        },
+        {
+            "requirement_id": "R2",
+            "requirement": "precedence (tree, 'evaluate loan risk', 'customer bank privilege check') and precedence (tree, 'evaluate loan risk', 'check credit worthiness') and leads_to (tree, 'customer bank privilege check', 'check credit worthiness')",
+            "assurance": 100,
+            "evidence": [
+                "Activity \"evaluate loan risk\" existence was checked but not found",
+                "Activity \"evaluate loan risk\" was not found in the process so precedence \"evaluate loan risk\" requires \"customer bank privilege check\" before it is true",
+                "Activity \"evaluate loan risk\" existence was checked but not found",
+                "Activity \"evaluate loan risk\" was not found in the process so precedence \"evaluate loan risk\" requires \"check credit worthiness\" before it is true",
+                "Activity \"customer bank privilege check\" is before Activity \"check credit worthiness\"",
+                "Activity \"check credit worthiness\" does not occur in all exclusive branches"
+            ]
+        }
+    ]
+}

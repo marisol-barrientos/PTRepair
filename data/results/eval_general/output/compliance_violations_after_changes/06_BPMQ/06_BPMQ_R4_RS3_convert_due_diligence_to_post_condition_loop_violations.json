@@ -1,0 +1,20 @@
+[
+    {
+        "requirement_id": "R4",
+        "requirement": "condition_eventually_follows (tree, 'data.evaluation_extra', 'conduct due diligence study')",
+        "assurance": 100,
+        "evidence": [
+            "Found no branch which matches to data.evaluation_extra",
+            "No branch with condition \"data.evaluation_extra\" was found"
+        ]
+    },
+    {
+        "requirement_id": "R6",
+        "requirement": "precedence (tree, 'open bank account', 'check respondent bank certificate')",
+        "assurance": 100,
+        "evidence": [
+            "Activity \"check respondent bank certificate\" was found before \"open bank account\". Ensuring that \"check respondent bank certificate\" is not on an exclusive branch which could lead to violations in some traces",
+            "Activity \"check respondent bank certificate\" was found before \"open bank account\", but it is in a different exclusive branch, so precedence can not be guaranteed in every trace"
+        ]
+    }
+]

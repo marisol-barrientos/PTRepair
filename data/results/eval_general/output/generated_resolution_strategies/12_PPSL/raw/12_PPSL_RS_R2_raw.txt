@@ -1,0 +1,122 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_insert_explicit_production_step_before_quality_test",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "Test Quality",
+            "new_activity_label": "production step"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The missing activity \"production step\" is introduced immediately before \"Test Quality\" in the fulfillment branch. Therefore, whenever \"production step\" occurs, \"Test Quality\" eventually occurs afterwards. The existing ordering of \"Test Quality\" before \"Ship\" is preserved, satisfying the precedence requirement for \"Ship\" with respect to \"Test Quality\"."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The inserted activity is placed in the production sequence directly before quality testing, which is a natural and localized position for a production-related step."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one activity insertion is required, and no existing activity labels, resources, data dependencies, or control-flow constructs are changed."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The strategy adds one sequential activity without modifying the surrounding exclusive or parallel structures. It slightly increases process length but does not add branching or nesting complexity."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is made inside the order fulfillment branch, between production activities and quality testing, which is in the middle part of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_rename_existing_production_activity",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Produce Part 2",
+            "new_activity_label": "production step"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Renaming \"Produce Part 2\" to \"production step\" creates the required source activity for the leads-to constraint. Since this renamed activity is followed by \"Test Quality\" in the same sequence, the leads_to requirement is satisfied. \"Test Quality\" remains before \"Ship\", so the precedence requirement is also preserved."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The renamed activity is genuinely part of production, so the placement is contextually reasonable. However, replacing the specific label \"Produce Part 2\" with the generic label \"production step\" loses some process detail."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only a single rename operation is required, with no control-flow restructuring or additional activities."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The process structure remains unchanged. Only the label of one existing activity is modified."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The renamed activity is located in the production part of the fulfillment branch, which occurs in the middle of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_conservative_repair_with_explicit_quality_gate_before_shipping",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "Produce Part 2",
+            "new_activity_label": "production step"
+          }
+        },
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Test Quality",
+            "new_activity_label": "Quality Review"
+          }
+        },
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "Ship",
+            "new_activity_label": "Test Quality"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The strategy introduces an explicit \"production step\" after production and places a newly inserted \"Test Quality\" directly before \"Ship\". This ensures that \"production step\" leads to \"Test Quality\" and that \"Ship\" is preceded by \"Test Quality\" in the same execution branch."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The final ordering is coherent because production is followed by review, testing, and shipping. However, the original \"Test Quality\" is renamed to \"Quality Review\", which may or may not reflect the intended business semantics."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "Three operations are required: one insertion of the missing production step, one rename, and one insertion of a quality test directly before shipping."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The strategy avoids changing branching structure but adds an extra activity and separates the original quality activity from the compliance-relevant \"Test Quality\" label. This increases sequential length and may introduce some semantic redundancy."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "All changes occur in the production and shipping sequence inside the fulfillment branch, which is in the middle of the overall process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_insert_explicit_production_step_before_quality_test",
+  "best_resolution_reason": "RS1 is recommended because it fully restores compliance with a single localized insertion while preserving all existing activity labels and the current control-flow structure. It directly addresses the missing \"production step\" evidence and keeps \"Test Quality\" before \"Ship\" without introducing unnecessary restructuring or semantic loss."
+}

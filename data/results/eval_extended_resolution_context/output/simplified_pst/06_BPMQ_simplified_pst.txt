@@ -1,0 +1,39 @@
+sequence
+  Receive correspondent Account open request (write: user_data)
+  Identify Respondent Bank
+  exclusive
+    sequence (cond: !data.record)
+      parallel (wait=-1, cancel=last)
+        check respondent bank certificate (write: certificate)
+        sequence
+          Assess Respondent Bank risk (write: risk)
+          exclusive
+            sequence (cond: data.risk)
+              terminate
+            sequence (cond: not (data.risk))
+        loop (cond: data.evaluation_extra) (mode=pre_test, cond=data.evaluation_extra)
+          conduct due diligence study (write: evaluation, evaluation_extra)
+          exclusive
+            sequence (cond: !data.evaluation)
+              Lookup Partner Banks
+            sequence (cond: not (!data.evaluation))
+      exclusive
+        sequence (cond: not data.evaluation)
+          add respondent bank to blacklist
+        sequence (cond: not (not data.evaluation))
+    sequence (cond: not (!data.record))
+  obtain respondent bank annual report
+  parallel (wait=-1, cancel=last)
+    analyze respondent bank annual report
+    sequence
+      Review Respondent Bank rating (write: respondent_bank_rating)
+      exclusive
+        sequence (cond: data.respondent_bank_rating == "rejected")
+          handle rejection
+          terminate
+        sequence (cond: not (data.respondent_bank_rating == "rejected"))
+  exclusive
+    sequence (cond: data.record or (data.eval and data.rating))
+      open bank account
+    sequence (cond: not (data.record or (data.eval and data.rating)))
+terminate

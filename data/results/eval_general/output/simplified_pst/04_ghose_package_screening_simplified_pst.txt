@@ -1,0 +1,10 @@
+sequence
+  scan package (res: sort officer)
+  exclusive
+    sequence (cond: package.status == "held")
+      assess package (res: sort officer)
+      route package (res: sort officer)
+      handle package (res: sort officer)
+    sequence (cond: not (package.status == "held"))
+  update status (res: sort officer)
+terminate

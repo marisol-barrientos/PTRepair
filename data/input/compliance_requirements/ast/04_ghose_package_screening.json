@@ -1,0 +1,3 @@
+{
+  "R1": "condition_eventually_follows('package.status == \"held\"', 'clear package status') and precedence('clear package status', 'route package') and executed_by('clear package status', 'regulatory authority')"
+}

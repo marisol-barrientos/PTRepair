@@ -1,0 +1,15 @@
+sequence
+  parallel (wait=1, cancel=first)
+    wait for user input
+    sequence
+      timeout (60)
+      automatic screen lock
+    activate screen lock
+  Access requested
+  Request Password (write: authenticated)
+  exclusive
+    sequence (cond: data.authenticated)
+      Unlock screen
+    sequence (cond: not (data.authenticated))
+      Reject access
+terminate

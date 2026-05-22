@@ -1,0 +1,217 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_minimal_label_and_resource_repair",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Check Customer Bank Privilege",
+            "new_activity_label": "customer bank privilege check"
+          }
+        },
+        {
+          "operation": "add_write",
+          "parameters": {
+            "target_activity_label": "customer bank privilege check",
+            "added_statement": "post_processing_resource = Supervisor"
+          }
+        },
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Check Credit Worthiness",
+            "new_activity_label": "check credit worthiness"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "check credit worthiness",
+            "new_resource": "data.post_processing_resource"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "substantial",
+          "reason": "This strategy fixes the missing customer bank privilege check label, keeps it executed by Credit Broker, assigns the credit worthiness check to data.post_processing_resource, and defines that variable as Supervisor before the credit-worthiness activity. It also supports separation of duty because the bank privilege check is executed by Credit Broker while the credit-worthiness activity is assigned to Supervisor through the data variable. However, the violation evidence also refers to the alternative label credit worthiness check, which remains unresolved."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The changes preserve the existing process intent: the existing bank privilege check and credit-worthiness check are repaired rather than duplicated or relocated. The post-processing resource is defined before it is used."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only two renames, one resource annotation change, and one additional write statement are required. No control-flow restructuring is introduced."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process structure remains unchanged. The only behavioral addition is assigning a post-processing resource before the later credit-worthiness activity."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The relevant repairs are located around the early-to-middle loan assessment part of the process, especially before and at the credit-worthiness check."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_strict_label_compliance_with_alias_activity",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Check Customer Bank Privilege",
+            "new_activity_label": "customer bank privilege check"
+          }
+        },
+        {
+          "operation": "add_write",
+          "parameters": {
+            "target_activity_label": "customer bank privilege check",
+            "added_statement": "post_processing_resource = Supervisor"
+          }
+        },
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Check Credit Worthiness",
+            "new_activity_label": "check credit worthiness"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "check credit worthiness",
+            "new_resource": "data.post_processing_resource"
+          }
+        },
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "check credit worthiness",
+            "new_activity_label": "credit worthiness check"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "credit worthiness check",
+            "new_resource": "data.post_processing_resource"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "This strategy addresses all label references appearing in the violation evidence: customer bank privilege check, check credit worthiness, and credit worthiness check. It also assigns the credit-worthiness-related activities to data.post_processing_resource and defines that variable as Supervisor before use, while the customer bank privilege check remains executed by Credit Broker."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The strategy is syntactically consistent with the detected compliance evidence, but it introduces an additional activity with a very similar meaning to the existing credit-worthiness check. This may be interpreted as an alias or compliance marker, but it could also be misunderstood as a duplicated business task."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "The strategy requires six operations, including insertion of a new activity and resource annotation changes. It is still localized but more expensive than simply repairing the existing activities."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The control-flow structure is not deeply modified, but the inserted credit worthiness check activity adds potential semantic duplication and may make the process less clear."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "Most changes are concentrated around the credit-worthiness evaluation stage, which is in the middle assessment portion of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_resource_only_partial_repair",
+      "change_operations": [
+        {
+          "operation": "add_write",
+          "parameters": {
+            "target_activity_label": "Check Customer Bank Privilege",
+            "added_statement": "post_processing_resource = Supervisor"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "Check Credit Worthiness",
+            "new_resource": "data.post_processing_resource"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "partial",
+          "reason": "This strategy repairs the resource assignment issue by ensuring that Check Credit Worthiness is executed by data.post_processing_resource and that the variable is defined before use. However, it does not fix the label mismatches that caused the compliance checker to report customer bank privilege check and credit worthiness check as missing."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The existing process labels and structure are preserved, and only the missing resource assignment is repaired."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only two localized data/resource operations are required."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "No activity is inserted, deleted, moved, or structurally reorganized."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The main change concerns the credit-worthiness activity in the middle of the loan evaluation process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_label_only_partial_repair",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Check Customer Bank Privilege",
+            "new_activity_label": "customer bank privilege check"
+          }
+        },
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Check Credit Worthiness",
+            "new_activity_label": "check credit worthiness"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "partial",
+          "reason": "This strategy resolves the most direct activity-existence evidence for customer bank privilege check and check credit worthiness. However, it does not assign check credit worthiness to data.post_processing_resource, does not define the resource variable for all paths, and does not address the separate credit worthiness check label mentioned in the evidence."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The changes only normalize labels and do not alter behavior or structure."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only two rename operations are required."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "No structural or behavioral modification is introduced."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The repaired labels occur in the early-to-middle checking and assessment part of the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS2_strict_label_compliance_with_alias_activity",
+  "best_resolution_reason": "RS2 is recommended if the compliance checker requires exact label matching, because it is the only strategy that addresses all reported missing activity labels and the missing resource annotation. Although it introduces a potentially redundant credit worthiness check activity, the change is localized and achieves full syntactic compliance with the detected violation evidence.",
+  "alternative_suggestion": {
+    "reason": "The violation appears to use inconsistent labels for the same conceptual activity: check credit worthiness and credit worthiness check. The supported process change operations cannot create a non-executing alias or update the compliance rule vocabulary directly.",
+    "conceptual_solution": "Normalize the compliance requirement or the compliance checker label mapping so that Check Credit Worthiness, check credit worthiness, and credit worthiness check are treated as the same activity. Then apply the minimal resource repair by assigning the existing credit-worthiness activity to data.post_processing_resource and ensuring post_processing_resource is set to Supervisor before the activity.",
+    "expected_compliance_impact": "This would achieve full compliance without inserting a duplicate or alias activity, preserving the process structure more cleanly than RS2."
+  }
+}

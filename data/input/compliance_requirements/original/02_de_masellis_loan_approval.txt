@@ -1,0 +1,3 @@
+R1: The activity ‘ask to recheck’ must not be executed
+R2: Predict risk may only be executed after ask for updates
+R3: The process must ask for updates before checking medical history

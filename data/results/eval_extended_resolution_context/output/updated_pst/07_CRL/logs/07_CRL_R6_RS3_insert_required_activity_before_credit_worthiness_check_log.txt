@@ -1,0 +1,6 @@
+ChangeOperationValidator: SUCCESS (insert_before)
+{'type': 'insert_before', 'target_activity': 'Check Credit Worthiness', 'new_activity': 'assign post processing to supervisor'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Execution time (milliseconds): 5.61

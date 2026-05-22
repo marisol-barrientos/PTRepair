@@ -1,0 +1,410 @@
+{
+    "total_files": 15,
+    "total_violations": 39,
+    "global_pattern_distribution": {
+        "exists": 5,
+        "timed_alternative": 1,
+        "directly_follows": 4,
+        "activity_receives": 5,
+        "leads_to": 11,
+        "parallel": 1,
+        "executed_by": 13,
+        "condition_eventually_follows": 7,
+        "condition_directly_follows": 2,
+        "precedence": 8,
+        "absence": 1
+    },
+    "file_statistics": {
+        "15_WinteretAlER_ALL_violations.json": {
+            "violations": 2,
+            "pattern_distribution": {
+                "exists": 2,
+                "timed_alternative": 1
+            }
+        },
+        "05_loebbecke_blood_collection_ALL_violations.json": {
+            "violations": 1,
+            "pattern_distribution": {
+                "directly_follows": 1
+            }
+        },
+        "13_Status_ALL_violations.json": {
+            "violations": 2,
+            "pattern_distribution": {
+                "activity_receives": 4,
+                "leads_to": 1,
+                "exists": 1
+            }
+        },
+        "07_CRL_ALL_violations.json": {
+            "violations": 5,
+            "pattern_distribution": {
+                "parallel": 1,
+                "executed_by": 5,
+                "condition_eventually_follows": 1
+            }
+        },
+        "09_HaarmannetAL2021_ALL_violations.json": {
+            "violations": 1,
+            "pattern_distribution": {
+                "condition_directly_follows": 1
+            }
+        },
+        "04_ghose_package_screening_ALL_violations.json": {
+            "violations": 1,
+            "pattern_distribution": {
+                "condition_eventually_follows": 1,
+                "precedence": 1,
+                "executed_by": 1
+            }
+        },
+        "02_de_masellis_loan_approval_ALL_violations.json": {
+            "violations": 3,
+            "pattern_distribution": {
+                "absence": 1,
+                "precedence": 2
+            }
+        },
+        "01_awad_delivery_of_goods_ALL_violations.json": {
+            "violations": 4,
+            "pattern_distribution": {
+                "leads_to": 4,
+                "exists": 1,
+                "directly_follows": 1
+            }
+        },
+        "08_DCR_ALL_violations.json": {
+            "violations": 1,
+            "pattern_distribution": {
+                "leads_to": 1
+            }
+        },
+        "16_Zasadaetal23_ALL_violations.json": {
+            "violations": 3,
+            "pattern_distribution": {
+                "executed_by": 3,
+                "leads_to": 1
+            }
+        },
+        "14_SunetAl24_ALL_violations.json": {
+            "violations": 4,
+            "pattern_distribution": {
+                "exists": 1,
+                "executed_by": 3,
+                "activity_receives": 1,
+                "precedence": 1
+            }
+        },
+        "11_PCL_ALL_violations.json": {
+            "violations": 3,
+            "pattern_distribution": {
+                "condition_eventually_follows": 2,
+                "condition_directly_follows": 1
+            }
+        },
+        "12_PPSL_ALL_violations.json": {
+            "violations": 3,
+            "pattern_distribution": {
+                "precedence": 3,
+                "leads_to": 4
+            }
+        },
+        "03_elgammal_loan_approval_ALL_violations.json": {
+            "violations": 2,
+            "pattern_distribution": {
+                "directly_follows": 2,
+                "executed_by": 1
+            }
+        },
+        "06_BPMQ_ALL_violations.json": {
+            "violations": 4,
+            "pattern_distribution": {
+                "condition_eventually_follows": 3,
+                "precedence": 1
+            }
+        }
+    },
+    "requirement_statistics": {
+        "15_WinteretAlER_ALL_violations.json": [
+            {
+                "requirement_id": "R2",
+                "patterns": [
+                    "exists"
+                ]
+            },
+            {
+                "requirement_id": "R3",
+                "patterns": [
+                    "exists",
+                    "timed_alternative"
+                ]
+            }
+        ],
+        "05_loebbecke_blood_collection_ALL_violations.json": [
+            {
+                "requirement_id": "R6",
+                "patterns": [
+                    "directly_follows"
+                ]
+            }
+        ],
+        "13_Status_ALL_violations.json": [
+            {
+                "requirement_id": "R1",
+                "patterns": [
+                    "activity_receives"
+                ]
+            },
+            {
+                "requirement_id": "R2",
+                "patterns": [
+                    "leads_to",
+                    "activity_receives",
+                    "activity_receives",
+                    "activity_receives",
+                    "exists"
+                ]
+            }
+        ],
+        "07_CRL_ALL_violations.json": [
+            {
+                "requirement_id": "R1",
+                "patterns": [
+                    "parallel"
+                ]
+            },
+            {
+                "requirement_id": "R3",
+                "patterns": [
+                    "executed_by",
+                    "executed_by",
+                    "executed_by"
+                ]
+            },
+            {
+                "requirement_id": "R4",
+                "patterns": [
+                    "executed_by",
+                    "executed_by"
+                ]
+            },
+            {
+                "requirement_id": "R5",
+                "patterns": []
+            },
+            {
+                "requirement_id": "R6",
+                "patterns": [
+                    "condition_eventually_follows"
+                ]
+            }
+        ],
+        "09_HaarmannetAL2021_ALL_violations.json": [
+            {
+                "requirement_id": "R1",
+                "patterns": [
+                    "condition_directly_follows"
+                ]
+            }
+        ],
+        "04_ghose_package_screening_ALL_violations.json": [
+            {
+                "requirement_id": "R1",
+                "patterns": [
+                    "condition_eventually_follows",
+                    "precedence",
+                    "executed_by"
+                ]
+            }
+        ],
+        "02_de_masellis_loan_approval_ALL_violations.json": [
+            {
+                "requirement_id": "R1",
+                "patterns": [
+                    "absence"
+                ]
+            },
+            {
+                "requirement_id": "R2",
+                "patterns": [
+                    "precedence"
+                ]
+            },
+            {
+                "requirement_id": "R3",
+                "patterns": [
+                    "precedence"
+                ]
+            }
+        ],
+        "01_awad_delivery_of_goods_ALL_violations.json": [
+            {
+                "requirement_id": "R1",
+                "patterns": [
+                    "leads_to"
+                ]
+            },
+            {
+                "requirement_id": "R2",
+                "patterns": [
+                    "leads_to",
+                    "leads_to"
+                ]
+            },
+            {
+                "requirement_id": "R3",
+                "patterns": [
+                    "leads_to"
+                ]
+            },
+            {
+                "requirement_id": "R4",
+                "patterns": [
+                    "exists",
+                    "directly_follows"
+                ]
+            }
+        ],
+        "08_DCR_ALL_violations.json": [
+            {
+                "requirement_id": "R2",
+                "patterns": [
+                    "leads_to"
+                ]
+            }
+        ],
+        "16_Zasadaetal23_ALL_violations.json": [
+            {
+                "requirement_id": "R2",
+                "patterns": [
+                    "executed_by"
+                ]
+            },
+            {
+                "requirement_id": "R3",
+                "patterns": [
+                    "leads_to"
+                ]
+            },
+            {
+                "requirement_id": "R5",
+                "patterns": [
+                    "executed_by",
+                    "executed_by"
+                ]
+            }
+        ],
+        "14_SunetAl24_ALL_violations.json": [
+            {
+                "requirement_id": "R1",
+                "patterns": []
+            },
+            {
+                "requirement_id": "R2",
+                "patterns": [
+                    "exists",
+                    "executed_by"
+                ]
+            },
+            {
+                "requirement_id": "R3",
+                "patterns": [
+                    "activity_receives",
+                    "executed_by"
+                ]
+            },
+            {
+                "requirement_id": "R4",
+                "patterns": [
+                    "precedence",
+                    "executed_by"
+                ]
+            }
+        ],
+        "11_PCL_ALL_violations.json": [
+            {
+                "requirement_id": "R1",
+                "patterns": [
+                    "condition_eventually_follows"
+                ]
+            },
+            {
+                "requirement_id": "R3",
+                "patterns": [
+                    "condition_directly_follows"
+                ]
+            },
+            {
+                "requirement_id": "R4",
+                "patterns": [
+                    "condition_eventually_follows"
+                ]
+            }
+        ],
+        "12_PPSL_ALL_violations.json": [
+            {
+                "requirement_id": "R2",
+                "patterns": [
+                    "precedence",
+                    "leads_to"
+                ]
+            },
+            {
+                "requirement_id": "R3",
+                "patterns": [
+                    "precedence",
+                    "precedence",
+                    "leads_to"
+                ]
+            },
+            {
+                "requirement_id": "R4",
+                "patterns": [
+                    "leads_to",
+                    "leads_to"
+                ]
+            }
+        ],
+        "03_elgammal_loan_approval_ALL_violations.json": [
+            {
+                "requirement_id": "R2",
+                "patterns": [
+                    "directly_follows"
+                ]
+            },
+            {
+                "requirement_id": "R3",
+                "patterns": [
+                    "executed_by",
+                    "directly_follows"
+                ]
+            }
+        ],
+        "06_BPMQ_ALL_violations.json": [
+            {
+                "requirement_id": "R2",
+                "patterns": [
+                    "condition_eventually_follows"
+                ]
+            },
+            {
+                "requirement_id": "R4",
+                "patterns": [
+                    "condition_eventually_follows"
+                ]
+            },
+            {
+                "requirement_id": "R5",
+                "patterns": [
+                    "condition_eventually_follows"
+                ]
+            },
+            {
+                "requirement_id": "R6",
+                "patterns": [
+                    "precedence"
+                ]
+            }
+        ]
+    }
+}

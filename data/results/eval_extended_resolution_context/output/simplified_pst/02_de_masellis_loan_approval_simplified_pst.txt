@@ -1,0 +1,16 @@
+parallel (wait=-1, cancel=last)
+  sequence
+    check application
+    exclusive
+      sequence (cond: data.conflicts == "true")
+        ask to recheck
+      sequence (cond: not (data.conflicts == "true"))
+        ask for updates
+  sequence
+    retrieve data
+    assess loan risk
+    parallel (wait=-1, cancel=last)
+      check medical history
+      check career
+    predict risk
+terminate

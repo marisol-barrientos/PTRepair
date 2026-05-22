@@ -1,0 +1,16 @@
+scenario,total_strategies,applied,warnings,errors,application_rate
+03_elgammal_loan_approval,8,6,6,2,75.0
+13_Status,4,4,0,0,100.0
+11_PCL,11,10,1,1,90.91
+14_SunetAl24,11,11,0,0,100.0
+16_Zasadaetal23,11,11,11,0,100.0
+07_CRL,13,11,0,2,84.62
+06_BPMQ,16,15,15,1,93.75
+12_PPSL,12,12,4,0,100.0
+02_de_masellis_loan_approval,14,13,5,1,92.86
+04_ghose_package_screening,4,4,0,0,100.0
+08_DCR,4,3,2,1,75.0
+05_loebbecke_blood_collection,4,4,4,0,100.0
+01_awad_delivery_of_goods,15,14,7,1,93.33
+09_HaarmannetAL2021,3,1,0,2,33.33
+15_WinteretAlER,6,5,0,1,83.33

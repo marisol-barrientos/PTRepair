@@ -1,0 +1,6 @@
+ChangeOperationValidator: SUCCESS (add_xor_branch)
+{'type': 'add_xor_branch', 'existing_branch_condition': 'data.status == "accepted"', 'new_branch_condition': 'data.status == "rejected"', 'new_activity_label': 'terminate'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Execution time (milliseconds): 3.27

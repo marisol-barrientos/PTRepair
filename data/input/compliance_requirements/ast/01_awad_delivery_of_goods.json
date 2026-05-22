@@ -1,0 +1,6 @@
+{
+  "R1": "leads_to('go to checkout', 'notify customer')",
+  "R2": "leads_to('pay by credit card', 'pack goods') and leads_to('pay by bank transfer', 'pack goods')",
+  "R3": "leads_to('pack goods', 'notify customer')",
+  "R4": "exists('archive order') and directly_follows('archive order', 'terminate')"
+}

@@ -1,0 +1,160 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_no_supported_full_repair",
+      "change_operations": [],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "none",
+          "reason": "The violation requires enforcing a maximum elapsed time between the process start and end. The available operations do not include an operation to insert a timeout boundary, timer event, deadline constraint, or timed wrapper around the whole process. Since no timeout activity exists, modify_timeout is not applicable."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "Leaving the process unchanged avoids introducing inconsistent or misleading control-flow constructs."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "No process change is applied."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The process structure is not modified."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "No actual change location exists; the requirement concerns the whole process from start to end."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_add_deadline_check_before_completion",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "Activate Sim Card",
+            "new_activity_label": "Check 30-day deadline"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "partial",
+          "reason": "Adding a deadline check before the final activation step can mitigate the risk of completing the process after the allowed maximum duration, but it does not technically enforce a timeout between the process start and end."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The inserted activity is contextually related to the end of the process and can act as a control point, but it does not correspond to an actual timeout construct."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one localized activity insertion is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process remains a simple sequence at the end; no additional branching, looping, or parallel structure is introduced."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The modification is placed immediately before the final operational activity, Activate Sim Card."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_add_deadline_monitoring_start_and_end_check",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "Request personal data",
+            "new_activity_label": "Start 30-day deadline monitoring"
+          }
+        },
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "Activate Sim Card",
+            "new_activity_label": "Verify 30-day deadline before activation"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "substantial",
+          "reason": "This strategy introduces an explicit monitoring start point near the beginning of the process and a verification point before completion. It substantially improves controllability, but still does not provide a formal timeout enforcement mechanism."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The two added activities are logically aligned with monitoring the maximum duration, but they rely on procedural checking rather than native timing semantics."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "Two activities are inserted at different locations in the process."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The control-flow structure remains sequential around the inserted activities and no complex constructs are added."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The changes span both the early part of the process and the late completion phase, so the overall repair is not confined to a single local area."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_add_explicit_start_end_markers_and_deadline_check",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "Request personal data",
+            "new_activity_label": "Start Activity"
+          }
+        },
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "Activate Sim Card",
+            "new_activity_label": "End Activity"
+          }
+        },
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "End Activity",
+            "new_activity_label": "Check maximum duration of 2592000 seconds"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "partial",
+          "reason": "The strategy makes the referenced start and end points explicit and adds a duration check before the end marker. However, it still does not create a real timeout constraint, so full compliance is not guaranteed."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The inserted markers correspond to the requirement terminology, but they may be artificial if the process engine already treats start and end implicitly."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "Three insertions are required, although all are simple activity-level changes."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The process remains structurally valid, but adding artificial start and end activities may reduce model clarity."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The changes affect both the beginning and end of the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS3_add_deadline_monitoring_start_and_end_check",
+  "best_resolution_reason": "No available operation can fully repair the violation because the operation set cannot insert a timeout or timed boundary around the process, and no existing timeout activity is available for modify_timeout. Among the partial repairs, RS3 provides the strongest mitigation by establishing both a deadline monitoring start point and a deadline verification point before process completion while preserving the existing process structure with limited cost.",
+  "alternative_suggestion": {
+    "reason": "A full repair would require creating a timeout or deadline constraint around the fragment from process start to process end. The provided operation set only allows modifying an existing timeout, not inserting a new timeout construct.",
+    "conceptual_solution": "Wrap the entire process from the implicit start before Request personal data to the implicit end after Activate Sim Card in a timed scope with timeout 2592000 seconds. If the timeout expires, trigger an escalation, cancellation, or alternative handling path before the process reaches completion.",
+    "expected_compliance_impact": "This would fully satisfy the maximum-time-between requirement by formally enforcing that the process cannot exceed 2592000 seconds between start and end without activating the timeout behavior."
+  }
+}

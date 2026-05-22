@@ -1,0 +1,183 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_copy_existing_update_before_predict_risk",
+      "change_operations": [
+        {
+          "operation": "copy_before",
+          "parameters": {
+            "source_activity_label": "ask for updates",
+            "target_activity_label": "predict risk"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "A copy of \"ask for updates\" is placed directly before \"predict risk\" in the same sequential branch. Therefore, every execution of \"predict risk\" is preceded by an \"ask for updates\" activity, satisfying the precedence requirement."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The repair preserves the existing process structure and keeps the original conditional \"ask for updates\" activity. However, in the no-conflict path, the process may ask for updates twice, once in the original XOR branch and once before risk prediction."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one localized copy operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The structured tree remains unchanged except for adding one activity before \"predict risk\". No parallel or XOR structure is modified."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The change is applied immediately before the late-stage activity \"predict risk\" in the risk assessment branch."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_insert_update_before_predict_risk",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "predict risk",
+            "new_activity_label": "ask for updates"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The inserted \"ask for updates\" activity executes before every occurrence of \"predict risk\", so \"predict risk\" no longer occurs without prior \"ask for updates\"."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The solution is simple and local, but the inserted activity may not inherit the same resource, data, or communication semantics as the existing \"ask for updates\" activity unless these are configured separately."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one activity insertion is needed."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process structure is preserved and only the sequential branch containing \"predict risk\" is extended."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The insertion occurs immediately before \"predict risk\", which is near the end of the risk assessment branch."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_move_predict_risk_after_ask_for_updates",
+      "change_operations": [
+        {
+          "operation": "move_after",
+          "parameters": {
+            "source_activity_label": "predict risk",
+            "target_activity_label": "ask for updates"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "After the move, \"predict risk\" occurs only after \"ask for updates\", so the precedence requirement is satisfied for all remaining executions of \"predict risk\"."
+        },
+        "resolution_context_consistency": {
+          "value": "low",
+          "reason": "This significantly changes the process semantics because \"predict risk\" is removed from the risk assessment branch and becomes dependent on the no-conflict XOR branch. If the conflict branch is taken, \"predict risk\" may no longer execute at all."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one move operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The operation moves an activity across structural boundaries from a parallel branch into an XOR branch, which may weaken the logical separation between application checking and risk assessment."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The target location is inside the application-checking XOR branch, which occurs before the final risk prediction stage."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_sequence_application_check_before_risk_branch_and_cover_conflict_path",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "ask to recheck",
+            "new_activity_label": "ask for updates"
+          }
+        },
+        {
+          "operation": "sequentialize_parallel",
+          "parameters": {
+            "first_activity_label": "check application",
+            "second_activity_label": "retrieve data"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The conflict path is repaired by adding \"ask for updates\" after \"ask to recheck\". Then the application-checking branch is made sequentially prior to the risk-assessment branch, ensuring \"ask for updates\" occurs before \"predict risk\" on both XOR paths."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "This strategy keeps the update request within the application-checking context and avoids adding an update request directly into the risk prediction branch. It also handles both the conflict and no-conflict cases."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "Two operations are required, including a structural change that removes the original top-level parallelism between application checking and risk assessment."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The process remains well-structured, but converting the top-level parallel branches into a sequence reduces concurrency and may increase process duration."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The changes affect the application-checking branch and the top-level relationship between the application-checking and data/risk branches."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS5_partial_sequence_existing_branches_only",
+      "change_operations": [
+        {
+          "operation": "sequentialize_parallel",
+          "parameters": {
+            "first_activity_label": "check application",
+            "second_activity_label": "retrieve data"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "partial",
+          "reason": "The no-conflict path is improved because the existing \"ask for updates\" will occur before \"predict risk\" once the top-level branches are sequentialized. However, the conflict path still contains \"ask to recheck\" instead of \"ask for updates\", so \"predict risk\" can still occur without prior \"ask for updates\"."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "This strategy preserves all existing activities and avoids duplicate update requests, but it does not fully satisfy the compliance rule."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one structural operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The process remains structured, but the original top-level parallelism is removed."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The change affects the top-level parallel structure near the beginning of the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_copy_existing_update_before_predict_risk",
+  "best_resolution_reason": "RS1 is recommended because it fully restores compliance with a single localized operation and preserves the existing structured tree. It has low change cost and avoids modifying the top-level parallel structure. Its main drawback is the possible duplicate execution of \"ask for updates\" in the no-conflict path, but this is less disruptive than removing parallelism or moving \"predict risk\" into a conditional branch."
+}

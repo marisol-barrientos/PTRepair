@@ -1,0 +1,169 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_sequentialize_payment_before_packing",
+      "change_operations": [
+        {
+          "operation": "sequentialize_parallel",
+          "parameters": {
+            "first_activity_label": "pay by credit card",
+            "second_activity_label": "pack goods"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The parallel branches containing payment and packing are transformed into sequential execution, with the payment branch executed before the branch containing 'pack goods'. Therefore, both 'pay by credit card' and 'pay by bank transfer' are followed by 'pack goods'."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The repair preserves the existing payment XOR structure and the existing shipping-address-before-packing sequence. It only changes the relation between the payment branch and the shipping/packing branch."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one change operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process becomes less parallel, which may reduce efficiency, but the resulting structure is simpler and remains well-structured."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change affects the central checkout fulfillment fragment, specifically the relationship between payment and packing."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_move_pack_into_credit_branch_and_copy_to_bank_branch",
+      "change_operations": [
+        {
+          "operation": "move_after",
+          "parameters": {
+            "source_activity_label": "pack goods",
+            "target_activity_label": "pay by credit card"
+          }
+        },
+        {
+          "operation": "copy_after",
+          "parameters": {
+            "source_activity_label": "pack goods",
+            "target_activity_label": "pay by bank transfer"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "A 'pack goods' activity is placed after each payment alternative. Therefore, every occurrence of 'pay by credit card' and every occurrence of 'pay by bank transfer' is followed by 'pack goods'."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The formal compliance issue is resolved, but packing is moved into the payment alternatives while 'provide shipping address' remains in a parallel branch. This may be operationally questionable because packing may occur before the shipping address is available."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Two localized activity placement operations are required."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The strategy duplicates 'pack goods' across the XOR payment alternatives and moves packing away from the original shipping sequence, increasing structural redundancy."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The changes are made inside the checkout payment and fulfillment fragment."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_insert_additional_pack_after_each_payment",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "pay by bank transfer",
+            "new_activity_label": "pack goods"
+          }
+        },
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "pay by credit card",
+            "new_activity_label": "pack goods"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Additional 'pack goods' activities are inserted directly after both payment alternatives, ensuring that each payment is followed by a packing activity."
+        },
+        "resolution_context_consistency": {
+          "value": "low",
+          "reason": "Although the leads-to requirement is formally satisfied, the original 'pack goods' activity remains in the parallel shipping branch, potentially causing duplicate packing behavior."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only two insertion operations are required and no existing structure is removed or reordered."
+        },
+        "structural_quality_impact": {
+          "value": "high",
+          "reason": "The strategy introduces redundant packing activities and may lead to inconsistent operational semantics, such as packing the same goods more than once."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The inserted activities are located in the payment alternatives within the central checkout fragment."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_move_pack_after_credit_payment_and_replicate_for_bank_payment",
+      "change_operations": [
+        {
+          "operation": "delete",
+          "parameters": {
+            "target_activity_label": "pack goods"
+          }
+        },
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "pay by bank transfer",
+            "new_activity_label": "pack goods"
+          }
+        },
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "pay by credit card",
+            "new_activity_label": "pack goods"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The original parallel 'pack goods' activity is removed, and a new 'pack goods' activity is inserted after each payment alternative. Thus, packing always occurs after the selected payment activity."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The strategy avoids duplicate packing per execution path, but it separates packing from the original shipping-address sequence. Packing may now occur before the shipping address branch completes."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "Three operations are required: one deletion and two insertions."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The model remains structured, but packing is replicated across XOR branches and the original fulfillment sequence is weakened."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The modification affects the checkout payment and fulfillment section of the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_sequentialize_payment_before_packing",
+  "best_resolution_reason": "RS1 is the preferred strategy because it fully restores compliance with a single operation, preserves the existing XOR payment logic, keeps 'provide shipping address' before 'pack goods', avoids duplicate activities, and maintains a clean structured process. Its main drawback is reduced parallelism, but this is acceptable because it directly enforces the required ordering between payment and packing."
+}

@@ -1,0 +1,152 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_remove_rejected_branch",
+      "change_operations": [
+        {
+          "operation": "remove_branch",
+          "parameters": {
+            "target_activity_label": "Report Rejected Order"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Removing the exclusive branch that does not contain Ship and Send Invoice leaves only the order-fulfillment branch after Report Order. In that remaining branch, Fill Order is followed eventually by both Ship and Send Invoice."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The context requirement precedence('Close Bill', 'Report Order') remains satisfied because Report Order still occurs before Close Bill in the remaining process."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one localized branch-removal operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The repair simplifies the XOR structure but removes the rejected-order handling path entirely, which may reduce business completeness."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is applied inside the central exclusive decision after Report Order and before Close Bill."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_remove_rejected_branch_by_condition",
+      "change_operations": [
+        {
+          "operation": "remove_branch_by_condition",
+          "parameters": {
+            "target_condition": "not (data.order.status)"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Removing the branch guarded by not (data.order.status) eliminates the path in which Ship and Send Invoice are absent. Therefore, whenever Fill Order occurs, both Ship and Send Invoice eventually occur afterwards."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "Report Order remains before Close Bill, so the existing precedence requirement is preserved."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The strategy requires a single localized branch-removal operation."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The process becomes structurally simpler, but the rejected-order alternative is removed, which may be undesirable from a business perspective."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The modification affects the middle XOR decision block following Report Order."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_move_ship_and_invoice_after_exclusive",
+      "change_operations": [
+        {
+          "operation": "move_before",
+          "parameters": {
+            "source_activity_label": "Ship",
+            "target_activity_label": "Close Bill"
+          }
+        },
+        {
+          "operation": "move_before",
+          "parameters": {
+            "source_activity_label": "Send Invoice",
+            "target_activity_label": "Close Bill"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Moving Ship and Send Invoice after the exclusive block ensures that both activities occur after the branch rejoins. Thus, if Fill Order occurs in the fulfillment branch, both required follow-up activities occur afterwards."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "Close Bill is still preceded by Report Order in all executions, so the context requirement is not violated."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "Two move operations are required and both affect activities that are currently embedded inside a parallel block."
+        },
+        "structural_quality_impact": {
+          "value": "high",
+          "reason": "The repair changes the intended ordering of shipping and invoicing relative to production, payment, and rejection handling. It may also cause rejected orders to be shipped and invoiced, which is structurally compliant but semantically questionable."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The moved activities are placed immediately before Close Bill, near the end of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_disable_rejected_branch_condition",
+      "change_operations": [
+        {
+          "operation": "modify_condition",
+          "parameters": {
+            "target_activity_label": "Report Rejected Order",
+            "new_condition": "false"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "substantial",
+          "reason": "If conditions are interpreted semantically, the rejected-order branch becomes unreachable, so the only executable branch after Report Order is the one where Fill Order is followed by Ship and Send Invoice. However, a purely structural checker may still see an XOR branch without Ship and Send Invoice."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The ordering between Report Order and Close Bill remains unchanged, so the context requirement is preserved."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one condition is modified and no activities are moved, inserted, or deleted."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The tree structure remains intact, but the rejected-order branch becomes dead code, which reduces model clarity."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The modified condition belongs to the XOR branch in the middle of the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_remove_rejected_branch",
+  "best_resolution_reason": "RS1 is the preferred supported repair because it fully restores the detected leads_to compliance violation with a single localized operation while preserving the existing context requirement that Close Bill is preceded by Report Order. Compared with moving Ship and Send Invoice after the XOR, it avoids introducing shipment and invoicing as mandatory post-processing for rejected orders. Its main drawback is the loss of rejected-order handling, but among the available operations it is the cleanest minimal structural repair.",
+  "alternative_suggestion": {
+    "reason": "The detected violation appears to arise because Ship and Send Invoice are not present in every exclusive branch, even though Fill Order itself only occurs in the fulfillment branch. The available change operations modify the process tree but do not allow changing or scoping the compliance rule.",
+    "conceptual_solution": "Refine the compliance requirement so that the leads_to obligations are evaluated only on paths where Fill Order occurs, or encode the rule conditionally as: if data.order.status is true and Fill Order occurs, then Ship and Send Invoice must eventually occur. Under that interpretation, the current fulfillment branch already satisfies the intended behavior.",
+    "expected_compliance_impact": "This would preserve the rejected-order path and avoid unnecessary process changes while aligning the compliance check with the actual conditional process semantics."
+  }
+}

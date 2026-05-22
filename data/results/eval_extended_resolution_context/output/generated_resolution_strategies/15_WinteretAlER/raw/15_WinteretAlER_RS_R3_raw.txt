@@ -1,0 +1,115 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_rename_wait_for_user_input",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "wait for user input",
+            "new_activity_label": "user input"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The missing activity label required by exists('user input') is introduced by renaming the existing semantically equivalent activity. The existing timeout structure with timeout value 60 and the parallel alternative behavior are preserved, so the timed_alternative relation can be satisfied without further restructuring."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The change is limited to the early timeout/user-input part of the process and does not affect the authentication branch containing 'Unlock screen'. Therefore it does not introduce a condition_eventually_follows violation involving not data.authenticated and Unlock screen."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one label is changed and no structural modification is required."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The structured tree remains unchanged. The repair only aligns the activity label with the compliance requirement."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The changed activity is in the initial parallel fragment before access request and authentication handling."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_insert_user_input_after_wait",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "wait for user input",
+            "new_activity_label": "user input"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "substantial",
+          "reason": "The missing 'user input' activity is added in the same early parallel branch as the existing user-input waiting behavior. This likely restores the existence requirement and may satisfy the timed alternative relation if the compliance checker accepts the inserted activity as the alternative branch counterpart to 'automatic screen lock'. However, it is less direct than renaming because the original 'wait for user input' activity remains as an additional preceding step."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The modification is isolated from the authentication XOR and does not affect the condition guarding 'Unlock screen'."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The strategy requires a single insertion, but it adds a new activity rather than only correcting an existing label."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process remains structurally valid, but the user-input branch becomes slightly more verbose and may contain redundant behavior: waiting for user input followed by user input."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The inserted activity is placed in the initial parallel timeout-handling fragment."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_copy_wait_for_user_input_after_timeout_branch",
+      "change_operations": [
+        {
+          "operation": "copy_after",
+          "parameters": {
+            "source_activity_label": "wait for user input",
+            "target_activity_label": "automatic screen lock"
+          }
+        },
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "wait for user input",
+            "new_activity_label": "user input"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "partial",
+          "reason": "This strategy can create an activity named 'user input', restoring the existence part of the requirement. However, placing the copied activity after 'automatic screen lock' is less likely to correctly model 'user input' as a timed alternative to 'automatic screen lock', because it may become sequential rather than alternative behavior. It is therefore only a partial repair."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The change remains outside the authentication XOR, so it should not directly violate the context requirement. However, copying and renaming may alter the semantics of the early control-flow region more than necessary."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "The strategy requires two operations and duplicates an existing activity before renaming."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The repair introduces duplicated user-input behavior and may reduce clarity by placing user input after automatic screen locking rather than preserving it as a clean alternative branch."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "Both operations affect the initial timeout and screen-lock handling region."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_rename_wait_for_user_input",
+  "best_resolution_reason": "RS1 is the recommended strategy because it is the minimal localized repair. The existing activity 'wait for user input' appears to be the intended activity required by the compliance rule, but its label does not match the expected label 'user input'. Renaming it restores the missing activity without adding redundant behavior, preserves the existing timeout value of 60, keeps the process structure intact, and does not affect the already compliant authentication behavior."
+}

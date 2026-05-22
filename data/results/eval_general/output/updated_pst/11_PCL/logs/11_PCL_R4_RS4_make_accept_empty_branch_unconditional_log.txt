@@ -1,0 +1,6 @@
+ChangeOperationValidator: SUCCESS (modify_condition)
+{'type': 'modify_condition', 'target_activity_label': 'Accept Empty Initial Balance', 'old_condition': 'data.special_allowance', 'new_condition': 'true'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Execution time (milliseconds): 3.16

@@ -1,0 +1,185 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_insert_missing_activity_with_resource",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "conduct customer identification & legitimation",
+            "new_activity_label": "legitimiation of suspected customer"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "legitimiation of suspected customer",
+              "new_resource": "money laundering officer"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The missing activity 'legitimiation of suspected customer' is added to the process and assigned to the required resource 'money laundering officer'. The already existing activity 'conduct customer identification & legitimation' remains available and is already executed by 'customer advisor'."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The new activity is inserted directly after the related customer identification and legitimation activity, which is contextually appropriate. However, it is executed for all new customers rather than only suspected customers."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only two localized changes are required: one insertion and one resource assignment."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process structure remains simple and sequential within the existing new-customer branch. No additional branching or loop structure is introduced."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The modification occurs in the early customer onboarding part of the process, before custody account opening and investment advice."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_insert_conditional_suspected_customer_legitimation",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "conduct customer identification & legitimation",
+            "new_activity_label": "legitimiation of suspected customer"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "legitimiation of suspected customer",
+            "new_resource": "money laundering officer"
+          }
+        },
+        {
+          "operation": "embed_activity_in_xor",
+          "parameters": {
+            "target_activity_label": "legitimiation of suspected customer",
+            "condition": "data.customer.suspected == true",
+            "mode": "skip"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The required activity is introduced and assigned to the required resource. Embedding it in an XOR structure still preserves the activity in the process model while making its execution dependent on the suspected-customer condition."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "Because the required activity concerns a suspected customer, making it conditional on a suspected-customer condition is more semantically consistent than executing it for every new customer."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "The strategy requires three changes: inserting the activity, assigning the resource, and embedding the activity in a conditional XOR structure."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The added XOR structure introduces some additional control-flow complexity, but the complexity is justified because it limits the special legitimation step to suspected customers."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The change is applied in the early new-customer onboarding branch, immediately after the existing identification and legitimation activity."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_separate_combined_identification_and_suspected_legitimation",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "conduct customer identification & legitimation",
+            "new_activity_label": "legitimiation of suspected customer"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "legitimiation of suspected customer",
+            "new_resource": "money laundering officer"
+          }
+        },
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "legitimiation of suspected customer",
+            "new_activity_label": "conduct customer identification & legitimation"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "conduct customer identification & legitimation",
+            "new_resource": "customer advisor"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "After the rename, the missing suspected-customer legitimation activity exists and is assigned to the money laundering officer. A new customer identification and legitimation activity is then inserted before it and assigned to the customer advisor, satisfying both required executed-by constraints."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The strategy separates the previously combined activity into two distinct responsibility-focused activities. However, without an added condition, the suspected-customer legitimation may still execute for every new customer."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "Four operations are required, including renaming an existing activity and inserting a replacement activity."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The strategy keeps the process sequential and avoids introducing additional branching. It clarifies responsibility separation but changes the meaning of the original activity."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "All changes are located in the early onboarding branch for new customers."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_partial_resource_normalization_only",
+      "change_operations": [
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "conduct customer identification & legitimation",
+            "new_resource": "customer advisor"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "partial",
+          "reason": "This ensures that 'conduct customer identification & legitimation' is clearly executed by 'customer advisor', but it does not create the missing activity 'legitimiation of suspected customer'. Therefore, the second executed-by requirement remains violated."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The resource assignment is consistent with the first part of the requirement, but it removes the money laundering officer from the combined activity without adding the separate suspected-customer legitimation step."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one resource modification is required."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The control-flow structure is not changed."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The change affects the early customer identification step in the new-customer branch."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS2_insert_conditional_suspected_customer_legitimation",
+  "best_resolution_reason": "RS2 is recommended because it fully restores compliance while preserving the intended distinction between general customer identification and special legitimation of suspected customers. Although it has slightly higher change cost than simply inserting the activity, the added conditional XOR makes the repair more contextually consistent and avoids executing the suspected-customer legitimation for all customers."
+}

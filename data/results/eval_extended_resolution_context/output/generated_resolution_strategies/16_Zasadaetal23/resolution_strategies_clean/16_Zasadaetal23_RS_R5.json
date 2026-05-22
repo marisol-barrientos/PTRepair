@@ -1,0 +1,145 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_conditional_common_path_legitimation",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "conduct risk disclosure",
+            "new_activity_label": "legitimiation of suspected customer"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "legitimiation of suspected customer",
+            "new_resource": "money laundering officer"
+          }
+        },
+        {
+          "operation": "embed_activity_in_xor",
+          "parameters": {
+            "target_activity_label": "legitimiation of suspected customer",
+            "condition": "data.customer_status == \"untrusted\"",
+            "mode": "skip"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The missing activity 'legitimiation of suspected customer' is added and explicitly assigned to the resource 'money laundering officer', satisfying the violated executed_by requirement."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy does not alter the existing customer-data handling, risk disclosure, investment advice resource assignment, or update-customer-data branch. It also supports the context requirement that an untrusted customer condition should eventually lead to the suspected-customer legitimation activity."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "Three localized operations are required: inserting the activity, assigning the required resource, and making its execution conditional."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The added XOR structure is simple and localized. It avoids executing the suspected-customer legitimation unnecessarily when the customer is not untrusted."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The repair is placed after the initial customer-status handling and before risk disclosure, which is a central point shared by both customer-status paths."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_unconditional_before_custody_account",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "conclude custody account",
+            "new_activity_label": "legitimiation of suspected customer"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "legitimiation of suspected customer",
+            "new_resource": "money laundering officer"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The missing activity is introduced and assigned to the required money laundering officer resource."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The change preserves the existing order between customer identification and conclusion of the custody account, and it does not affect the satisfied investment-advice or update-customer-data requirements. However, the activity is executed for all new customers, not only suspected or untrusted customers, which may be behaviorally excessive."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only two operations are needed, and both are localized near the custody-account creation path."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The sequence remains structurally simple because no new branching or loop construct is introduced."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The repair is applied inside the initial new-customer branch before the custody account is concluded."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_conditional_before_custody_account",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "conclude custody account",
+            "new_activity_label": "legitimiation of suspected customer"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "legitimiation of suspected customer",
+            "new_resource": "money laundering officer"
+          }
+        },
+        {
+          "operation": "embed_activity_in_xor",
+          "parameters": {
+            "target_activity_label": "legitimiation of suspected customer",
+            "condition": "data.customer_status == \"untrusted\"",
+            "mode": "skip"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The required suspected-customer legitimation activity is added and assigned to the money laundering officer."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The activity is conditionally executed for untrusted customers and is placed before concluding the custody account in the new-customer path. Existing requirements concerning risk disclosure, investment advice, and update customer data remain unaffected."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "The strategy requires three operations: insertion, resource assignment, and conditional embedding."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The added conditional structure is small and localized within the new-customer onboarding branch."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The change is applied in the early customer-onboarding part of the process, immediately before custody-account conclusion."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_conditional_common_path_legitimation",
+  "best_resolution_reason": "RS1 is recommended because it fully resolves the missing executed_by requirement while preserving the existing compliant behavior. By placing the conditional legitimation activity on the common path before risk disclosure, it can cover both new and existing customers if the untrusted condition holds, supports the relevant context requirement, and avoids unnecessary execution for non-suspected customers."
+}

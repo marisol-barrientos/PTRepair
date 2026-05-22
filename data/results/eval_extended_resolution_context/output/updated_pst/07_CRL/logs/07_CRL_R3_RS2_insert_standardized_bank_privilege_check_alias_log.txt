@@ -1,0 +1,11 @@
+ChangeOperationValidator: SUCCESS (insert_after)
+{'type': 'insert_after', 'target_activity': 'Check Customer Bank Privilege', 'new_activity': 'customer bank privilege check'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+ChangeOperationValidator: SUCCESS (modify_resource)
+{'type': 'modify_resource', 'target_activity_label': 'customer bank privilege check', 'old_resource': None, 'new_resource': 'Credit Broker'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Execution time (milliseconds): 11.55

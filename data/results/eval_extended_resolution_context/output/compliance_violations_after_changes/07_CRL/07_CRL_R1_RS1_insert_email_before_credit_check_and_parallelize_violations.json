@@ -1,0 +1,60 @@
+{
+    "scenario_name": "07_CRL",
+    "pst_file": "07_CRL_R1_RS1_insert_email_before_credit_check_and_parallelize.xml",
+    "verified_violation_requirements": [
+        "R1",
+        "R3",
+        "R4",
+        "R6"
+    ],
+    "verified_resolution_context_requirements": [
+        "R2",
+        "R7"
+    ],
+    "all_verified_requirements": [
+        "R1",
+        "R3",
+        "R4",
+        "R6",
+        "R2",
+        "R7"
+    ],
+    "violation_report": [
+        {
+            "requirement_id": "R3",
+            "requirement": "executed_by (tree, 'customer bank privilege check', 'credit broker') or executed_by (tree, 'customer bank privilege check', 'supervisor') and executed_by (tree, 'check credit worthiness', 'data.post_processing_resource') and executed_by_return (tree, 'customer bank privilege check') != executed_by_return (tree, 'credit worthiness check')",
+            "assurance": 100,
+            "evidence": [
+                "Activity \"customer bank privilege check\" existence was checked but not found",
+                "Activity \"customer bank privilege check\" is missing in the process",
+                "Activity \"customer bank privilege check\" existence was checked but not found",
+                "Activity \"customer bank privilege check\" is missing in the process",
+                "Activity \"check credit worthiness\" does not have an annotation Resource \"data.post_processing_resource\"",
+                "Activity \"customer bank privilege check\" existence was checked but not found",
+                "Activity \"customer bank privilege check\" does not exist.",
+                "Activity \"credit worthiness check\" existence was checked but not found",
+                "Activity \"credit worthiness check\" does not exist."
+            ]
+        },
+        {
+            "requirement_id": "R4",
+            "requirement": "executed_by (tree, 'evaluate loan risk', 'manager') and executed_by (tree, 'officially sign loan contract', 'manager')",
+            "assurance": 100,
+            "evidence": [
+                "Activity \"evaluate loan risk\" existence was checked but not found",
+                "Activity \"evaluate loan risk\" is missing in the process",
+                "Activity \"officially sign loan contract\" existence was checked but not found",
+                "Activity \"officially sign loan contract\" is missing in the process"
+            ]
+        },
+        {
+            "requirement_id": "R6",
+            "requirement": "condition_eventually_follows (tree, 'data.loan_amount > 1000000', 'assign post processing to supervisor')",
+            "assurance": 100,
+            "evidence": [
+                "Found no branch which matches to data.loan_amount>1000000",
+                "No branch with condition \"data.loan_amount > 1000000\" was found"
+            ]
+        }
+    ]
+}

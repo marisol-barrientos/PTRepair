@@ -1,0 +1,112 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_copy_send_to_existing_customer_branch",
+      "change_operations": [
+        {
+          "operation": "copy_after",
+          "parameters": {
+            "source_activity_label": "send legitimation & custody account documents",
+            "target_activity_label": "update customer data"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The activity that sends the custody_account_contract is copied into the alternative branch of the customer-status XOR. Therefore, after the exclusive branch is evaluated, the send activity exists in all branches, addressing the reported reason that the send activity does not occur in all exclusive branches."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy does not alter conduct risk disclosure, conduct investment advice, conclude custody account, customer identification, or update customer data. Requirements R1, R4, R6, and R7 remain structurally preserved. The only caveat is that the send activity is now also performed for non-new customers."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one localized copy operation is required. No existing activities are moved or deleted."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The XOR structure remains unchanged. The strategy introduces a duplicate activity in the existing-customer branch, which slightly increases redundancy but avoids broader restructuring."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The change is located inside the first customer-status decision block near the beginning of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_move_send_after_customer_status_xor",
+      "change_operations": [
+        {
+          "operation": "move_before",
+          "parameters": {
+            "source_activity_label": "send legitimation & custody account documents",
+            "target_activity_label": "conduct risk disclosure"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Moving the send activity before conduct risk disclosure places it after the customer-status XOR on the common continuation path. As a result, every execution path leaving the XOR includes the activity that sends custody_account_contract, and the activity still occurs after conclude custody account when the new-customer branch is taken."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy does not modify the resource assignment of conduct investment advice, does not remove update customer data, and does not change the required ordering between customer identification and conclude custody account. The explicit context requirements remain satisfied."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one move operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The process remains structurally simple, but the send activity is moved out of the new-customer branch and becomes common to both new and non-new customers. This may introduce semantically unnecessary sending for existing customers and changes the original ordering in the new-customer path."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The activity is moved within the early onboarding part of the process, immediately before conduct risk disclosure."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_remove_existing_customer_branch",
+      "change_operations": [
+        {
+          "operation": "remove_branch",
+          "parameters": {
+            "target_activity_label": "update customer data"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Removing the branch that does not contain the send activity leaves only the new-customer branch, where conclude custody account is followed by the activity that sends custody_account_contract."
+        },
+        "resolution_context_consistency": {
+          "value": "low",
+          "reason": "This strategy violates or strongly endangers R7, because the process would no longer execute update customer data when the customer is not new. It also removes important existing-customer behavior."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "The technical change is a single branch-removal operation, but the behavioral impact is significant because an entire customer path is eliminated."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The XOR becomes simpler, but this simplification is achieved by removing a meaningful alternative path, reducing process completeness."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The removed branch is part of the first customer-status decision block near the beginning of the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_copy_send_to_existing_customer_branch",
+  "best_resolution_reason": "RS1 is recommended because it directly addresses the detected issue with a minimal and localized change while preserving the original new-customer path and all stated resolution context requirements. Compared with moving the send activity to the common path, it avoids changing the ordering of the new-customer branch. Compared with removing the existing-customer branch, it preserves the required behavior for non-new customers.",
+  "alternative_suggestion": {
+    "reason": "The supported change operations cannot express a path-sensitive compliance-rule adjustment or a conditional common send that is visible to the compliance checker as satisfying all branches while only executing for new customers.",
+    "conceptual_solution": "If the compliance framework supports path-sensitive implication semantics, refine the rule evaluation so that leads_to only requires the send activity on paths where conclude custody account actually occurs. Under that interpretation, the existing new-customer branch already places send legitimation & custody account documents after conclude custody account.",
+    "expected_compliance_impact": "This would avoid unnecessary process changes and preserve the existing behavior, but it depends on changing the compliance interpretation rather than modifying the process tree with the provided operations."
+  }
+}

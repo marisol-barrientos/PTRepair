@@ -1,0 +1,142 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_move_notify_after_send_goods",
+      "change_operations": [
+        {
+          "operation": "move_after",
+          "parameters": {
+            "source_activity_label": "notify customer",
+            "target_activity_label": "send goods"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Moving 'notify customer' after 'send goods' places it after the parallel block. Since 'pack goods' occurs before the parallel block completes and before 'send goods', every execution containing 'pack goods' will eventually be followed by 'notify customer'."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The notification is placed at a stable point after packing and shipment, outside the payment/shipping parallelism. This avoids path-dependent behavior and removes the parallel-ordering ambiguity."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one activity is moved. No new branches, loops, or conditions are introduced."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process remains simple and structured. The XOR payment branch becomes shorter, and the notification is moved to the main sequence after the parallel join."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The compliance-restoring placement is after 'send goods', near the end of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_move_notify_after_pack_goods",
+      "change_operations": [
+        {
+          "operation": "move_after",
+          "parameters": {
+            "source_activity_label": "notify customer",
+            "target_activity_label": "pack goods"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Moving 'notify customer' directly after 'pack goods' ensures that whenever 'pack goods' occurs, 'notify customer' occurs afterwards in the same shipping branch."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The violation is resolved locally around 'pack goods', but the notification is moved from the credit-card payment branch into the shipping branch, changing its contextual meaning from payment-related to fulfillment-related."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one move operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The tree remains structured and no additional control-flow constructs are introduced. However, the activity is moved across branch boundaries."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The modification affects the parallel block where 'pack goods' currently appears."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_copy_notify_after_send_goods",
+      "change_operations": [
+        {
+          "operation": "copy_after",
+          "parameters": {
+            "source_activity_label": "notify customer",
+            "target_activity_label": "send goods"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "A copied 'notify customer' activity after 'send goods' guarantees that every execution containing 'pack goods' is followed by a later notification after the parallel block completes."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The existing credit-card notification is preserved, which may be desirable if it has payment-specific meaning. However, credit-card cases may now notify the customer twice."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one copy operation is required, and no existing activity is removed or reordered."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The process remains structurally valid, but the duplicate 'notify customer' activity may introduce semantic redundancy and potential confusion."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The added notification is placed after 'send goods', near the end of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_insert_notify_after_pack_goods",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "pack goods",
+            "new_activity_label": "notify customer"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Adding 'notify customer' immediately after 'pack goods' ensures that all executions of 'pack goods' are followed by a notification."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The repair is highly localized to the violation, but it leaves the existing notification in the credit-card branch, which may cause duplicate notifications in credit-card executions."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one insertion is required."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The control-flow structure is preserved, but the process may contain two activities with the same label and potentially overlapping purpose."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is applied directly after 'pack goods' inside the parallel shipping branch."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_move_notify_after_send_goods",
+  "best_resolution_reason": "RS1 is recommended because it fully restores the leads_to('pack goods','notify customer') requirement with a single operation, avoids duplicate notifications, and removes the ordering ambiguity caused by the current parallel placement. Placing the notification after the parallel join is structurally clean and ensures that all paths containing 'pack goods' are followed by 'notify customer'."
+}

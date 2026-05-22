@@ -1,0 +1,7 @@
+ChangeOperationValidator: SUCCESS (rename)
+{'type': 'rename', 'target_activity_label': 'provide customer brochurs', 'new_activity_label': 'send customer brochures'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Structural WARNING: WARNING: Duplicate label detected: execute plausibility check
+Execution time (milliseconds): 5.86

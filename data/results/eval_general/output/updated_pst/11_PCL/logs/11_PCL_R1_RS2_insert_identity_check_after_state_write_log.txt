@@ -1,0 +1,7 @@
+ChangeOperationValidator: SUCCESS (insert_after)
+{'type': 'insert_after', 'target_activity': 'Customer Request Arrives', 'new_activity': 'Identity Check'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Structural WARNING: WARNING: Duplicate label detected: Identity Check
+Execution time (milliseconds): 5.24

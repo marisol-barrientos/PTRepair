@@ -1,0 +1,3 @@
+ChangeOperationValidator: SUCCESS (insert_before)
+APPLICATION FAILED: No node found with label 'terminate'
+Execution time (milliseconds): 0.32

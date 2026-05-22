@@ -1,0 +1,4 @@
+{
+  "R2": "directly_follows('check credit worthiness', 'notify customer')",
+  "R3": "executed_by('judge high risk loan', 'branch office manager') and directly_follows('judge high risk loan', 'take final decision')"
+}

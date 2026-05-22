@@ -1,0 +1,21 @@
+ChangeOperationValidator: SUCCESS (insert_before)
+{'type': 'insert_before', 'target_activity': 'Check Customer Bank Privilege', 'new_activity': 'customer bank privilege check'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+ChangeOperationValidator: SUCCESS (modify_resource)
+{'type': 'modify_resource', 'target_activity_label': 'customer bank privilege check', 'old_resource': None, 'new_resource': 'Credit Broker'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+ChangeOperationValidator: SUCCESS (add_write)
+{'type': 'add_write', 'target_activity_label': 'customer bank privilege check', 'added_statement': 'bank_privilege_suspended'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+ChangeOperationValidator: SUCCESS (delete)
+{'type': 'delete', 'target_activity_label': 'Check Customer Bank Privilege'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Execution time (milliseconds): 23.47

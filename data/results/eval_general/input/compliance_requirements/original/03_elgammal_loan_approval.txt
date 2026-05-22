@@ -1,0 +1,3 @@
+R1 Not included because PTV does not verify segregation of activities -> R1: The activity “customer bank privilege check” should be segregated from “credit worthiness check”
+In R2, we interpret that the "credit bureau service" collects customer data in activity "check credit worthiness" -> R2: The customer should receive an automated email notification directly after her personal data is collected by the “credit bureau service”
+R3: The branch office manager should check whether risks are acceptable and should make either the final approval or rejection of the request

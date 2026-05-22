@@ -1,0 +1,150 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_move_identity_check_to_guarded_common_point",
+      "change_operations": [
+        {
+          "operation": "move_before",
+          "parameters": {
+            "source_activity_label": "Identity Check",
+            "target_activity_label": "Approve Account Opening"
+          }
+        },
+        {
+          "operation": "embed_activity_in_xor",
+          "parameters": {
+            "target_activity_label": "Identity Check",
+            "condition": "data.state == \"new\"",
+            "mode": "skip"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The Identity Check is moved to a common point after the state-based exclusive branch and before account approval, then guarded by the condition data.state == \"new\". Therefore, whenever the condition holds after the branch resolution, Identity Check will eventually execute."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The repair preserves the intended business meaning that only new customers require an identity check, while ensuring the check is not confined to a branch whose reachability analysis caused the violation."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "The strategy requires two operations: moving the existing activity and embedding it in a conditional XOR structure. No new business activity is introduced."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process remains structured. The added XOR wrapper introduces limited additional structure but avoids duplication and keeps the compliance logic explicit."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is applied around the first exclusive decision and immediately before Approve Account Opening, which is in the middle of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_insert_identity_check_after_state_write",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "Customer Request Arrives",
+            "new_activity_label": "Identity Check"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Customer Request Arrives writes the state variable that influences the condition data.state == \"new\". Inserting Identity Check immediately after this activity ensures that if the condition becomes true there, Identity Check eventually follows."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The strategy directly addresses the data-writing source identified in the violation evidence. However, it performs Identity Check for all cases, including existing or unknown customers, unless further conditionalization is added."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one insertion operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The process structure remains simple, but the strategy introduces a duplicate Identity Check because the original activity remains in the new-customer branch."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The insertion is performed immediately after Customer Request Arrives, at the beginning of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_move_identity_check_before_approval_without_guard",
+      "change_operations": [
+        {
+          "operation": "move_before",
+          "parameters": {
+            "source_activity_label": "Identity Check",
+            "target_activity_label": "Approve Account Opening"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Moving Identity Check to the common sequence before Approve Account Opening ensures that every execution path reaching account approval performs Identity Check, including paths where data.state == \"new\" holds."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The compliance requirement is satisfied, but the check is no longer limited to new customers. Existing customers and fallback-state cases would also undergo Identity Check."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one move operation is needed."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process remains sequential and structured. No additional branching or duplication is introduced."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The activity is relocated from the new-customer branch to the common path before Approve Account Opening."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_swap_identity_check_to_start_of_new_customer_branch",
+      "change_operations": [
+        {
+          "operation": "swap",
+          "parameters": {
+            "first_activity_label": "Enter New Customer Information",
+            "second_activity_label": "Identity Check"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "substantial",
+          "reason": "The new-customer branch would execute Identity Check immediately after the condition data.state == \"new\" selects the branch. This mitigates the violation for the explicit branch condition, but it may not fully address cases where the state is changed or re-evaluated elsewhere."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The change is localized to the affected branch, but it may be semantically questionable if Identity Check depends on information collected by Enter New Customer Information."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only a single swap operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "No new activities, branches, or loops are introduced. The structured tree shape remains unchanged."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The swap is performed inside the first exclusive branch near the beginning of the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_move_identity_check_to_guarded_common_point",
+  "best_resolution_reason": "RS1 is recommended because it achieves full compliance while preserving the intended rule that Identity Check is required for new customers only. It avoids the duplication introduced by inserting another Identity Check and avoids the over-enforcement caused by making all customers undergo the check unconditionally."
+}

@@ -1,0 +1,4 @@
+{
+	"R1": "precedence('verify symptoms', 'consult')",
+	"R3": "precedence('prescribe medicine', 'verify symptoms')"
+}

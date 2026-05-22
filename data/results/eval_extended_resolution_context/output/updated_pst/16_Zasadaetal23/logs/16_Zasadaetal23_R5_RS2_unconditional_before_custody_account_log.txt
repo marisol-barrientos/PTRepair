@@ -1,0 +1,13 @@
+ChangeOperationValidator: SUCCESS (insert_before)
+{'type': 'insert_before', 'target_activity': 'conclude custody account', 'new_activity': 'legitimiation of suspected customer'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Structural WARNING: WARNING: Duplicate label detected: execute plausibility check
+ChangeOperationValidator: SUCCESS (modify_resource)
+{'type': 'modify_resource', 'target_activity_label': 'legitimiation of suspected customer', 'old_resource': None, 'new_resource': 'money laundering officer'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Structural WARNING: WARNING: Duplicate label detected: execute plausibility check
+Execution time (milliseconds): 11.91

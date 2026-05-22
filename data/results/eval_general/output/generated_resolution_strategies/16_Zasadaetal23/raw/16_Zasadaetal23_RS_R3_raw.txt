@@ -1,0 +1,161 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_copy_send_to_missing_xor_branch",
+      "change_operations": [
+        {
+          "operation": "copy_after",
+          "parameters": {
+            "source_activity_label": "send legitimation & custody account documents",
+            "target_activity_label": "update customer data"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The existing send activity that provides the custody_account_contract is copied into the exclusive branch where it is currently missing. Therefore, the send activity is available in all branches of the exclusive structure following the point where the custody account conclusion may occur."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The change directly addresses the missing branch and preserves the original new-customer path. However, sending legitimation and custody account documents after merely updating customer data for an existing customer may be semantically questionable unless such customers also require these documents."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one localized operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The existing XOR structure is preserved. The only structural side effect is an additional activity in the second branch."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The repair is applied inside the first customer-status exclusive branch near the beginning of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_move_send_after_customer_status_xor",
+      "change_operations": [
+        {
+          "operation": "move_before",
+          "parameters": {
+            "source_activity_label": "send legitimation & custody account documents",
+            "target_activity_label": "conduct risk disclosure"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Moving the send activity before conduct risk disclosure places it after the entire customer-status exclusive block. As a result, whenever conclude custody account occurs in the new-customer branch, the send activity necessarily occurs afterwards on the common continuation path."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The activity remains after conclude custody account for new customers, but it also becomes part of the common path and may execute for existing customers. This may be acceptable if all customers require custody account documents, but otherwise it weakens business-context precision."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one move operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The strategy avoids duplicating the send activity and keeps the process compact. It changes the scope of the activity from branch-local to common-path execution."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The moved activity is relocated immediately after the first exclusive block, still in the early part of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_insert_explicit_contract_send_in_missing_branch",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "update customer data",
+            "new_activity_label": "send custody account contract"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "send custody account contract",
+            "new_resource": "Market support"
+          }
+        },
+        {
+          "operation": "add_write",
+          "parameters": {
+            "target_activity_label": "send custody account contract",
+            "added_statement": "custody_account_contract"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "An explicit activity producing or sending custody_account_contract is added to the branch where the required send was missing. This satisfies the requirement that the custody account contract is eventually sent after conclude custody account across the relevant exclusive structure."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "Compared with copying the full legitimation-document activity, this strategy adds a more specific activity for sending the custody account contract only. Assigning Market support is consistent with the existing send activity."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "The repair requires three operations: inserting the activity, assigning a resource, and adding the data write statement."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The XOR structure is preserved and the inserted activity is localized to the missing branch. The added activity is specific and does not require restructuring."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The repair is applied in the first customer-status exclusive branch near the beginning of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_copy_common_send_before_risk_disclosure",
+      "change_operations": [
+        {
+          "operation": "copy_before",
+          "parameters": {
+            "source_activity_label": "send legitimation & custody account documents",
+            "target_activity_label": "conduct risk disclosure"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "A copy of the send activity is placed on the common path before conduct risk disclosure. Therefore, after the exclusive block completes, the custody account contract is sent regardless of which branch was taken."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The original branch-local send activity remains unchanged, but the copied common send may cause duplicate sending for new customers and unnecessary sending for existing customers."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one copy operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The process remains structurally valid, but duplicate occurrences of the same send activity can reduce clarity and may introduce redundant execution."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The copied activity is inserted immediately after the first exclusive block, before conduct risk disclosure."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS3_insert_explicit_contract_send_in_missing_branch",
+  "best_resolution_reason": "RS3 is recommended because it resolves the violation while keeping the change localized to the branch where the send is missing. It avoids moving the existing new-customer send activity out of its original context and avoids duplicating the broader legitimation-document activity. Although it has a slightly higher change cost than the one-operation alternatives, it provides the best balance of compliance restoration, semantic precision, and structural quality.",
+  "alternative_suggestion": {
+    "reason": "The supported change operations cannot express a refinement of the compliance rule or path-sensitive interpretation of the existing process.",
+    "conceptual_solution": "If the intended rule is only that conclude custody account must be followed by sending the custody account contract on paths where conclude custody account actually occurs, the existing process may already be semantically compliant because both activities are in the same new-customer branch and the send activity follows the conclusion. In that case, the compliance pattern or checker could be refined to evaluate leads_to only on branches containing the triggering activity.",
+    "expected_compliance_impact": "This would eliminate the apparent violation without changing the process model, but it requires changing the compliance interpretation rather than applying a supported process change operation."
+  }
+}

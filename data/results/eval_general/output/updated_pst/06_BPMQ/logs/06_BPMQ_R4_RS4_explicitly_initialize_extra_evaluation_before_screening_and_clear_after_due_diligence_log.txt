@@ -1,0 +1,16 @@
+ChangeOperationValidator: SUCCESS (insert_after)
+{'type': 'insert_after', 'target_activity': 'Identify Respondent Bank', 'new_activity': 'Determine need for extra due diligence'}
+BehavioralValidator WARNING: Behavioral risk: terminate inside parallel block may cause synchronization anomalies
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+ChangeOperationValidator: SUCCESS (add_write)
+{'type': 'add_write', 'target_activity_label': 'Determine need for extra due diligence', 'added_statement': 'evaluation_extra = extra_due_diligence_required'}
+BehavioralValidator WARNING: Behavioral risk: terminate inside parallel block may cause synchronization anomalies
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+ChangeOperationValidator: SUCCESS (modify_write)
+{'type': 'modify_write', 'target_activity_label': 'conduct due diligence study', 'old_statement': 'data.evaluation = result\ndata.evaluation_extra = result', 'new_statement': 'write: evaluation; evaluation_extra = false'}
+BehavioralValidator WARNING: Behavioral risk: terminate inside parallel block may cause synchronization anomalies
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Execution time (milliseconds): 15.96

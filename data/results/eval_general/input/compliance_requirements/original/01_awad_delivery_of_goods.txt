@@ -1,0 +1,4 @@
+R1: Go to checkout leads to Notify customer
+R2: Pack goods cannot happen before payment
+R3: Pack goods leads to notify customer
+R4: Archive order after completion/cancellation

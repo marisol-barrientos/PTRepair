@@ -1,0 +1,10 @@
+{
+    "activities": [
+        "'terminate'"
+    ],
+    "resources": [],
+    "data": [],
+    "temporal": [
+        "directly_follows"
+    ]
+}

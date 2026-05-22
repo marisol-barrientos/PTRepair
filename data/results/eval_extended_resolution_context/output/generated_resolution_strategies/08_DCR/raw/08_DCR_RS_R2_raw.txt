@@ -1,0 +1,122 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_insert_generic_diagnosis_after_verify_symptoms",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "verify symptoms",
+            "new_activity_label": "diagnosis"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The required activity label \"diagnosis\" is inserted immediately after \"verify symptoms\". Therefore, whenever \"verify symptoms\" occurs, \"diagnosis\" necessarily occurs afterwards on all execution paths."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The existing ordering of \"consult\" before \"verify symptoms\" is preserved, so R1 remains satisfied. No \"prescribe medicine\" activity is introduced, so R3 remains unaffected."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one localized insertion is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process structure remains simple. The inserted activity is placed directly after the symptom verification step, which is a natural location for a diagnosis activity. It may introduce some semantic overlap with the existing specific diagnosis activities, but it does not complicate the control-flow structure."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The change is applied immediately after \"verify symptoms\", near the beginning of the loop body after \"consult\"."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_insert_diagnosis_in_each_main_branch",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "Wait for Patient Callback or Timeout",
+            "new_activity_label": "diagnosis"
+          }
+        },
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "terminate",
+            "new_activity_label": "diagnosis"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "A \"diagnosis\" activity is inserted into both main paths after \"verify symptoms\": the throat-related path before the waiting step and the non-throat path before termination. Thus, every path that continues after \"verify symptoms\" eventually reaches an activity labeled \"diagnosis\"."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The change does not move or remove \"consult\" or \"verify symptoms\", so R1 remains satisfied. It also does not introduce \"prescribe medicine\", so R3 remains unaffected."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Two insertions are required, both localized to branch endings."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The strategy preserves the XOR structure but adds duplicate generic diagnosis activities in separate branches. In some paths, this generic diagnosis may occur after more specific diagnosis and treatment activities, which may be less semantically clean than diagnosing immediately after symptom verification."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The inserted activities are placed near the end of the respective branches, before waiting or termination."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_rename_existing_specific_diagnoses",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "diagnosis: cold",
+            "new_activity_label": "diagnosis"
+          }
+        },
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "diagnosis: strep throat",
+            "new_activity_label": "diagnosis"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "partial",
+          "reason": "The exact required activity label \"diagnosis\" would exist after \"verify symptoms\" in the cold and strep-throat paths. However, other paths, such as the non-throat path and the no-cough/no-fever path, may still complete without executing \"diagnosis\". Therefore, the leads-to requirement is only partially restored."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy does not alter the position of \"consult\" or \"verify symptoms\" and does not introduce \"prescribe medicine\", so the provided context requirements remain satisfied."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only two rename operations are required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The control-flow structure is unchanged. However, the more specific labels \"diagnosis: cold\" and \"diagnosis: strep throat\" are replaced by the generic label \"diagnosis\", reducing semantic specificity."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The renamed activities are located inside the diagnostic XOR branches after symptom verification."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_insert_generic_diagnosis_after_verify_symptoms",
+  "best_resolution_reason": "RS1 is the recommended strategy because it fully restores the leads-to requirement with a single localized change. It preserves the existing ordering constraints, does not affect the satisfied context requirements, and introduces minimal structural complexity."
+}

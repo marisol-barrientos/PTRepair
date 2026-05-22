@@ -1,0 +1,7 @@
+ChangeOperationValidator: SUCCESS (remove_branch)
+{'type': 'remove_branch', 'target_activity_label': 'update customer data', 'removed_branch_type': 'otherwise'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Structural WARNING: WARNING: Duplicate label detected: execute plausibility check
+Execution time (milliseconds): 5.63

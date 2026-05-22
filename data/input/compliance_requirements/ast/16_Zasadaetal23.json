@@ -1,0 +1,5 @@
+{
+	"R2": "executed_by(send_exist('customer_brochures'), 'customer_advisor')",
+	"R3": "leads_to('conclude custody account', send_exist('custody_account_contract'))",
+    "R5": "executed_by('conduct customer identification & legitimation', 'customer advisor') and executed_by('legitimiation of suspected customer', 'money laundering officer')"
+}

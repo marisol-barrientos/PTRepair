@@ -1,0 +1,108 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_rename_wait_for_user_input",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "wait for user input",
+            "new_activity_label": "user input"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The violation is caused by the missing activity label \"user input\". The process already contains an activity with the same apparent semantics, \"wait for user input\", inside the timed parallel structure with timeout 60 and \"automatic screen lock\". Renaming it restores the required activity existence and aligns the timed alternative relation with the intended label."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The renamed activity preserves the existing behavior and only corrects the label mismatch. It remains in the same timed interaction context as the existing screen-lock logic."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one localized rename operation is required, with no control-flow restructuring."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The process structure is unchanged. No additional branches, loops, or activities are introduced."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The changed activity is located in the initial parallel block before access is requested."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_insert_user_input_after_timeout",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "timeout (60)",
+            "new_activity_label": "user input"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "partial",
+          "reason": "This introduces the missing \"user input\" activity, satisfying the existence part of the requirement. However, it does not clearly model \"user input\" as the timed alternative to \"automatic screen lock\"; instead, it places user input in the timeout branch before or near the automatic lock behavior."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The new activity is added close to the existing timeout behavior, but it may conflict with the already existing \"wait for user input\" activity and could introduce redundant user-input handling."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one insertion is required, but it changes the execution behavior by adding an extra activity."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The structured tree remains valid, but the inserted activity may make the timeout branch semantically less clear."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The insertion occurs in the initial timeout-related parallel block."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_insert_user_input_after_automatic_screen_lock",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "automatic screen lock",
+            "new_activity_label": "user input"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "partial",
+          "reason": "The missing \"user input\" activity is added, but the resulting behavior makes user input occur after automatic screen lock rather than as a true timed alternative. Therefore, the existence violation is repaired, but the timed-alternative semantics are only weakly mitigated."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The inserted activity is close to \"automatic screen lock\", but requiring user input immediately after locking may not match the intended timeout-alternative behavior."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The repair requires a single insertion operation."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "No structural nesting is changed, but the process gains an additional activity that may duplicate the existing user-input wait."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The change is made inside the initial screen-lock handling fragment."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_rename_wait_for_user_input",
+  "best_resolution_reason": "RS1 is the best strategy because it directly addresses the detected cause of the violation: the required activity \"user input\" is absent while a semantically equivalent activity \"wait for user input\" already exists in the correct timed context. It restores compliance with a single localized rename, preserves the existing process structure, and avoids introducing redundant or behavior-changing activities."
+}

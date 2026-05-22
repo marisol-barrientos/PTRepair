@@ -1,0 +1,171 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_insert_recurring_dms_check_at_start",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "Create resolution proposal",
+            "new_activity_label": "check for new document in DMS"
+          }
+        },
+        {
+          "operation": "embed_post_loop",
+          "parameters": {
+            "start_activity_label": "check for new document in DMS",
+            "end_activity_label": "check for new document in DMS",
+            "condition": "10518984 "
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "substantial",
+          "reason": "The missing activity is inserted and embedded in a loop, addressing the recurring aspect of the requirement. However, the provided operations do not allow adding a read or receive data object to the newly inserted activity, so the activity_receives part cannot be fully guaranteed."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "Checking for a new document in the DMS before creating the resolution proposal is contextually appropriate because the process can start from the availability of the completed and signed checklist."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only two localized operations are required: one insertion and one loop embedding."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The change adds a small loop around a single new activity at the beginning of the process without disturbing the existing parallel, exclusive, or sequential structure."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The new activity is inserted before the first existing process activity."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_insert_dms_check_without_recurring_loop",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "Create resolution proposal",
+            "new_activity_label": "check for new document in DMS"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "partial",
+          "reason": "The strategy resolves the absence of the required activity but does not make it recurring and does not establish that it receives the checklist data object."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "Placing the DMS check at the start is logically consistent with using a completed checklist as an input for the resolution process."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one insertion operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The existing structured process tree is preserved and only one sequential activity is added."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The inserted activity is placed before the first existing activity."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_insert_recurring_dms_check_before_report_analysis",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "Analyse reports",
+            "new_activity_label": "check for new document in DMS"
+          }
+        },
+        {
+          "operation": "embed_post_loop",
+          "parameters": {
+            "start_activity_label": "check for new document in DMS",
+            "end_activity_label": "check for new document in DMS",
+            "condition": "10518984 "
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "substantial",
+          "reason": "The required activity is added and made recurring through a loop. The data-receive requirement remains unresolved because no provided operation can add a consumed data object to the activity."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "Checking the DMS before analysing reports may be useful, but it is less natural than checking before the resolution proposal is created."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The strategy requires only an insertion and loop embedding."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The loop is localized around the inserted activity and does not alter the existing parallel report-generation block."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The activity is inserted after report generation and before report analysis, which is in the middle of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_rename_existing_activity_and_make_recurring",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Create resolution proposal",
+            "new_activity_label": "check for new document in DMS"
+          }
+        },
+        {
+          "operation": "embed_post_loop",
+          "parameters": {
+            "start_activity_label": "check for new document in DMS",
+            "end_activity_label": "check for new document in DMS",
+            "condition": "10518984 "
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "partial",
+          "reason": "The required activity name would exist and be recurring, but this replaces the original proposal-creation activity and still does not establish receipt of the checklist data object."
+        },
+        "resolution_context_consistency": {
+          "value": "low",
+          "reason": "Renaming the proposal-creation activity changes the business meaning of an existing core task rather than adding the missing DMS check."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only two operations are needed, but the semantic cost is higher than a simple insertion."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The process structure remains syntactically valid, but an important original activity is effectively lost."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The modified activity is the first activity in the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_insert_recurring_dms_check_at_start",
+  "best_resolution_reason": "RS1 is the best available strategy because it minimally and locally introduces the missing DMS check at the most appropriate point in the process and embeds it in a recurring loop. Full compliance cannot be guaranteed using only the provided operations because there is no operation to add a read or receive data object to an activity.",
+  "alternative_suggestion": {
+    "reason": "The provided change operations support inserting activities and wrapping them in loops, but they do not include an operation for adding a new read or receive data object to an activity. The available modify_read operation can only rename or replace an existing read variable, and the process tree does not show an existing read variable for the new activity.",
+    "conceptual_solution": "Insert the activity 'check for new document in DMS' before 'Create resolution proposal', configure it as a recurring activity with recurrence value '10518984 ', and define that it receives or consumes the data object 'checklist completed and signed by Tax Manager and Financial Controller'.",
+    "expected_compliance_impact": "This conceptual repair would fully satisfy both the recurring activity requirement and the activity_receives requirement."
+  }
+}

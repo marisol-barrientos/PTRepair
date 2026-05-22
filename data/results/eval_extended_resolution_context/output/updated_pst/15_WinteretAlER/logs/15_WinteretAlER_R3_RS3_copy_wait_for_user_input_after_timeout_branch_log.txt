@@ -1,0 +1,9 @@
+ChangeOperationValidator: SUCCESS (copy_after)
+{'type': 'copy_after', 'source_activity_label': 'wait for user input', 'target_activity_label': 'automatic screen lock', 'copied_activity_label': 'wait for user input'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Structural WARNING: WARNING: Duplicate label detected: wait for user input
+ChangeOperationValidator: SUCCESS (rename)
+APPLICATION FAILED: Ambiguous label 'wait for user input' found in nodes ['a8', 'n_4160cf']
+Execution time (milliseconds): 2.87

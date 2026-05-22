@@ -1,0 +1,11 @@
+ChangeOperationValidator: SUCCESS (remove_write)
+{'type': 'remove_write', 'target_activity_label': 'Customer Request Arrives', 'removed_variable_name': 'special_allowance'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+ChangeOperationValidator: SUCCESS (add_write)
+{'type': 'add_write', 'target_activity_label': 'Apply Account Policy', 'added_statement': 'special_allowance = assess_special_allowance(customer_information)'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Execution time (milliseconds): 6.41

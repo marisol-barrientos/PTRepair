@@ -1,0 +1,147 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_copy_blacklist_into_failed_evaluation_branch",
+      "change_operations": [
+        {
+          "operation": "copy_before",
+          "parameters": {
+            "source_activity_label": "add respondent bank to blacklist",
+            "target_activity_label": "Lookup Partner Banks"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The copied blacklist activity is placed inside the exclusive branch guarded by the failed evaluation condition. Therefore, when not data.evaluation becomes true during or after the due diligence study, the process will eventually execute add respondent bank to blacklist on that branch. The existing later blacklist activity remains available for paths where the condition is evaluated only after the parallel block."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The repair preserves the existing business intent: a respondent bank with a failed evaluation is blacklisted. The change is localized to the already existing failed-evaluation handling branch."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one copy operation is required. No existing activity, condition, resource, or data write is changed."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The structure of the process remains unchanged except for an additional activity in an existing branch. The main drawback is possible duplicate blacklisting if the later blacklist activity is also reached."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is applied in the due diligence and evaluation handling part of the process, which occurs after account request intake and before annual report analysis."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_stop_repeating_due_diligence_after_failed_evaluation",
+      "change_operations": [
+        {
+          "operation": "modify_loop_condition",
+          "parameters": {
+            "target_activity_label": "conduct due diligence study",
+            "new_condition": "data.evaluation_extra and not (data.evaluation == false)"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "substantial",
+          "reason": "The modified loop condition prevents further due diligence iterations once the evaluation has explicitly failed. This reduces the risk that not data.evaluation becomes true inside the loop and is later overwritten before the final blacklist branch is reached. However, compliance depends on the precise runtime semantics of undefined or missing data.evaluation values."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The strategy is consistent with the idea that a failed evaluation should stop additional evaluation cycles and lead to blacklisting. However, it changes the behavior of the due diligence loop and may prevent additional checks that were previously allowed."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only the loop condition is modified. No activities are added, removed, or moved."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The structured tree topology is unchanged. The modification only affects the loop guard."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is applied directly to the due diligence loop in the middle of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_insert_unconditional_blacklist_after_due_diligence",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "conduct due diligence study",
+            "new_activity_label": "add respondent bank to blacklist"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Whenever conduct due diligence study executes and may cause not data.evaluation to become true, the blacklist activity is guaranteed to occur immediately afterwards."
+        },
+        "resolution_context_consistency": {
+          "value": "low",
+          "reason": "The inserted blacklist activity is unconditional. It would also execute when the due diligence result is positive, which may conflict with the intended business semantics."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The strategy requires only one insertion operation."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process structure remains simple, but the added activity may introduce behaviorally incorrect executions."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is applied directly after the due diligence study, in the middle compliance-relevant part of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_rename_partner_lookup_to_blacklist_in_failed_branch",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Lookup Partner Banks",
+            "new_activity_label": "add respondent bank to blacklist"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The activity executed in the not data.evaluation branch becomes add respondent bank to blacklist, ensuring that the required activity occurs when the failed evaluation condition holds."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The failed-evaluation branch is repaired, but the original partner-bank lookup behavior is lost. This may be acceptable only if partner lookup is not required for other obligations."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one activity label is changed."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The structure of the process remains unchanged."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The renamed activity is located in the failed due-diligence branch in the middle of the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_copy_blacklist_into_failed_evaluation_branch",
+  "best_resolution_reason": "RS1 is the best option because it directly addresses the violated condition_eventually_follows requirement in the relevant failed-evaluation branch while preserving the existing process structure and business semantics. It is localized, low-cost, and avoids changing loop behavior or removing existing activities. Its only notable drawback is possible duplicate blacklisting, which is usually less harmful than failing to blacklist or blacklisting unconditionally.",
+  "alternative_suggestion": {
+    "reason": "The provided operations do not support inserting a uniquely identified guarded copy of an existing activity together with an idempotency check, nor do they allow precise reference to duplicated activity instances after insertion.",
+    "conceptual_solution": "Introduce a guarded blacklist step inside the not data.evaluation branch with an idempotency condition such as not data.blacklisted, and make the blacklist activity write data.blacklisted = true. The later blacklist branch should then execute only if not data.evaluation and not data.blacklisted.",
+    "expected_compliance_impact": "This would fully satisfy the compliance requirement while avoiding duplicate blacklist execution and preserving the intended failed-evaluation handling logic."
+  }
+}

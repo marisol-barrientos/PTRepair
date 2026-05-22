@@ -1,0 +1,14 @@
+{
+  "model": "openai/gpt-5.5",
+  "scenario_name": "04_ghose_package_screening",
+  "requirement_id": "R1",
+  "output_prefix": "04_ghose_package_screening_RS_R1",
+  "execution_time_milliseconds": 41047.43,
+  "problems_detected": [],
+  "usage": {
+    "prompt_tokens": 2832,
+    "completion_tokens": 2987,
+    "total_tokens": 5819,
+    "reasoning_tokens": null
+  }
+}

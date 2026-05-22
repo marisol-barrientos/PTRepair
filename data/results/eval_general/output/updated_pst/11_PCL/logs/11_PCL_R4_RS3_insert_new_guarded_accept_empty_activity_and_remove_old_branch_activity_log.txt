@@ -1,0 +1,21 @@
+ChangeOperationValidator: SUCCESS (rename)
+{'type': 'rename', 'target_activity_label': 'Accept Empty Initial Balance', 'new_activity_label': 'Accept Empty Initial Balance (legacy branch)'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+ChangeOperationValidator: SUCCESS (insert_after)
+{'type': 'insert_after', 'target_activity': 'Apply Account Policy', 'new_activity': 'Accept Empty Initial Balance'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+ChangeOperationValidator: SUCCESS (embed_activity_in_xor)
+{'type': 'embed_activity_in_xor', 'target_activity_label': 'Accept Empty Initial Balance', 'condition': 'data.special_allowance', 'mode': 'skip'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+ChangeOperationValidator: SUCCESS (delete)
+{'type': 'delete', 'target_activity_label': 'Accept Empty Initial Balance (legacy branch)'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Execution time (milliseconds): 13.84

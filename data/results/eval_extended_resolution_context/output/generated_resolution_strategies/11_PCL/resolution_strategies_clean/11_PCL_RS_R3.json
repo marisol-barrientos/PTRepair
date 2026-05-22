@@ -1,0 +1,223 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_local_conditional_warning_after_initial_deposit",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "Accept Initial Deposit",
+            "new_activity_label": "send warning"
+          }
+        },
+        {
+          "operation": "embed_activity_in_xor",
+          "parameters": {
+            "target_activity_label": "send warning",
+            "condition": "data.balance < 0 and not data.special_allowance",
+            "mode": "skip"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The inserted XOR branch explicitly uses the missing condition and directly executes 'send warning' when the condition is true."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy does not delete, rename, or move 'Initiate Account', so the context requirement exists('initiate account') remains satisfied."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one activity is inserted and then wrapped in a simple conditional structure."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The change is localized to the branch where the initial balance is accepted and avoids restructuring the surrounding process."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The modification is placed in the initial-balance handling part of the process, after account opening and policy application but before account initiation."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_conditional_warning_before_account_initiation",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "Initiate Account",
+            "new_activity_label": "send warning"
+          }
+        },
+        {
+          "operation": "embed_activity_in_xor",
+          "parameters": {
+            "target_activity_label": "send warning",
+            "condition": "data.balance < 0 and not data.special_allowance",
+            "mode": "skip"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The new XOR structure ensures that whenever 'data.balance < 0 and not data.special_allowance' holds at this point, 'send warning' directly follows the condition."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "'Initiate Account' remains present and is not modified; the warning is inserted immediately before it."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The strategy requires two simple operations: inserting the warning activity and making it conditional."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process structure remains mostly unchanged, with only a small conditional check added before account initiation."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The change is made shortly before 'Initiate Account', near the end of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_split_initial_balance_branch_with_warning_alternative",
+      "change_operations": [
+        {
+          "operation": "modify_condition",
+          "parameters": {
+            "target_activity_label": "Accept Initial Deposit",
+            "new_condition": "data.balance < 0 and not data.special_allowance"
+          }
+        },
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Accept Initial Deposit",
+            "new_activity_label": "send warning"
+          }
+        },
+        {
+          "operation": "add_xor_branch",
+          "parameters": {
+            "existing_branch_condition": "data.balance < 0 and not data.special_allowance",
+            "new_branch_condition": "data.balance >= 0 and not data.special_allowance",
+            "new_activity_label": "Accept Initial Deposit"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The branch with condition 'data.balance < 0 and not data.special_allowance' directly contains 'send warning', satisfying the violated condition-directly-follows requirement."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy modifies only the initial-balance XOR area and leaves 'Initiate Account' intact."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "The strategy requires changing a branch condition, renaming an activity, and adding a replacement branch for the normal initial-deposit case."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The XOR logic becomes more detailed by splitting the original non-special-allowance branch into negative-balance and non-negative-balance cases."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The modifications are concentrated in the initial-balance decision area of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_preserve_initial_deposit_after_warning_in_negative_balance_case",
+      "change_operations": [
+        {
+          "operation": "modify_condition",
+          "parameters": {
+            "target_activity_label": "Accept Initial Deposit",
+            "new_condition": "data.balance >= 0 and not data.special_allowance"
+          }
+        },
+        {
+          "operation": "add_xor_branch",
+          "parameters": {
+            "existing_branch_condition": "data.balance >= 0 and not data.special_allowance",
+            "new_branch_condition": "data.balance < 0 and not data.special_allowance",
+            "new_activity_label": "send warning"
+          }
+        },
+        {
+          "operation": "copy_after",
+          "parameters": {
+            "source_activity_label": "Accept Initial Deposit",
+            "target_activity_label": "send warning"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The new negative-balance branch is guarded by the required condition and directly starts with 'send warning'. The copied initial-deposit activity then preserves the deposit-handling behavior after the warning."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "'Initiate Account' is preserved, and the changes are limited to the balance-handling XOR structure."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "The strategy requires one condition modification, one new branch, and a copy operation."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The strategy preserves behavior but introduces a duplicated 'Accept Initial Deposit' activity, which may reduce model clarity."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The changes are made in the initial-balance handling fragment."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS5_add_warning_branch_without_disambiguating_existing_branch",
+      "change_operations": [
+        {
+          "operation": "add_xor_branch",
+          "parameters": {
+            "existing_branch_condition": "not (data.special_allowance)",
+            "new_branch_condition": "data.balance < 0 and not data.special_allowance",
+            "new_activity_label": "send warning"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "partial",
+          "reason": "A branch with the required condition and activity is added, but it overlaps with the existing 'not data.special_allowance' branch. Therefore, executions satisfying the condition may still take the old branch and bypass 'send warning'."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The context requirement is not affected because 'Initiate Account' remains unchanged."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only a single branch insertion is required."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The added branch creates overlapping XOR conditions, which may introduce ambiguity or non-deterministic branch selection."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is located in the existing initial-balance decision area."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_local_conditional_warning_after_initial_deposit",
+  "best_resolution_reason": "RS1 is recommended because it fully restores compliance with minimal localized change. It adds the required warning exactly in the relevant initial-deposit path, preserves the existing 'Initiate Account' activity, avoids overlapping XOR conditions, and does not require restructuring or duplicating existing activities."
+}

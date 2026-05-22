@@ -1,0 +1,6 @@
+ChangeOperationValidator: SUCCESS (modify_condition)
+{'type': 'modify_condition', 'target_activity_label': 'ask to recheck', 'old_condition': 'data.conflicts == "true"', 'new_condition': 'false'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Execution time (milliseconds): 2.93

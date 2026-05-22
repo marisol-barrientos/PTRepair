@@ -1,0 +1,8 @@
+ChangeOperationValidator: SUCCESS (insert_before)
+{'type': 'insert_before', 'target_activity': 'Wait for Patient Callback or Timeout', 'new_activity': 'diagnosis'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+ChangeOperationValidator: SUCCESS (insert_before)
+APPLICATION FAILED: No node found with label 'terminate'
+Execution time (milliseconds): 3.26
