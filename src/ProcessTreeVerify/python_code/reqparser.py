@@ -18,6 +18,7 @@ import json
 import re
 
 ## when using the "language" I used, only this tiny bit of replacement is needed, but this could be replaced with an extensive dictionary to enable a mapping between any language and the code 
+
 method_dict = {
     "prohibition": "not ",
     "root": "Start Activity",
@@ -25,21 +26,38 @@ method_dict = {
 }
 
 
-#parses the requirements into requirements that can be passed to the AST
+# ---------------------------------------------
+# Parse requirements while PRESERVING IDs
+# ---------------------------------------------
 def parse_requirements(req):
+
     req = re.sub(r'=>', ':', req)
+
     req = json.loads(req)
-    eval_req = []
-    for tag, content in req.items():
-        eval_req.append(parse_req(content))
-    return eval_req
 
-## enables writing an ast without the tree in every method as it would be in a proper object oriented implementation 
+    parsed_requirements = {}
+
+    for req_id, content in req.items():
+
+        parsed_requirements[req_id] = parse_req(content)
+
+    return parsed_requirements
+
+
+# ---------------------------------------------
+# Enables writing an AST without explicitly
+# writing "tree" in every method
+# ---------------------------------------------
 def parse_req(string):
-    result = []
-    for word in string.split("("):
-        word = f'(tree, {word}'
-        result.append(word)
-    result = " ".join(result)
-    return result[7:]
 
+    result = []
+
+    for word in string.split("("):
+
+        word = f'(tree, {word}'
+
+        result.append(word)
+
+    result = " ".join(result)
+
+    return result[7:]

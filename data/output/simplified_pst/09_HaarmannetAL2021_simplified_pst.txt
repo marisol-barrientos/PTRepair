@@ -21,4 +21,3 @@ sequence
           update translation memory manually
     sequence (cond: not (data.status == "accepted"))
       terminate
-terminate

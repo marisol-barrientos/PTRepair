@@ -1,0 +1,43 @@
+[
+    {
+        "requirement_id": "R1",
+        "requirement": "absence (tree, 'ask to recheck')",
+        "assurance": 100,
+        "affected_elements": {
+            "activities": [
+                "ask to recheck"
+            ],
+            "resources": [],
+            "data_objects": []
+        },
+        "evidence": [
+            "Activity \"ask to recheck\" exists in the process"
+        ]
+    },
+    {
+        "requirement_id": "R2",
+        "requirement": "precedence (tree, 'predict risk', 'ask for updates')",
+        "assurance": 100,
+        "affected_elements": {
+            "activities": [],
+            "resources": [],
+            "data_objects": []
+        },
+        "evidence": [
+            "Activities \"predict risk\" and \"ask for updates\" are in parrallel and accordingly cannot be compared using precedence"
+        ]
+    },
+    {
+        "requirement_id": "R3",
+        "requirement": "precedence (tree, 'check medical history', 'ask for updates')",
+        "assurance": 100,
+        "affected_elements": {
+            "activities": [],
+            "resources": [],
+            "data_objects": []
+        },
+        "evidence": [
+            "Activities \"check medical history\" and \"ask for updates\" are in parrallel and accordingly cannot be compared using precedence"
+        ]
+    }
+]

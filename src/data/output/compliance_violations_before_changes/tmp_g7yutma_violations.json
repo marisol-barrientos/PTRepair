@@ -1,0 +1,16 @@
+[
+    {
+        "requirement_id": "R2",
+        "requirement": "condition_directly_follows (tree, 'data.balance < 0 and not data.special_allowance', 'send warning')",
+        "assurance": 100,
+        "affected_elements": {
+            "activities": [],
+            "resources": [],
+            "data_objects": []
+        },
+        "evidence": [
+            "Found no branch which matches to data.balance<0andnotdata.special_allowance",
+            "No branch with condition \"data.balance < 0 and not data.special_allowance\" was found"
+        ]
+    }
+]

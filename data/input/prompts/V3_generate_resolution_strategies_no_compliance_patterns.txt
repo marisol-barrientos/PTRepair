@@ -1,0 +1,351 @@
+I am working on business process compliance and have detected a compliance violation in a process structured tree.
+
+Your task is to analyze the violation and suggest possible resolution strategies that modify the process structured tree
+in order to resolve or mitigate the violation.
+
+A resolution strategy may consist of one or more process change operations, and multiple alternative resolution strategies
+may exist for the same violation. Some violations may not have a feasible resolution strategy. In such cases, explicitly
+indicate that no valid strategy exists and explain why the violation cannot be resolved.
+
+When generating resolution strategies:
+- Use only the provided process change operations.
+- Prefer minimal and localized modifications.
+- Avoid introducing unnecessary process complexity, inconsistencies, or breaking the structure of the process.
+- If full compliance cannot be achieved, provide the best partial-compliance alternatives.
+- For strategies with multiple operations, ensure that each operation remains valid after applying the previous ones.
+
+
+A set of resolution context requirements is also provided.
+These requirements are currently satisfied and should remain satisfied whenever possible.
+
+When generating resolution strategies:
+- Avoid introducing new violations of the resolution context requirements.
+- Prefer strategies that preserve already compliant behavior.
+
+The available process change operations are the following:
+
+{
+  "change_operations": [
+
+    {
+      "operation": "insert_after",
+      "change_description": "Insert a new activity after an existing activity.",
+      "parameters": {
+        "target_activity_label": "",
+        "new_activity_label": ""
+      }
+    },
+
+    {
+      "operation": "insert_before",
+      "change_description": "Insert a new activity before an existing activity.",
+      "parameters": {
+        "target_activity_label": "",
+        "new_activity_label": ""
+      }
+    },
+
+    {
+      "operation": "delete",
+      "change_description": "Delete an activity from the process.",
+      "parameters": {
+        "target_activity_label": ""
+      }
+    },
+
+    {
+      "operation": "rename",
+      "change_description": "Rename an existing activity.",
+      "parameters": {
+        "target_activity_label": "",
+        "new_activity_label": ""
+      }
+    },
+
+    {
+      "operation": "move_after",
+      "change_description": "Move an activity after another activity.",
+      "parameters": {
+        "source_activity_label": "",
+        "target_activity_label": ""
+      }
+    },
+
+    {
+      "operation": "move_before",
+      "change_description": "Move an activity before another activity.",
+      "parameters": {
+        "source_activity_label": "",
+        "target_activity_label": ""
+      }
+    },
+
+    {
+      "operation": "swap",
+      "change_description": "Swap the positions of two activities.",
+      "parameters": {
+        "first_activity_label": "",
+        "second_activity_label": ""
+      }
+    },
+
+    {
+      "operation": "merge",
+      "change_description": "Merge two activities into one.",
+      "parameters": {
+        "first_activity_label": "",
+        "second_activity_label": "",
+        "keep_position": "first"
+      }
+    },
+
+    {
+      "operation": "split",
+      "change_description": "Split a merged activity into two separate activities.",
+      "parameters": {
+        "target_activity_label": ""
+      }
+    },
+
+    {
+      "operation": "copy_after",
+      "change_description": "Copy an activity after another activity.",
+      "parameters": {
+        "source_activity_label": "",
+        "target_activity_label": ""
+      }
+    },
+
+    {
+      "operation": "copy_before",
+      "change_description": "Copy an activity before another activity.",
+      "parameters": {
+        "source_activity_label": "",
+        "target_activity_label": ""
+      }
+    },
+
+    {
+      "operation": "modify_condition",
+      "change_description": "Modify the condition of a conditional branch.",
+      "parameters": {
+        "target_activity_label": "",
+        "new_condition": ""
+      }
+    },
+
+    {
+      "operation": "modify_resource",
+      "change_description": "Modify the assigned resource of an activity.",
+      "parameters": {
+        "target_activity_label": "",
+        "new_resource": ""
+      }
+    },
+
+    {
+      "operation": "modify_write",
+      "change_description": "Replace a write statement in an activity.",
+      "parameters": {
+        "target_activity_label": "",
+        "new_statement": ""
+      }
+    },
+
+    {
+      "operation": "add_write",
+      "change_description": "Add a new write statement to an activity.",
+      "parameters": {
+        "target_activity_label": "",
+        "added_statement": ""
+      }
+    },
+
+    {
+      "operation": "remove_write",
+      "change_description": "Remove a variable write statement from an activity.",
+      "parameters": {
+        "target_activity_label": "",
+        "removed_variable_name": ""
+      }
+    },
+
+    {
+      "operation": "modify_read",
+      "change_description": "Rename or replace a read variable in an activity.",
+      "parameters": {
+        "target_activity_label": "",
+        "old_variable_name": "",
+        "new_variable_name": ""
+      }
+    },
+
+    {
+      "operation": "parallelize",
+      "change_description": "Transform two consecutive activities into parallel branches.",
+      "parameters": {
+        "first_activity_label": "",
+        "second_activity_label": ""
+      }
+    },
+
+    {
+      "operation": "sequentialize_parallel",
+      "change_description": "Transform parallel branches into sequential execution.",
+      "parameters": {
+        "first_activity_label": "",
+        "second_activity_label": ""
+      }
+    },
+
+    {
+      "operation": "add_xor_branch",
+      "change_description": "Add a new XOR branch with a condition and activity.",
+      "parameters": {
+        "existing_branch_condition": "",
+        "new_branch_condition": "",
+        "new_activity_label": ""
+      }
+    },
+
+    {
+      "operation": "remove_branch",
+      "change_description": "Remove the branch containing an activity.",
+      "parameters": {
+        "target_activity_label": ""
+      }
+    },
+
+    {
+      "operation": "remove_branch_by_condition",
+      "change_description": "Remove an XOR branch using its condition.",
+      "parameters": {
+        "target_condition": ""
+      }
+    },
+
+    {
+      "operation": "embed_activity_in_xor",
+      "change_description": "Embed an activity inside a new XOR structure.",
+      "parameters": {
+        "target_activity_label": "",
+        "condition": "",
+        "mode": "skip"
+      }
+    },
+
+    {
+      "operation": "embed_pre_loop",
+      "change_description": "Wrap a fragment inside a pre-condition loop.",
+      "parameters": {
+        "start_activity_label": "",
+        "end_activity_label": "",
+        "condition": ""
+      }
+    },
+
+    {
+      "operation": "embed_post_loop",
+      "change_description": "Wrap a fragment inside a post-condition loop.",
+      "parameters": {
+        "start_activity_label": "",
+        "end_activity_label": "",
+        "condition": ""
+      }
+    },
+
+    {
+      "operation": "remove_loop",
+      "change_description": "Remove the surrounding loop of an activity.",
+      "parameters": {
+        "target_activity_label": ""
+      }
+    },
+
+    {
+      "operation": "modify_loop_condition",
+      "change_description": "Modify the condition of a loop.",
+      "parameters": {
+        "target_activity_label": "",
+        "new_condition": ""
+      }
+    },
+
+    {
+      "operation": "modify_timeout",
+      "change_description": "Modify the timeout value of a timeout activity.",
+      "parameters": {
+        "target_activity_label": "",
+        "new_timeout": ""
+      }
+    }
+
+  ]
+}
+
+
+For each resolution strategy:
+- Provide the sequence of process change operations required to apply the strategy.
+- Evaluate the strategy according to:
+1) compliance restoration,
+2) change cost,
+3) structural quality impact,
+4) change location within the process.
+Provide a short explanation for each evaluation criterion.
+
+
+You must strictly follow the provided JSON schema for the output. The output must always be valid JSON and must
+not contain additional text outside the JSON structure.
+
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "Unique identifier of the resolution strategy.",
+
+      "change_operations": "Reference to change_operations schema.",
+
+      "evaluation": {
+        "compliance_degree": {
+          "value": "none | partial | substantial | full",
+          "reason": "Explanation of why this compliance degree was assigned."
+        },
+
+        "resolution_context_consistency": {
+          "value": "low | medium | high",
+          "reason": "Explanation of why this consistency level was assigned."
+        },
+
+        "change_cost": {
+          "value": "very_low | low | medium | high | very_high",
+          "reason": "Explanation of why this cost level was assigned."
+        },
+
+        "structural_quality_impact": {
+          "value": "none | low | medium | high",
+          "reason": "Explanation of how the strategy affects process structure."
+        },
+
+        "change_location": {
+          "value": "early | middle | late",
+          "reason": "Explanation of why this location category was assigned."
+        }
+      }
+    }
+  ],
+
+  "best_resolution_strategy_id": "Identifier of the recommended resolution strategy.",
+
+  "best_resolution_reason": "Explanation of why the strategy was selected as the best option."
+}
+
+If additional conceptual resolution strategies exist that cannot be expressed using the provided change operations,
+include them in an optional "alternative_suggestion" field. These suggestions are informational only and may describe
+repairs outside the supported change patterns.
+
+Schema extension:
+
+"alternative_suggestion": {
+  "reason": "Why the strategy cannot be represented using the provided operations.",
+  "conceptual_solution": "Description of the alternative repair strategy.",
+  "expected_compliance_impact": "Expected compliance improvement."
+}

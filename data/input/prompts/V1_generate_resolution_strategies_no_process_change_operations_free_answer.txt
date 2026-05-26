@@ -1,0 +1,112 @@
+I am working on business process compliance and have detected a compliance violation in a process structured tree.
+
+Your task is to analyze the violation and suggest possible resolution strategies that modify the process structured tree
+in order to resolve or mitigate the violation. Multiple alternative resolution strategies
+may exist for the same violation. Some violations may not have a feasible resolution strategy. In such cases, explicitly
+indicate that no valid strategy exists and explain why the violation cannot be resolved.
+
+When generating resolution strategies:
+- Prefer minimal and localized modifications.
+- Avoid introducing unnecessary process complexity, inconsistencies, or breaking the structure of the process.
+- If full compliance cannot be achieved, provide the best partial-compliance alternatives.
+- For strategies with multiple operations, ensure that each operation remains valid after applying the previous ones.
+
+
+A set of resolution context requirements is also provided.
+These requirements are currently satisfied and should remain satisfied whenever possible.
+
+When generating resolution strategies:
+- Avoid introducing new violations of the resolution context requirements.
+- Prefer strategies that preserve already compliant behavior.
+
+
+The detected violations reference compliance patterns.
+The semantics of each violation are defined by the corresponding compliance pattern description.
+
+{
+  "compliance_patterns": [
+
+    {
+      "pattern": "exists(a)",
+      "description": "Activity a must exist in the process."
+    },
+
+    {
+      "pattern": "absence(a)",
+      "description": "Activity a must not exist in the process."
+    },
+
+    {
+      "pattern": "loop(a)",
+      "description": "Activity a must be embedded inside a loop structure."
+    },
+
+    {
+      "pattern": "directly_follows(a,b)",
+      "description": "Activity b must directly follow activity a."
+    },
+
+    {
+      "pattern": "leads_to(a,b)",
+      "description": "If activity a occurs, activity b must eventually occur afterwards."
+    },
+
+    {
+      "pattern": "precedence(a,b)",
+      "description": "Activity a may only occur if activity b occurred before."
+    },
+
+    {
+      "pattern": "leads_to_absence(a,b)",
+      "description": "If activity a occurs, activity b must not occur afterwards."
+    },
+
+    {
+      "pattern": "precedence_absence(a,b)",
+      "description": "Activity b must not occur before activity a."
+    },
+
+    {
+      "pattern": "parallel(a,b)",
+      "description": "Activities a and b must execute in parallel branches."
+    },
+
+    {
+      "pattern": "executed_by(a,r)",
+      "description": "Activity a must be executed by resource r."
+    },
+
+    {
+      "pattern": "timed_alternative(a,b,t)",
+      "description": "If activity a exceeds timeout t, activity b must execute as an alternative."
+    },
+
+    {
+      "pattern": "activity_sends(a,data)",
+      "description": "Activity a must send or produce the specified data object."
+    },
+
+    {
+      "pattern": "activity_receives(a,data)",
+      "description": "Activity a must receive or consume the specified data object."
+    },
+
+    {
+      "pattern": "condition_directly_follows(c,a)",
+      "description": "Activity a must directly execute after condition c becomes true."
+    },
+
+    {
+      "pattern": "condition_eventually_follows(c,a)",
+      "description": "Activity a must eventually execute after condition c becomes true."
+    },
+
+    {
+      "pattern": "data_leads_to_absence(c,a)",
+      "description": "Activity a must not execute when condition c holds."
+    }
+
+  ]
+}
+
+Present each resolution strategy as a string in a list.
