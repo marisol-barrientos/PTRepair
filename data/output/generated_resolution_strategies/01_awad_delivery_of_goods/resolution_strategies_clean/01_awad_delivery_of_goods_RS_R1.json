@@ -1,0 +1,121 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_insert_notify_in_bank_transfer_branch",
+      "change_operations": [
+        "Insert activity \"notify customer\" directly after activity \"pay by bank transfer\" inside the exclusive branch with condition payment_type == \"bank transfer\"."
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "After the change, every execution path following \"go to checkout\" contains \"notify customer\", including both the bank transfer and credit card branches."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No resolution context requirements are provided, and the change is localized to the violating branch without affecting other compliant behavior."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one activity insertion is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The existing structured tree is preserved. The only impact is a duplicated notification activity across both exclusive payment branches."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is made inside the payment-handling part of the process, after checkout and before goods are sent."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_move_notify_after_payment_choice",
+      "change_operations": [
+        "Remove activity \"notify customer\" from the exclusive branch with condition not (payment_type == \"bank transfer\").",
+        "Wrap the existing exclusive payment choice in a sequence if needed.",
+        "Insert activity \"notify customer\" directly after the exclusive payment choice, so it executes after either \"pay by bank transfer\" or \"pay by credit card\"."
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The notification becomes common to both exclusive payment paths, so every path after \"go to checkout\" eventually reaches \"notify customer\"."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No existing context requirements are endangered. The notification remains after payment and is generalized to all payment types."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "This requires removing an existing activity, restructuring the payment branch into a sequence if it is not already one, and reinserting the activity after the exclusive choice."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The resulting structure is cleaner than duplicating the notification in each exclusive branch, although it requires a small restructuring."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is applied within the payment-handling portion of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_insert_notify_after_parallel_block",
+      "change_operations": [
+        "Insert activity \"notify customer\" directly after the parallel block and before activity \"send goods\"."
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "All executions after \"go to checkout\" must pass through the point after the parallel block before \"send goods\", so \"notify customer\" will eventually occur on every path."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No resolution context requirements are provided. The change does not remove or reorder existing required behavior."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one activity insertion is needed."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The strategy may cause credit card customers to be notified twice, because the existing \"notify customer\" activity remains in the credit card branch."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The new notification is placed after the payment and shipping preparation parallel block, shortly before goods are sent."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_move_notify_after_parallel_block",
+      "change_operations": [
+        "Remove activity \"notify customer\" from the exclusive branch with condition not (payment_type == \"bank transfer\").",
+        "Insert activity \"notify customer\" directly after the parallel block and before activity \"send goods\"."
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The notification is moved to a common point reached by all executions after \"go to checkout\", ensuring that it occurs regardless of the selected payment type."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No resolution context requirements are provided, and the strategy avoids duplicate notifications while preserving the overall process flow."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The strategy requires one removal and one insertion, without complex restructuring."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process remains well structured and avoids duplicated notification activities. However, the notification timing changes for credit card payments."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The final notification is placed after completion of the parallel payment and shipping preparation block."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_insert_notify_in_bank_transfer_branch",
+  "best_resolution_reason": "RS1 is recommended because it fully restores compliance with the leads_to requirement using the smallest and most localized modification. It preserves the existing credit card behavior, affects only the branch where the violation occurs, and does not require restructuring the process tree."
+}

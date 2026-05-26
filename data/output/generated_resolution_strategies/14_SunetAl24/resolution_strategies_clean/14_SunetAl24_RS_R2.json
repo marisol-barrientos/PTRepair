@@ -1,0 +1,122 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_insert_verification_after_data_request",
+      "change_operations": [
+        "Insert activity \"verify user data\" into the top-level sequence immediately after \"Request personal data\".",
+        "Assign resource \"telephone company\" as the executor of activity \"verify user data\"."
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The missing activity \"verify user data\" is added to the process and explicitly assigned to the required resource \"telephone company\", satisfying both exists and executed_by requirements."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "There are no explicit resolution context requirements, and the change is localized without altering existing control-flow behavior."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one new activity and one resource assignment are introduced. No existing activities or gateways are modified."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process remains a simple structured sequence at this point. The added verification step is placed logically after personal data collection."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The change is applied near the beginning of the process, immediately after personal data is requested."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_insert_verification_before_contract",
+      "change_operations": [
+        "Insert activity \"verify user data\" into the top-level sequence immediately before \"Sign contract\".",
+        "Assign resource \"telephone company\" as the executor of activity \"verify user data\"."
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The required activity is added and assigned to the required executor, fully resolving the detected violation."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The existing process behavior is preserved, and the verification is introduced before contract signing, which is semantically consistent."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The strategy requires only a single activity insertion and a resource assignment."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The structured tree remains unchanged except for an additional sequential activity. No new branching or synchronization is introduced."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is located after the number assignment and portability handling logic but before contract signing."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_insert_verification_before_activation",
+      "change_operations": [
+        "Insert activity \"verify user data\" into the top-level sequence immediately before \"Activate Sim Card\".",
+        "Assign resource \"telephone company\" as the executor of activity \"verify user data\"."
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The process contains the required activity and the activity is executed by the required resource."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No existing context requirements are violated. Existing activities and control-flow structures are preserved."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one activity and one resource annotation are added."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The change keeps the process structured and sequential. However, the verification occurs relatively late, after contract signing and SIM dispatch."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The inserted verification occurs near the end of the process, immediately before SIM activation."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_rename_store_data_to_verify_user_data",
+      "change_operations": [
+        "Rename activity \"Store Data\" to \"verify user data\" inside the parallel branch following \"Sign contract\".",
+        "Assign resource \"telephone company\" as the executor of activity \"verify user data\"."
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "After renaming, the required activity exists and is assigned to the required executor."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "There are no explicit context requirements, but replacing \"Store Data\" may remove or obscure an existing data-storage behavior that could be operationally important."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "This avoids adding a new activity and only changes an existing activity label and resource assignment."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The control-flow structure is unchanged, but the semantic meaning of an existing activity is altered, which may reduce process clarity if data storage is still required."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The affected activity is located after contract signing in the parallel block before sending the SIM card."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_insert_verification_after_data_request",
+  "best_resolution_reason": "RS1 is the recommended strategy because it fully resolves the violation with minimal and localized change. Placing \"verify user data\" immediately after \"Request personal data\" is semantically appropriate, because the required data has just been collected and can be verified before portability, number assignment, contract signing, payment handling, SIM dispatch, or activation proceed."
+}

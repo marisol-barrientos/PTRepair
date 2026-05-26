@@ -1,0 +1,16 @@
+{
+  "model": "openai/gpt-5.5",
+  "scenario_name": "12_PPSL",
+  "requirement_id": "R3",
+  "output_prefix": "12_PPSL_RS_R3",
+  "execution_time_milliseconds": 61100.67,
+  "execution_time_seconds": 61.1,
+  "resolution_context_requirements": 1,
+  "problems_detected": [],
+  "usage": {
+    "prompt_tokens": 1569,
+    "completion_tokens": 3998,
+    "total_tokens": 5567,
+    "reasoning_tokens": null
+  }
+}

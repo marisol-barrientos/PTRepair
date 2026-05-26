@@ -1,0 +1,99 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_insert_conditional_warning_after_balance_handling",
+      "change_operations": [
+        "Insert an exclusive choice immediately after the existing exclusive block that contains 'Accept Empty Initial Balance' and 'Accept Initial Deposit', and before 'Initiate Account'.",
+        "Add a first branch to the new exclusive choice with condition 'data.balance < 0 and not data.special_allowance' containing the single activity 'send warning'.",
+        "Add a second branch to the new exclusive choice with condition 'not (data.balance < 0 and not data.special_allowance)' containing no activity."
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The required condition branch is introduced, and when 'data.balance < 0 and not data.special_allowance' holds, the activity 'send warning' executes directly as the first activity in that branch."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The existing activity 'Initiate Account' is preserved and remains reachable, so the context requirement exists('initiate account') is not violated."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one exclusive decision block and one new activity are added. No existing activities need to be removed or reordered."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The added structure is simple and localized. It introduces a clear conditional check without disrupting the main sequence."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The modification is placed after the initial-balance handling section and before account initiation, which is in the middle-to-late part of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_insert_warning_only_in_initial_deposit_branch",
+      "change_operations": [
+        "Replace the activity 'Accept Initial Deposit' in the branch with condition 'not (data.special_allowance)' by a sequence.",
+        "In that sequence, keep 'Accept Initial Deposit' as the first activity.",
+        "Immediately after 'Accept Initial Deposit', insert an exclusive choice.",
+        "Add a first branch to the new exclusive choice with condition 'data.balance < 0 and not data.special_allowance' containing the single activity 'send warning'.",
+        "Add a second branch to the new exclusive choice with condition 'not (data.balance < 0 and not data.special_allowance)' containing no activity."
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The warning is executed directly after the required condition becomes true in the non-special-allowance path where a balance is accepted."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The existing process behavior is mostly preserved, and 'Initiate Account' remains present and reachable."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The change is limited to one existing branch and adds only one conditional choice plus one activity."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The change is highly localized to the path where the condition can naturally arise. It avoids evaluating the condition on the special-allowance branch."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The modification is applied inside the initial-deposit handling section, before 'Initiate Account'."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_insert_warning_before_account_initiation_with_guarded_skip",
+      "change_operations": [
+        "Insert an exclusive choice immediately before 'Initiate Account'.",
+        "Add a first branch with condition 'data.balance < 0 and not data.special_allowance' containing the activity 'send warning'.",
+        "Add a second branch with condition 'not (data.balance < 0 and not data.special_allowance)' containing no activity.",
+        "Keep 'Initiate Account' immediately after the new exclusive choice."
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Whenever the negative-balance condition without special allowance holds before account initiation, 'send warning' executes directly in the matching branch."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The activity 'Initiate Account' is retained unchanged and remains part of the main process flow."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The strategy adds a single conditional block and one activity without modifying existing branches."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process remains well structured, although the condition is checked slightly later than in the most localized branch-specific solution."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The change is placed immediately before 'Initiate Account', near the end of the account-opening process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS2_insert_warning_only_in_initial_deposit_branch",
+  "best_resolution_reason": "RS2 is the recommended strategy because it resolves the violation fully while keeping the change localized to the branch where 'not data.special_allowance' already holds and where balance information is most likely established by 'Accept Initial Deposit'. It preserves the existing 'Initiate Account' activity and avoids adding unnecessary condition evaluation to the special-allowance path."
+}

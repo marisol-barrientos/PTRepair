@@ -1,0 +1,110 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_local_parallel_wrap_credit_check",
+      "change_operations": "OP1: In the sequence branch with condition data.bank_information_valid, replace the activity \"Check Credit Worthiness\" with a parallel block containing two branches: branch 1 contains the existing activity \"Check Credit Worthiness\" with its existing write effects credit_worthiness and risk_report; branch 2 contains the new activity \"send automated email\". OP2: Keep the following credit_worthiness-based exclusive decision after the new parallel block.",
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The missing activity \"send automated email\" is added and is placed in a parallel branch with \"Check Credit Worthiness\", directly satisfying the parallel requirement."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The ordering between customer bank privilege checking, credit worthiness checking, and loan risk evaluation is preserved. No new path is introduced that makes Evaluate LoanRisk occur earlier or under the forbidden gold-customer condition."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one existing activity is locally wrapped into a small parallel block and one new activity is inserted."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The modification is localized and preserves the existing sequence, decision logic, data dependencies, and termination behavior."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is applied in the middle of the valid bank information path, at the existing credit worthiness check."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_parallel_wrap_assignment_and_credit_check",
+      "change_operations": "OP1: In the sequence branch with condition data.bank_information_valid, replace the consecutive fragment consisting of the loan_amount-based exclusive assignment block followed by \"Check Credit Worthiness\" with a parallel block. OP2: Put the original loan_amount-based exclusive assignment block and \"Check Credit Worthiness\" in branch 1 of the parallel block, preserving their internal order. OP3: Add the new activity \"send automated email\" as branch 2 of the same parallel block. OP4: Keep the following credit_worthiness-based exclusive decision after the parallel block.",
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "\"send automated email\" is added in a branch parallel to a branch that contains \"Check Credit Worthiness\", satisfying the required parallel relation."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The existing dependency that Evaluate LoanRisk occurs only after Check Credit Worthiness remains intact. The customer bank privilege check still occurs before this valid-bank-information branch."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "The change is still localized, but it restructures a larger fragment than strictly necessary by including the loan amount assignment decision in the parallelized region."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The process remains structured, but the parallel block now contains a decision plus an activity in one branch, which is slightly more complex than wrapping only the credit check."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The modification occurs in the middle of the valid bank information path before the credit worthiness result is evaluated."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_parallel_wrap_valid_bank_information_processing",
+      "change_operations": "OP1: In the branch with condition data.bank_information_valid, place the existing processing fragment from the loan_amount-based exclusive assignment through the approval or decline decision into branch 1 of a new parallel block. OP2: Add the new activity \"send automated email\" as branch 2 of that parallel block. OP3: Ensure the process continues to the common \"Notify Customer\" activity after the parallel block completes.",
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "\"send automated email\" is added in a parallel branch while \"Check Credit Worthiness\" remains inside the other branch, so both activities execute in parallel branches."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The original order inside the main processing branch is preserved, so R2 is not directly violated. However, the parallel region is much broader and may affect assumptions about when the email is sent relative to approval, decline, or contract initialization."
+        },
+        "change_cost": {
+          "value": "high",
+          "reason": "A large valid-bank-information fragment must be wrapped and reconnected, making the change more invasive than necessary."
+        },
+        "structural_quality_impact": {
+          "value": "high",
+          "reason": "The strategy introduces a broad parallel block around complex decision logic, increasing nesting and making the process harder to understand and maintain."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is applied to the main middle section of the process after bank information validation and before notification."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_partial_sequential_email_near_credit_check",
+      "change_operations": "OP1: Insert the new activity \"send automated email\" immediately before or immediately after \"Check Credit Worthiness\" in the branch with condition data.bank_information_valid, without introducing a parallel block.",
+      "evaluation": {
+        "compliance_degree": {
+          "value": "partial",
+          "reason": "The missing activity is added, but it is not executed in a parallel branch with \"Check Credit Worthiness\", so the parallel requirement remains unsatisfied."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The existing order of customer bank privilege checking, credit worthiness checking, and loan risk evaluation is preserved, and no new path to Evaluate LoanRisk is introduced."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only a single activity is inserted into an existing sequence."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The structured tree remains a simple sequence at this point and no additional control-flow nesting is introduced."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The insertion is made near the existing credit worthiness check in the middle of the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_local_parallel_wrap_credit_check",
+  "best_resolution_reason": "RS1 is the preferred strategy because it fully restores compliance with the parallel requirement using the smallest localized structural change. It preserves the existing data dependencies and ordering required by the resolution context, avoids unnecessary restructuring, and introduces only a simple parallel block around the affected activity."
+}

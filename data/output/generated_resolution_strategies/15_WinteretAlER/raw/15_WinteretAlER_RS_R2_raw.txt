@@ -1,0 +1,84 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_RENAME_EXISTING_ACTIVITY",
+      "change_operations": "1. Rename the existing activity \"activate screen lock\" in the early parallel block to \"activate screeen lock\".",
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The required activity label \"activate screeen lock\" will exist in the process tree exactly as required by the exists pattern."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The change is limited to the screen-lock activity before authentication handling and does not affect the exclusive authentication branches. It preserves the requirement that \"Unlock screen\" does not eventually follow the condition \"not data.authenticated\"."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one activity label is changed, with no control-flow restructuring."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process structure remains unchanged. However, the renamed activity contains a likely spelling error, which may reduce model readability and semantic clarity."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The modified activity is located in the initial screen-lock handling part of the process, before access is requested and authentication is evaluated."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_INSERT_REQUIRED_ACTIVITY_AFTER_PARALLEL_BLOCK",
+      "change_operations": "1. Insert a new activity \"activate screeen lock\" directly after the initial parallel block and before \"Access requested\".",
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The process tree will contain an activity named \"activate screeen lock\", satisfying the exists requirement."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The inserted activity occurs before authentication and does not alter the later exclusive choice between \"Unlock screen\" and \"Reject access\". Therefore, the existing context requirement remains satisfied."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The strategy adds one new activity without modifying existing branches or authentication logic."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "Although structurally simple, this introduces a likely duplicate or semantically redundant screen-lock activity because \"activate screen lock\" already exists."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The insertion is made in the early part of the process, immediately after the initial screen-lock handling."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_WRAP_EXISTING_ACTIVITY_WITH_SEQUENCE",
+      "change_operations": "1. Replace the existing activity branch \"activate screen lock\" inside the initial parallel block with a sequence containing two activities: \"activate screen lock\" followed by \"activate screeen lock\".",
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The required activity \"activate screeen lock\" is added to the process tree while preserving the original \"activate screen lock\" activity."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The change remains confined to the initial screen-lock block and does not affect authentication conditions or the placement of \"Unlock screen\"."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "This requires replacing an existing leaf activity with a structured sequence, which is more intrusive than a simple rename or insertion."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The control-flow structure becomes slightly more complex, and the branch may contain redundant screen-lock behavior. It also changes the execution duration of that parallel branch."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The change is located in the initial parallel block before access is requested."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_RENAME_EXISTING_ACTIVITY",
+  "best_resolution_reason": "RS1 is the most localized and lowest-cost process-tree modification. It fully restores compliance with the exact exists requirement without changing the process control flow or affecting the satisfied resolution context requirement. The only drawback is that the required label appears to contain a spelling error, but under the given compliance pattern semantics the exact activity name must exist."
+}

@@ -1,0 +1,85 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_insert_missing_activity_unconditionally",
+      "change_operations": [
+        {
+          "operation": "insert_activity",
+          "activity": "legitimiation of suspected customer",
+          "resource": "money laundering officer",
+          "location": "In the sequence branch with condition data.customer.status == \"new\", immediately after activity \"conduct customer identification & legitimation\" and before activity \"conclude custody account\"."
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The missing activity \"legitimiation of suspected customer\" is added to the process and assigned to the required resource \"money laundering officer\". The already satisfied execution of \"conduct customer identification & legitimation\" by \"customer advisor\" is preserved."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The change does not modify the activities or ordering relevant to R1, R4, or R7. It also supports R6 because the added legitimation activity occurs before \"conclude custody account\" in the new-customer branch, while \"conduct customer identification & legitimation\" remains before \"conclude custody account\"."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one activity is inserted locally into an existing sequence. No gateway restructuring or major control-flow change is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process remains block-structured and the new activity is inserted at a semantically appropriate point. However, the activity would execute for every new customer, even if the customer is not suspected or untrusted."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The modification is located in the initial customer onboarding and custody-account-opening part of the process, before risk disclosure and investment advice."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_insert_conditional_suspected_customer_legitimation",
+      "change_operations": [
+        {
+          "operation": "insert_exclusive_block",
+          "location": "In the sequence branch with condition data.customer.status == \"new\", immediately after activity \"conduct customer identification & legitimation\" and before activity \"conclude custody account\".",
+          "branches": [
+            {
+              "condition": "data.customer_status == \"untrusted\"",
+              "sequence": [
+                {
+                  "activity": "legitimiation of suspected customer",
+                  "resource": "money laundering officer"
+                }
+              ]
+            },
+            {
+              "condition": "not (data.customer_status == \"untrusted\")",
+              "sequence": []
+            }
+          ]
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The required activity \"legitimiation of suspected customer\" is introduced and explicitly assigned to \"money laundering officer\". The existing compliant assignment of \"conduct customer identification & legitimation\" to \"customer advisor\" is preserved."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy preserves R1, R4, and R7 because it does not affect customer data reception, investment advice, or the update-customer-data branch. It is also well aligned with R6 because when the untrusted-customer condition holds, the legitimation activity eventually follows and occurs before \"conclude custody account\" in the new-customer path."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "The strategy requires adding a structured exclusive decision block rather than only inserting one activity. The change is still localized and does not affect the rest of the process."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The added exclusive block is structured and semantically justified because the new activity is only executed for untrusted or suspected customers. This avoids unnecessary execution for regular customers while keeping the process understandable."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The change is applied in the early onboarding branch for new customers, before custody-account conclusion and before the later advisory and purchase steps."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS2_insert_conditional_suspected_customer_legitimation",
+  "best_resolution_reason": "RS2 is recommended because it fully resolves the violation while best preserving the intended process behavior. It introduces the missing money-laundering-officer activity only for untrusted or suspected customers, which is more semantically precise than executing it unconditionally for all new customers. Although it has a slightly higher change cost than RS1, it better aligns with the existing resolution context requirement concerning untrusted customers and avoids unnecessary process work."
+}

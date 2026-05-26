@@ -1,0 +1,95 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_conditional_post_branch_identity_check",
+      "change_operations": [
+        "Insert an exclusive block immediately after the existing customer-state exclusive block and before 'Approve Account Opening'.",
+        "In the inserted exclusive block, add one branch with condition 'data.state == \"new\"' containing activity 'Identity Check'.",
+        "Add a second default branch with condition 'not (data.state == \"new\")' containing no activity.",
+        "Remove the existing 'Identity Check' activity from the 'data.state == \"new\"' branch of the original customer-state exclusive block."
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Whenever 'data.state == \"new\"' holds after the customer-state handling block, 'Identity Check' is executed before account approval. This directly satisfies the requirement that the identity check eventually follows the condition."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The context requirement R2, exists('initiate account'), is preserved because 'Initiate Account' is not modified or removed. Existing compliant behavior after account opening remains unchanged."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The change is localized around the existing customer-state decision point and requires only one additional conditional block plus moving the identity check."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process remains block-structured. The added exclusive block is simple and keeps the identity check conditional on the relevant data state, avoiding unnecessary execution for existing customers."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The modification is applied near the beginning of the process, immediately after the initial customer-state branching logic."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_unconditional_post_branch_identity_check",
+      "change_operations": [
+        "Move activity 'Identity Check' from the 'data.state == \"new\"' branch of the original customer-state exclusive block to the sequence position immediately after that exclusive block and before 'Approve Account Opening'."
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "After the customer-state exclusive block completes, 'Identity Check' always executes. Therefore, if 'data.state == \"new\"' holds, the identity check is guaranteed to eventually follow."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy does not affect 'Initiate Account', so R2 remains satisfied."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one activity is moved, with no additional branching structure introduced."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process structure becomes simpler because the identity check is no longer embedded inside one exclusive branch. However, the identity check will also execute for existing or undefined customer states, which may be behaviorally broader than necessary."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The change is made around the first decision block, before account approval."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_duplicate_identity_check_in_all_state_branches",
+      "change_operations": [
+        "Keep the existing 'Identity Check' in the 'data.state == \"new\"' branch.",
+        "Add activity 'Identity Check' at the end of the 'data.state == \"existing\"' branch, after 'Login for Existing Customer'.",
+        "Add activity 'Identity Check' to the default branch with condition 'not ((data.state == \"new\") or (data.state == \"existing\"))'."
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "substantial",
+          "reason": "This mitigates the violation by ensuring that every branch of the customer-state exclusive block contains an identity check. If the condition can become true or be interpreted as true within any branch, an identity check will occur. However, it may not be as semantically precise as placing the check after the state-handling block."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy does not remove or alter 'Initiate Account', so R2 remains satisfied."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "The change requires adding duplicate activities to multiple branches, increasing maintenance effort."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The process remains block-structured, but duplication of the same activity across exclusive branches reduces structural clarity and may cause inconsistent future updates."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "All modifications occur inside the initial customer-state exclusive block."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_conditional_post_branch_identity_check",
+  "best_resolution_reason": "RS1 is the best strategy because it fully restores compliance while preserving the intended behavior that only new customers require an identity check. It keeps the change localized near the violated condition, preserves the existing 'Initiate Account' activity required by R2, and avoids unnecessary identity checks for existing or default customer states."
+}

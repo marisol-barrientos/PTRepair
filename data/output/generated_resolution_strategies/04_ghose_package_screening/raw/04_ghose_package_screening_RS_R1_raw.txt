@@ -1,0 +1,84 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_insert_clear_after_route_in_held_branch",
+      "change_operations": "1. In the held-package branch with condition package.status == \"held\", insert activity \"clear package status\" immediately after activity \"route package\" and before activity \"handle package\". 2. Assign resource \"regulatory authority\" to activity \"clear package status\".",
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The activity \"clear package status\" is added to the branch where package.status == \"held\", so it eventually follows the condition. It is placed after \"route package\", satisfying the precedence requirement. It is assigned to \"regulatory authority\", satisfying the resource requirement."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "There are no additional resolution context requirements, and the change is localized to the violating branch without affecting the non-held package path."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one activity is inserted and one resource assignment is specified."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The existing sequence and exclusive branching structure are preserved. The added activity is placed directly where it is required and does not introduce additional gateways or complex control flow."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change occurs inside the held-package branch, after assessment and routing but before later handling and status update activities."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_insert_clear_after_handle_in_held_branch",
+      "change_operations": "1. In the held-package branch with condition package.status == \"held\", insert activity \"clear package status\" immediately after activity \"handle package\". 2. Assign resource \"regulatory authority\" to activity \"clear package status\".",
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The activity \"clear package status\" occurs on the branch following condition package.status == \"held\" and therefore eventually follows the condition. Since \"route package\" occurs earlier in the same branch, the precedence requirement is satisfied. The activity is executed by \"regulatory authority\"."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy preserves the existing behavior of the non-held branch and introduces no conflict with any stated context requirement."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The strategy requires only the insertion of one activity with the correct resource assignment."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process remains block-structured and no new control-flow constructs are introduced. However, placing clearance after handling may be less semantically direct than clearing status immediately after routing."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is still within the held-package branch, near the middle of the overall process before the final status update."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_split_final_update_and_add_clear_before_update_for_held_branch",
+      "change_operations": "1. Move the existing activity \"update status\" into both branches of the exclusive block so that the held and non-held paths each retain an \"update status\" activity executed by \"sort officer\". 2. In the held-package branch, insert activity \"clear package status\" after \"handle package\" and before the branch-local \"update status\". 3. Assign resource \"regulatory authority\" to activity \"clear package status\".",
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The held branch now contains \"clear package status\" after \"route package\", so the condition-eventually-follows and precedence requirements are satisfied. The activity is assigned to \"regulatory authority\"."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The observable behavior can remain equivalent if both branches still perform \"update status\", but duplicating the update activity changes the structure more broadly and may complicate future maintenance."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "This strategy requires restructuring the final status update into both exclusive branches in addition to inserting the missing activity."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The process remains structured, but duplicating \"update status\" across branches introduces redundancy and reduces structural compactness."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The main change places the new clearance activity near the end of the held branch, close to the final status update."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_insert_clear_after_route_in_held_branch",
+  "best_resolution_reason": "RS1 is the best strategy because it fully restores compliance with the least disruptive change. It inserts the missing activity only in the branch where package.status == \"held\", places it immediately after \"route package\" to satisfy precedence, assigns it to the required regulatory authority, and preserves the existing process structure with minimal cost."
+}

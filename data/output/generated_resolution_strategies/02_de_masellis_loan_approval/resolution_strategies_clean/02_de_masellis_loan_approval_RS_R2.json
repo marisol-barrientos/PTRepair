@@ -1,0 +1,136 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_insert_update_before_predict",
+      "change_operations": "1. Insert a new activity \"ask for updates\" in the second top-level sequence immediately before \"predict risk\", after the inner parallel block containing \"check medical history\" and \"check career\".",
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "\"predict risk\" is always preceded in the same sequential branch by the newly inserted \"ask for updates\" activity, so the precedence requirement is satisfied on every execution path where \"predict risk\" occurs."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "There are no additional resolution context requirements, and the strategy preserves the existing parallel structure and existing behavior as much as possible."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one activity insertion is required, localized near the violating activity."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The structured tree remains well-formed and no control-flow restructuring is needed. The only drawback is that \"ask for updates\" may now occur twice on paths where it also executes in the other parallel branch."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The change is applied immediately before \"predict risk\", which is near the end of the risk-assessment branch."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_insert_update_at_start_of_risk_branch",
+      "change_operations": "1. Insert a new activity \"ask for updates\" at the beginning of the second top-level sequence, before \"retrieve data\".",
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Because the inserted \"ask for updates\" occurs before all activities in the risk-assessment sequence, every execution of \"predict risk\" is preceded by \"ask for updates\"."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No existing context requirements are violated, and the original control-flow structure is preserved."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The strategy requires a single insertion operation."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process structure remains simple and unchanged except for one additional activity. However, the inserted activity may duplicate the existing \"ask for updates\" in the other parallel branch."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is placed at the beginning of the risk-assessment branch, before \"retrieve data\" and well before \"predict risk\"."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_sequence_application_before_risk_and_complete_update_paths",
+      "change_operations": "1. Insert activity \"ask for updates\" after \"ask to recheck\" inside the exclusive branch with condition data.conflicts == \"true\". 2. Replace the root-level parallel block with a sequence that executes the original application-checking branch first and the original risk-assessment branch second.",
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "After the restructuring, the application-handling branch always completes before the risk-assessment branch starts. Both exclusive alternatives now include \"ask for updates\" before control reaches \"predict risk\"."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "There are no context requirements that conflict with this strategy. The strategy preserves the existing activities and ensures the required ordering explicitly."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "The strategy requires both an activity insertion and a control-flow restructuring of the root parallel block into a sequence."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The resulting structure remains well-formed, but the strategy removes top-level parallelism, reducing concurrency and potentially changing process performance."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change affects the root-level relation between the application-handling branch and the risk-assessment branch."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_sequence_application_before_risk_only_partial",
+      "change_operations": "1. Replace the root-level parallel block with a sequence that executes the original application-checking branch first and the original risk-assessment branch second.",
+      "evaluation": {
+        "compliance_degree": {
+          "value": "partial",
+          "reason": "When the condition not (data.conflicts == \"true\") holds, \"ask for updates\" occurs before \"predict risk\". However, when data.conflicts == \"true\", the process executes \"ask to recheck\" but not \"ask for updates\", so \"predict risk\" may still occur without the required predecessor."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No resolution context requirements are violated, and no new activities are introduced."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one structural change is required."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The process remains structured, but top-level parallelism is removed, which may reduce concurrency and alter execution timing."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is applied at the root-level relation between the two main branches."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS5_move_risk_assessment_into_update_branch",
+      "change_operations": "1. Copy the entire second top-level risk-assessment sequence, containing \"retrieve data\", \"assess loan risk\", the inner parallel block, and \"predict risk\", into the exclusive branch with condition not (data.conflicts == \"true\"), immediately after \"ask for updates\". 2. Delete the original second top-level risk-assessment branch and replace the root-level parallel block with the remaining application-handling sequence.",
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "\"predict risk\" can only execute in the branch where \"ask for updates\" has already occurred. On the data.conflicts == \"true\" path, \"predict risk\" no longer executes, so the precedence rule is not violated."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "No explicit context requirement is violated, but the behavior of the process changes significantly because risk prediction is removed from the conflicts-true path."
+        },
+        "change_cost": {
+          "value": "high",
+          "reason": "This requires moving or copying a whole process fragment and restructuring the root of the process."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The final tree remains structured, but the risk-assessment logic becomes nested inside one exclusive branch, reducing behavioral coverage and changing the process design substantially."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change affects the exclusive decision area and the placement of the entire risk-assessment branch."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_insert_update_before_predict",
+  "best_resolution_reason": "RS1 is the recommended strategy because it fully restores compliance with the precedence requirement using a single localized insertion immediately before the violating activity. It preserves the existing parallel structure and avoids broad restructuring. Although it may introduce a duplicate \"ask for updates\" on some paths, this is less disruptive than removing concurrency or changing which paths can reach \"predict risk\"."
+}

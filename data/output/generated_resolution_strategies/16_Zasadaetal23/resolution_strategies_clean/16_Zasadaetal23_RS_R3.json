@@ -1,0 +1,84 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_insert_send_in_not_new_branch",
+      "change_operations": "1. In the first exclusive block, in the branch with condition not (data.customer.status == \"new\"), insert a new activity immediately after \"update customer data\": \"send existing custody account documents\" with resource \"Market support\" and send/write data object \"custody_account_contract\".",
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The violation arises because the sending of custody_account_contract is not present in all branches of the exclusive block. Adding a send activity to the not-new branch ensures that after the exclusive block is entered, the required data object is sent regardless of the selected branch. Therefore, every occurrence of \"conclude custody account\" is still followed by a send of custody_account_contract, and the exclusive-branch coverage issue is removed."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy does not modify \"conduct risk disclosure\", \"conduct investment advice\", \"conclude custody account\", or \"conduct customer identification & legitimation\". It also preserves the existing not-new branch behavior where \"update customer data\" eventually follows the not-new condition. Therefore, R1, R4, R6, and R7 remain satisfied."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one activity is inserted in the affected exclusive branch. No existing activity needs to be moved or deleted."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The structured tree remains well-formed. The modification is localized to one branch of an existing exclusive block and does not introduce additional gateways or nesting. The only drawback is that an additional document-sending activity is introduced for existing customers."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The modification is located in the first exclusive block, before \"conduct risk disclosure\" and before the later investment-advice and contract-conclusion activities."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_move_send_to_common_continuation",
+      "change_operations": "1. Remove \"send legitimation & custody account documents\" from the new-customer branch of the first exclusive block. 2. Insert the same activity immediately after the first exclusive block and before \"conduct risk disclosure\", preserving resource \"Market support\" and send/write data object \"custody_account_contract\".",
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "By moving the send activity to the common continuation after the exclusive block, all executions that pass through the first exclusive block will eventually execute an activity that sends custody_account_contract. Therefore, when \"conclude custody account\" occurs in the new-customer branch, the send activity is guaranteed to occur afterwards."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy does not change the resource assignment of \"conduct investment advice\", does not remove \"update customer data\" from the not-new branch, and does not alter the required ordering between customer identification and \"conclude custody account\". R1, R4, R6, and R7 are therefore preserved."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The strategy consists of one move operation: removing the send activity from its original location and reinserting it at the common continuation point."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process remains structurally simple because no new gateway is introduced. However, the send activity is delayed for new customers and is also executed for not-new customers, which may slightly alter the intended business behavior."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The change is applied around the first exclusive block, before the risk-disclosure and investment-advice part of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_insert_common_send_after_exclusive",
+      "change_operations": "1. Keep the existing \"send legitimation & custody account documents\" activity in the new-customer branch. 2. Insert an additional activity immediately after the first exclusive block and before \"conduct risk disclosure\": \"send custody account contract confirmation\" with resource \"Market support\" and send/write data object \"custody_account_contract\".",
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The additional common send activity guarantees that custody_account_contract is sent after the first exclusive block on every path. Therefore, every execution containing \"conclude custody account\" is followed by a send of the required data object."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No existing activities relevant to R1, R4, R6, or R7 are removed, moved, or reassigned. The already compliant behavior is preserved, including the existing update of customer data for not-new customers and the resource assignment of investment advice."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one activity is inserted. No existing control-flow structure is changed."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The structured tree remains valid, but the new-customer path may send custody-account-related documents twice: once inside the new-customer branch and once again after the exclusive block. This introduces potential redundancy."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The new activity is inserted immediately after the first exclusive block, in the early customer-onboarding part of the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_insert_send_in_not_new_branch",
+  "best_resolution_reason": "RS1 is recommended because it directly addresses the reported cause of the violation: the required send of custody_account_contract is missing from one branch of the first exclusive block. It is the most localized strategy, leaves the existing new-customer path unchanged, preserves all resolution context requirements, and avoids the redundant double-send behavior introduced by RS3 and the ordering change introduced by RS2."
+}

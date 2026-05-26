@@ -1,0 +1,84 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_replace_with_silent_skip",
+      "change_operations": "Replace the activity \"ask to recheck\" in the exclusive branch with condition data.conflicts == \"true\" by a silent skip/no-op node, preserving the branch condition and the surrounding exclusive structure.",
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The prohibited activity \"ask to recheck\" is removed from the process tree, satisfying the absence requirement."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "There are no additional resolution context requirements, and the existing routing structure is preserved."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one localized replacement is required, affecting a single activity node."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process structure remains well-formed, although the conflict branch becomes behaviorally empty except for the silent skip."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The change is located in the first parallel branch shortly after \"check application\"."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_replace_with_allowed_activity",
+      "change_operations": "Replace the activity \"ask to recheck\" in the exclusive branch with condition data.conflicts == \"true\" by an allowed alternative activity, such as \"request clarification\".",
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The activity \"ask to recheck\" no longer exists in the process tree, so the absence requirement is satisfied."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No context requirements are violated, and the original conflict-handling branch is retained."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The strategy requires a single localized activity substitution."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The original structured tree shape is unchanged, and the exclusive branch remains meaningful."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The modified activity occurs near the beginning of the process after \"check application\"."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_remove_conflict_branch_and_generalize_update_path",
+      "change_operations": "Delete the exclusive branch with condition data.conflicts == \"true\" containing \"ask to recheck\". Then change the remaining branch condition from not (data.conflicts == \"true\") to a default or unconditional branch so that the exclusive block remains executable.",
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The prohibited activity is removed entirely from the process tree."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "There are no context requirements to preserve, and the process remains structurally executable."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "The strategy requires deleting a branch and modifying the condition of another branch."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The exclusive choice becomes unnecessary or degenerate if only one unconditional branch remains, so the tree may need simplification."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The affected exclusive block appears near the start of the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS2_replace_with_allowed_activity",
+  "best_resolution_reason": "RS2 fully resolves the absence violation while preserving the meaningful conflict-handling behavior and maintaining the original structured tree shape. It has low cost, does not introduce structural degradation, and avoids leaving an empty branch."
+}

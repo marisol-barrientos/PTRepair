@@ -1,0 +1,84 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_add_customer_brochures_output_to_existing_activity",
+      "change_operations": "1) Modify the existing activity \"provide customer brochurs\" by adding output/write data object \"customer_brochures\". 2) Keep the existing resource assignment \"customer_advisor\" unchanged.",
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The existing activity already executed by \"customer_advisor\" becomes an activity that sends or produces \"customer_brochures\", satisfying the violated executed_by requirement for the send activity."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No control-flow, ordering, condition, or resource assignment relevant to R1, R4, R6, or R7 is changed. Existing compliant behavior is preserved."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only a data-output annotation is added to an existing activity. No new activity or restructuring is required."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The structured tree remains unchanged. The modification only enriches the data semantics of an existing activity."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The changed activity occurs near the beginning of the process, immediately after \"new customer arrives\"."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_rename_and_annotate_existing_brochure_activity",
+      "change_operations": "1) Rename the existing activity \"provide customer brochurs\" to \"provide customer brochures\" or \"send customer brochures\" to clarify its purpose. 2) Add output/write data object \"customer_brochures\" to that activity. 3) Preserve the existing resource assignment \"customer_advisor\".",
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The renamed activity explicitly represents sending or providing brochures, produces \"customer_brochures\", and remains executed by \"customer_advisor\"."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The change does not alter the process order, branches, conditions, or the activities involved in the context requirements. R1, R4, R6, and R7 remain unaffected."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The strategy requires a label correction and a data-output annotation, but no structural change."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The activity name becomes clearer and the data semantics become explicit. The process structure is not modified."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The affected activity is located at the start of the process, directly after customer arrival."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_insert_explicit_send_customer_brochures_activity",
+      "change_operations": "1) Insert a new activity \"send customer brochures\" directly after \"provide customer brochurs\" and before the following exclusive branch. 2) Assign resource \"customer_advisor\" to the new activity. 3) Add output/write data object \"customer_brochures\" to the new activity.",
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The inserted activity explicitly sends or produces \"customer_brochures\" and is executed by \"customer_advisor\", satisfying the violated requirement."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The insertion is before the existing exclusive branch and does not affect the ordering or execution conditions required by R1, R4, R6, or R7."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "A new activity is added, requiring changes to the process model and possibly operational execution, even though no complex restructuring is needed."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The sequence remains well-structured, but the process gains an additional task that may be redundant with the existing brochure-provision activity."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The new activity is inserted near the beginning of the process, before the first exclusive branch."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_add_customer_brochures_output_to_existing_activity",
+  "best_resolution_reason": "RS1 is the preferred strategy because it fully restores compliance with the smallest possible localized change. The existing activity is already performed by \"customer_advisor\" and semantically appears to provide brochures, so adding the missing \"customer_brochures\" output is sufficient. It preserves all resolution context requirements and has no structural impact."
+}

@@ -1,0 +1,91 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_insert_notify_immediately_after_credit_check",
+      "change_operations": [
+        "Insert activity 'notify customer' immediately after activity 'check credit worthiness' in the sequence under condition loan.amount == 'lower equal 1M', before the exclusive split on loan.credit."
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "After the insertion, every execution of 'check credit worthiness' is directly followed by 'notify customer', satisfying directly_follows('check credit worthiness', 'notify customer')."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "There are no additional resolution context requirements, and the strategy preserves all existing behavior while only adding the required direct notification."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one localized insertion is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The existing structured tree remains unchanged except for one added activity. However, the process may notify the customer more than once in the approved low-risk path because an existing later 'notify customer' activity remains."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The modification is located inside the middle part of the process, within the approved loan and lower-or-equal-to-1M branch."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_move_existing_low_amount_notification_after_credit_check",
+      "change_operations": [
+        "Remove the existing activity 'notify customer' from the sequence under condition loan.credit == 'good', where it currently occurs after 'send loan contract'.",
+        "Insert activity 'notify customer' immediately after activity 'check credit worthiness' in the sequence under condition loan.amount == 'lower equal 1M', before the exclusive split on loan.credit."
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The moved 'notify customer' activity directly follows 'check credit worthiness', so the direct-follow requirement is satisfied."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No explicit context requirements are violated. The strategy avoids duplicate customer notifications in the low-amount approved path."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "The strategy requires both a deletion and an insertion, and it changes the timing of an existing notification."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process structure remains simple and block-structured. The main impact is behavioral: the customer is notified earlier than before, including cases where credit is not good."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "Both operations occur in the middle of the process, inside the lower-or-equal-to-1M loan branch."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_notify_only_good_credit_branch",
+      "change_operations": [
+        "Insert activity 'notify customer' as the first activity in the sequence under condition loan.credit == 'good', before 'evaluate loan risk'."
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "partial",
+          "reason": "For executions where loan.credit == 'good', 'notify customer' occurs immediately after the credit-worthiness decision is routed into the good-credit branch. However, if loan.credit is not good, 'check credit worthiness' is not followed by 'notify customer', so the direct-follow requirement is not fully satisfied."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No context requirements are violated, and the bad-credit decline behavior is preserved without adding a notification before rejection."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one localized insertion is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The modification is structurally simple and preserves the existing exclusive branching. It does not require restructuring the tree."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is placed in the middle of the process, inside the low-amount loan branch after the credit check."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_insert_notify_immediately_after_credit_check",
+  "best_resolution_reason": "RS1 is recommended because it fully restores compliance with the directly_follows requirement using a single localized insertion while preserving the existing process behavior. Although it may introduce an additional customer notification in some paths, it has the lowest change cost and does not require deleting or moving existing activities."
+}

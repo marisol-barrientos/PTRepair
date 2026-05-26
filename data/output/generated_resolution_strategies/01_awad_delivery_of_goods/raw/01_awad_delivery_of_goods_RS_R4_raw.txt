@@ -1,0 +1,58 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_insert_archive_before_terminate",
+      "change_operations": "Insert activity 'archive order' in the top-level sequence between 'send goods' and 'terminate'. The resulting suffix becomes: 'send goods' -> 'archive order' -> 'terminate'.",
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The missing activity 'archive order' is added, satisfying exists('archive order'). Because 'terminate' immediately follows 'archive order', directly_follows('archive order','terminate') is also satisfied."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "There are no additional context requirements, and the change preserves all existing ordering and branching behavior before termination."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one activity is inserted at the end of the process, with no need to move or delete existing nodes."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process structure remains a simple top-level sequence. No additional gateways, loops, or nesting are introduced."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The change is applied immediately before the process termination, after 'send goods'."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_replace_termination_with_archive_then_terminate_sequence",
+      "change_operations": "Replace the existing terminal node 'terminate' with a sequence containing 'archive order' followed directly by 'terminate'.",
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The replacement introduces 'archive order' and ensures that 'terminate' directly follows it within the inserted sequence."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The behavior before termination is preserved, and no existing activity ordering or branching behavior is changed."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "Although only the termination area is changed, this strategy replaces an existing node with a nested sequence rather than performing a simple insertion."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The strategy introduces an additional sequence nesting level, which is structurally valid but less simple than directly inserting the activity into the existing top-level sequence."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The modification is localized at the final termination point of the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_insert_archive_before_terminate",
+  "best_resolution_reason": "RS1 is the best strategy because it fully restores compliance with the missing existence and directly-follows requirements using a single localized insertion. It preserves the existing process behavior, avoids unnecessary nesting, has low change cost, and maintains good structural quality."
+}

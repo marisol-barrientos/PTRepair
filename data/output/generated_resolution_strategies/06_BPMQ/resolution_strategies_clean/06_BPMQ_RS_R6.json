@@ -1,0 +1,120 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_add_certificate_check_to_record_branch",
+      "change_operations": [
+        "Insert activity 'check respondent bank certificate' into the exclusive branch with condition 'not (!data.record)', before the branch rejoins the main sequence."
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The only trace that could currently reach 'open bank account' without first executing 'check respondent bank certificate' is the branch where 'data.record' holds. Adding the certificate check to that branch ensures that every possible execution of 'open bank account' is preceded by 'check respondent bank certificate'."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The existing activities 'obtain respondent bank annual report' and 'analyze respondent bank annual report' remain unchanged, preserving R1. The risk-handling structure where 'data.risk' directly leads to 'terminate' is not modified, preserving R3."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one activity is inserted into a currently empty exclusive branch. No existing control-flow structure needs to be moved or redesigned."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The change is localized and preserves the existing exclusive structure. It introduces a duplicate occurrence of 'check respondent bank certificate', but this duplication is limited and directly addresses the missing behavior."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The change is applied in the initial exclusive decision concerning whether a respondent bank record already exists, before the annual report and account-opening phases."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_move_certificate_check_before_record_exclusive",
+      "change_operations": [
+        "Insert activity 'check respondent bank certificate' after 'Identify Respondent Bank' and before the exclusive branching on '!data.record'.",
+        "Remove the existing activity 'check respondent bank certificate' from the parallel block inside the branch with condition '!data.record'."
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "By placing 'check respondent bank certificate' before the exclusive split, every trace that can later reach 'open bank account' necessarily executes the certificate check first."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The annual report activities required by R1 remain in the main sequence. The risk branch containing the direct transition from condition 'data.risk' to 'terminate' is not changed, so R3 remains satisfied."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "This strategy requires both inserting the certificate check at a higher level and removing its original occurrence from the parallel block. It is more invasive than simply adding the missing check to the existing record branch."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The resulting structure is clean because the certificate check is performed once for all cases instead of being duplicated across exclusive branches. However, it changes the ordering for the '!data.record' branch by moving the check outside the existing parallel block."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The modification is placed immediately after respondent bank identification and before the first major control-flow split."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_insert_certificate_check_directly_before_account_opening",
+      "change_operations": [
+        "Replace the activity 'open bank account' in the final exclusive branch with a sequence containing 'check respondent bank certificate' followed directly by 'open bank account'."
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Whenever the final branch to open the bank account is selected, the certificate check is executed immediately before 'open bank account'. Therefore, the precedence requirement is guaranteed for every account-opening trace."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The existing annual report activities remain untouched, so R1 is preserved. The risk-related exclusive branch and its direct 'data.risk' to 'terminate' behavior are not modified, so R3 is also preserved."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only the final account-opening branch is modified by wrapping one existing activity in a short sequence with one additional activity."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The change is structurally simple, but it may duplicate the certificate check for traces that already performed it earlier in the process. This may introduce redundant work, although it guarantees compliance in a localized way."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The change is made in the final decision point immediately before 'open bank account'."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_restrict_account_opening_to_paths_with_certificate_check",
+      "change_operations": [
+        "Modify the condition of the final exclusive branch containing 'open bank account' from 'data.record or (data.eval and data.rating)' to 'data.eval and data.rating'.",
+        "Keep the alternative final branch as the negation of the modified account-opening condition."
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "substantial",
+          "reason": "This prevents the known violating case where 'data.record' alone allows 'open bank account' without a prior certificate check. Account opening would only remain possible for paths that go through the non-record branch where the certificate check exists. However, this resolves the violation by suppressing some valid account-opening behavior rather than ensuring that recorded banks are also checked."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The activities required by R1 remain unchanged, and the risk termination behavior required by R3 is not affected."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one branch condition is changed. No activities or control-flow blocks are inserted, deleted, or moved."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process structure remains the same. The main drawback is behavioral restriction, because recorded respondent banks may no longer reach 'open bank account' unless they also satisfy the remaining condition."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The modification is applied at the final exclusive decision that determines whether the bank account is opened."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_add_certificate_check_to_record_branch",
+  "best_resolution_reason": "RS1 is the best strategy because it fully restores the precedence requirement with a minimal and localized change. It directly fixes the only branch that can currently reach 'open bank account' without executing 'check respondent bank certificate', while preserving the existing compliant behavior of the non-record branch and avoiding changes to the annual report and risk termination requirements."
+}

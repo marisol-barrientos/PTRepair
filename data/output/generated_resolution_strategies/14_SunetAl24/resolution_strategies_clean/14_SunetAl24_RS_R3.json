@@ -1,0 +1,110 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_annotate_activate_sim_card",
+      "change_operations": "1. Add a data receive/consume annotation for data.sim_card_status to the existing activity \"Activate Sim Card\". 2. Add the resource annotation \"telephone company\" to the existing activity \"Activate Sim Card\".",
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Both violated requirements are directly satisfied: \"Activate Sim Card\" receives the required data object and is assigned to the required resource."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No additional resolution context requirements are provided, and the strategy does not alter control-flow behavior or introduce new activities."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only metadata annotations are added to an existing activity; no restructuring or new control-flow elements are required."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The process structured tree remains unchanged. Only the data and resource annotations of one existing activity are modified."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The modified activity \"Activate Sim Card\" occurs near the end of the process, after \"Send Sim card\" and before termination."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_add_status_check_before_activation",
+      "change_operations": "1. Insert a new activity \"Check Sim Card Status\" directly before \"Activate Sim Card\" in the enclosing sequence. 2. Add a data send/produce annotation for data.sim_card_status to \"Check Sim Card Status\". 3. Add a data receive/consume annotation for data.sim_card_status to \"Activate Sim Card\". 4. Add the resource annotation \"telephone company\" to \"Activate Sim Card\".",
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The required data object is explicitly produced before activation and then received by \"Activate Sim Card\"; the required resource assignment is also added."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No existing compliance context requirements are affected. The new activity is placed locally before activation and does not modify existing branching, parallelism, or ordering constraints."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "One new activity and two data annotations are introduced, plus one resource annotation. The change is still localized and simple."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The main sequence is extended by one preparatory activity. This slightly increases process length but keeps the structured tree simple and readable."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The insertion and annotations are located immediately before and at \"Activate Sim Card\", which is near the end of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_add_status_receive_step_and_keep_activation_by_company",
+      "change_operations": "1. Insert a new activity \"Receive Sim Card Status\" directly before \"Activate Sim Card\" in the enclosing sequence. 2. Add a data receive/consume annotation for data.sim_card_status to \"Receive Sim Card Status\". 3. Add a data receive/consume annotation for data.sim_card_status to \"Activate Sim Card\". 4. Add the resource annotation \"telephone company\" to \"Activate Sim Card\".",
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The violated requirement is fully satisfied because \"Activate Sim Card\" itself receives data.sim_card_status and is executed by the telephone company. The added receive step also makes the source of the status information explicit."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The change is local and does not interfere with any stated context requirements. It preserves the existing sequence of payment, data handling, SIM sending, and activation."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The strategy adds one activity and two data annotations, plus a resource annotation. It is slightly more costly than directly annotating the existing activity."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process remains a well-structured sequence at this point. However, the additional receive activity may be redundant if the status can simply be annotated as an input of \"Activate Sim Card\"."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The added and modified activities are located near the end of the process, immediately before activation."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_partial_resource_only",
+      "change_operations": "1. Add the resource annotation \"telephone company\" to the existing activity \"Activate Sim Card\".",
+      "evaluation": {
+        "compliance_degree": {
+          "value": "partial",
+          "reason": "Only the executed_by requirement is satisfied. The activity still does not receive data.sim_card_status, so the activity_receives requirement remains violated."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy only adds a resource annotation and does not alter control flow or data dependencies."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one metadata annotation is added."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The process structure is not changed."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The change affects \"Activate Sim Card\", which is located near the end of the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_annotate_activate_sim_card",
+  "best_resolution_reason": "RS1 is the recommended strategy because it fully restores compliance with the least intrusive change. It directly adds the missing data receive annotation and the missing resource annotation to the existing \"Activate Sim Card\" activity without changing the process control-flow structure or introducing additional activities."
+}

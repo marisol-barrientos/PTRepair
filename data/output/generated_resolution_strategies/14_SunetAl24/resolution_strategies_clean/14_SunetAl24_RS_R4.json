@@ -1,0 +1,84 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_insert_consent_before_personal_data",
+      "change_operations": "1) Insert activity \"obtain data processing consent\" immediately before activity \"Request personal data\" in the top-level sequence. 2) Assign resource \"data controller\" as the executor of activity \"obtain data processing consent\".",
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The missing activity is added, it occurs before \"Request personal data\", and it is explicitly executed by the required resource \"data controller\". This fully satisfies both precedence and executed_by requirements."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "There are no additional resolution context requirements, and the change does not interfere with existing ordering, branching, parallelism, or termination behavior."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one activity insertion and one resource assignment are required. The modification is localized and does not require restructuring existing control-flow blocks."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process remains a simple top-level sequence. No additional gateways, loops, or nested structures are introduced."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The new activity is inserted at the beginning of the process, directly before \"Request personal data\"."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_repurpose_existing_permission_activity",
+      "change_operations": "1) Remove activity \"Ask for permission\" from the sequence branch inside the parallel block. 2) Insert activity \"obtain data processing consent\" immediately before \"Request personal data\" in the top-level sequence. 3) Assign resource \"data controller\" as the executor of activity \"obtain data processing consent\".",
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The consent activity is placed before \"Request personal data\" and assigned to the \"data controller\", satisfying both parts of the violated requirement."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No stated context requirement is violated. The existing later permission request is removed because it is assumed to represent the same consent-related purpose and is replaced by the earlier compliant consent activity."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "This strategy requires removing an existing activity from a parallel branch and inserting a replacement activity earlier in the process. It is more invasive than simply adding the missing activity."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The parallel block remains structurally valid. The sequence branch containing \"Store Data\" becomes shorter, but the overall structured tree remains clean and well-formed."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The compliance-relevant insertion occurs before the first personal-data collection activity, although the removed activity is located in the middle part of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_insert_consent_before_request_and_keep_later_permission",
+      "change_operations": "1) Insert activity \"obtain data processing consent\" immediately before \"Request personal data\" in the top-level sequence. 2) Assign resource \"data controller\" as the executor of activity \"obtain data processing consent\". 3) Keep the existing activity \"Ask for permission\" unchanged in the parallel branch after \"Store Data\".",
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The required consent activity exists before \"Request personal data\" and is executed by the \"data controller\". Keeping the later \"Ask for permission\" activity does not prevent satisfaction of the violated requirement."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy preserves all existing behavior and adds only the missing compliance activity. Since no context requirements are specified, it introduces no known conflicts."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The only effective process modification is adding one activity with a resource assignment. Existing process elements are not moved or removed."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "Although structurally valid, the process may now contain two consent- or permission-related activities, which could introduce semantic redundancy unless they serve distinct purposes."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The added consent activity is placed before the first collection of personal data."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_insert_consent_before_personal_data",
+  "best_resolution_reason": "RS1 is recommended because it fully restores compliance with minimal localized change. It adds the missing consent activity exactly where required, assigns it to the required data controller resource, avoids restructuring the process, and does not introduce redundancy with unnecessary additional changes."
+}

@@ -1,0 +1,164 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_context_preserving_risk_branch_and_rename",
+      "change_operations": [
+        {
+          "operation_id": "RS1_OP1",
+          "operation": "rename_activity",
+          "target": "Sign officially Loan Contract",
+          "new_label": "officially sign loan contract",
+          "resource": "Manager",
+          "details": "Rename the existing signing activity to the activity name required by R4 while preserving its existing Manager resource assignment."
+        },
+        {
+          "operation_id": "RS1_OP2",
+          "operation": "replace_activity_with_exclusive_choice",
+          "target": "Evaluate LoanRisk",
+          "replacement": {
+            "type": "exclusive",
+            "branches": [
+              {
+                "condition": "data.customer_status == gold && data.loan_amount < 1000000",
+                "body": [
+                  {
+                    "activity": "Assess low-amount gold customer risk",
+                    "resource": "Manager",
+                    "write": [
+                      "low_risk"
+                    ]
+                  }
+                ]
+              },
+              {
+                "condition": "not (data.customer_status == gold && data.loan_amount < 1000000)",
+                "body": [
+                  {
+                    "activity": "evaluate loan risk",
+                    "resource": "Manager",
+                    "write": [
+                      "low_risk"
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "details": "Replace the existing risk-evaluation activity with a localized exclusive choice. The required activity 'evaluate loan risk' is executed by Manager only outside the condition protected by R7. The alternative branch still writes low_risk so the downstream approval logic remains structurally compatible."
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The process contains an activity named 'evaluate loan risk' executed by Manager and an activity named 'officially sign loan contract' executed by Manager, satisfying both parts of R4."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The new 'evaluate loan risk' activity remains after the customer bank privilege check and after credit worthiness checking, preserving R2. The explicit branch prevents 'evaluate loan risk' from executing when data.customer_status == gold and data.loan_amount < 1000000, preserving R7."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "The signing fix is only a rename, but the risk-evaluation fix requires replacing one activity with a local exclusive choice and maintaining equivalent low_risk output in both branches."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The modification is localized, but it introduces an additional exclusive branching structure. The branches are simple and both preserve the same downstream data output, so the added complexity is controlled."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The main structural change is located in the middle of the process after credit-worthiness checking and before high-risk judgment or low-risk approval. A minor rename also occurs later in the approved-contract branch."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_minimal_rename_and_resource_assignment",
+      "change_operations": [
+        {
+          "operation_id": "RS2_OP1",
+          "operation": "rename_activity_and_assign_resource",
+          "target": "Evaluate LoanRisk",
+          "new_label": "evaluate loan risk",
+          "resource": "Manager",
+          "details": "Rename the existing risk-evaluation activity to the required activity name and assign it to Manager."
+        },
+        {
+          "operation_id": "RS2_OP2",
+          "operation": "rename_activity",
+          "target": "Sign officially Loan Contract",
+          "new_label": "officially sign loan contract",
+          "resource": "Manager",
+          "details": "Rename the existing signing activity to the required activity name while keeping its existing Manager resource assignment."
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Both required activities exist under the exact required names and are executed by Manager."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "R2 remains preserved because the renamed risk-evaluation activity is still after customer bank privilege checking and credit-worthiness checking. However, this strategy may introduce tension with R7 because 'evaluate loan risk' may now execute on paths where data.customer_status == gold and data.loan_amount < 1000000."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only two existing activities are updated. No control-flow restructuring is required."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The process structure is unchanged. Only labels and the resource annotation of the risk-evaluation activity are modified."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The risk-evaluation update occurs in the middle of the process after credit-worthiness checking. The signing rename occurs later in the approved-contract branch."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_insert_required_manager_risk_review_before_existing_risk_evaluation",
+      "change_operations": [
+        {
+          "operation_id": "RS3_OP1",
+          "operation": "insert_activity_before",
+          "target": "Evaluate LoanRisk",
+          "inserted_activity": {
+            "activity": "evaluate loan risk",
+            "resource": "Manager"
+          },
+          "details": "Insert a Manager-executed activity named 'evaluate loan risk' immediately before the existing risk-evaluation activity."
+        },
+        {
+          "operation_id": "RS3_OP2",
+          "operation": "rename_activity",
+          "target": "Sign officially Loan Contract",
+          "new_label": "officially sign loan contract",
+          "resource": "Manager",
+          "details": "Rename the signing activity to the required name while preserving the Manager resource assignment."
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "substantial",
+          "reason": "The required activity names and Manager assignments are introduced. However, the inserted 'evaluate loan risk' activity does not replace the original risk-evaluation step and may be interpreted as an additional review rather than the actual activity producing low_risk."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "R2 is preserved because the inserted activity is still after bank privilege checking and credit-worthiness checking. R7 may be affected because the inserted activity can occur on low-amount gold-customer paths."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The strategy only inserts one activity and renames one existing activity. It does not require restructuring the tree."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The sequence becomes slightly longer and may duplicate risk-review semantics, but the block structure remains simple and valid."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The inserted risk-review activity is placed in the middle of the process before the existing risk evaluation. The signing rename occurs in the later contract-signing branch."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_context_preserving_risk_branch_and_rename",
+  "best_resolution_reason": "RS1 is recommended because it fully restores R4 while best preserving the resolution context. Unlike the minimal rename strategy, it avoids making 'evaluate loan risk' occur under the gold-customer low-amount condition protected by R7. Although it has a higher change cost and adds a small exclusive choice, the modification is localized and maintains the same downstream low_risk data required by the existing approval logic."
+}

@@ -1,0 +1,94 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_nested_timeout_alternative_for_screen_lock",
+      "change_operations": [
+        "In the second branch of the initial parallel block, replace the activity node \"automatic screen lock\" with a nested parallel block configured as parallel(wait=1, cancel=first).",
+        "Inside the new nested parallel block, add branch 1 as the activity \"automatic screen lock\".",
+        "Inside the new nested parallel block, add branch 2 as a sequence containing timeout(60) followed by the activity \"user input\"."
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The process still contains \"automatic screen lock\" and now explicitly models \"user input\" as the timeout alternative if \"automatic screen lock\" does not complete within 60 time units."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The change is confined to the pre-authentication screen-lock part of the process and does not modify the later authentication decision that prevents \"Unlock screen\" when data.authenticated is false."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "The strategy adds one nested control-flow block, one timeout event, and one activity, but does not require restructuring the whole process."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The added nested parallel timeout structure increases process complexity, but it is localized and directly represents the required timed alternative."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "All modifications occur in the initial screen-lock handling block before \"Access requested\"."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_rename_existing_user_input_activity",
+      "change_operations": [
+        "Rename the activity \"wait for user input\" to \"user input\"."
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "partial",
+          "reason": "This resolves the missing activity name identified in the evidence, but it does not fully establish that \"user input\" executes as the timeout alternative when \"automatic screen lock\" exceeds 60 time units."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "Only an activity label is changed in the initial part of the process; the authentication and rejection logic remains unchanged."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "The strategy requires only a single rename operation."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The process structure is not changed."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The renamed activity is located in the initial parallel block before access is requested."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_reconfigure_initial_parallel_as_timeout_alternative",
+      "change_operations": [
+        "Rename the activity \"wait for user input\" to \"user input\".",
+        "Move the existing timeout(60) node from the branch containing \"automatic screen lock\" to the branch containing \"user input\", placing it directly before \"user input\".",
+        "Leave \"automatic screen lock\" as the competing branch in the initial parallel(wait=1, cancel=first) block."
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The initial parallel block is reconfigured so that \"automatic screen lock\" competes with a timeout branch that triggers \"user input\" after 60 time units, thereby satisfying the timed alternative requirement."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The change does not affect the authentication condition or the exclusive choice between \"Unlock screen\" and \"Reject access\"."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "The strategy requires a rename and relocation of an existing timeout node, but does not introduce additional control-flow nesting."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The resulting structure remains simple, but the behavioral meaning of the initial parallel block changes because \"automatic screen lock\" may start immediately rather than after the timeout."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "All changes are made in the first parallel block before \"Access requested\"."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_nested_timeout_alternative_for_screen_lock",
+  "best_resolution_reason": "RS1 is recommended because it achieves full compliance while preserving the existing initial behavior as much as possible. It adds a localized timed alternative specifically around \"automatic screen lock\" without changing the later authentication logic or introducing a risk of violating the existing context requirement."
+}

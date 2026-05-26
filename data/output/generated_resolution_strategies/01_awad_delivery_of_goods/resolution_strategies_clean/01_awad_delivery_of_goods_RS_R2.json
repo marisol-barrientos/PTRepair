@@ -1,0 +1,94 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_move_pack_goods_after_parallel_join",
+      "change_operations": [
+        "Move activity 'pack goods' out of the second branch of the parallel block.",
+        "Insert activity 'pack goods' immediately after the parallel block and before activity 'send goods'."
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "After the change, both 'pay by credit card' and 'pay by bank transfer' occur inside the payment branch of the parallel block, while 'pack goods' occurs only after the parallel block completes. Therefore, every execution of either payment activity is eventually followed by 'pack goods'."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No additional resolution context requirements are specified, and the change preserves the existing payment choice and shipping address collection behavior."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one existing activity is relocated. No new control-flow constructs or duplicate activities are introduced."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The structure remains simple and block-structured. The parallelism between payment handling and shipping address provision is mostly preserved, while packing is correctly delayed until after payment completion."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The modification is localized inside and immediately after the existing parallel block, which occurs in the middle of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_move_payment_before_shipping_and_packing",
+      "change_operations": [
+        "Move the exclusive payment choice block out of the parallel block.",
+        "Place the exclusive payment choice block immediately after 'go to checkout'.",
+        "Replace the original parallel block with a sequence containing 'provide shipping address' followed by 'pack goods'."
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Both payment alternatives are completed before 'provide shipping address' and 'pack goods'. Thus, every occurrence of 'pay by credit card' or 'pay by bank transfer' is eventually followed by 'pack goods'."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No stated resolution context requirements are violated. The original payment alternatives and subsequent shipping behavior are retained."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "This strategy requires restructuring the parallel block and moving the entire payment-choice fragment, which is more invasive than moving only 'pack goods'."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The resulting process is structurally valid and simpler in some respects, but it removes the original parallelism between payment handling and address provision, potentially reducing process efficiency."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The changes affect the main checkout-processing section after 'go to checkout' and before 'send goods'."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_add_additional_pack_goods_after_parallel_join",
+      "change_operations": [
+        "Keep the existing parallel block unchanged.",
+        "Insert an additional activity 'pack goods' immediately after the parallel block and before 'send goods'."
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The inserted 'pack goods' activity occurs after the parallel block, so it is eventually executed after either payment activity. This satisfies the leads_to requirements syntactically and behaviorally with respect to eventual occurrence."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "No explicit context requirement is violated, but the process now contains two occurrences of 'pack goods', which may introduce semantic ambiguity or unintended duplicate packing."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "The change only inserts one additional activity and does not require moving or restructuring existing fragments."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "Although the structured tree remains valid, duplicating 'pack goods' may reduce process clarity and create an unrealistic process where goods can be packed twice."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The additional activity is inserted immediately after the existing parallel block, in the middle part of the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_move_pack_goods_after_parallel_join",
+  "best_resolution_reason": "RS1 is the best strategy because it fully restores compliance with both leads_to requirements using a minimal and localized change. It avoids duplicating activities, preserves most of the original parallel behavior, keeps the process block-structured, and introduces the least semantic disruption."
+}

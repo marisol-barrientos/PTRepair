@@ -1,0 +1,110 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_insert_recurring_dms_check_before_process_start",
+      "change_operations": "1) Insert a loop structure as the first child of the top-level sequence, before \"Create resolution proposal\". 2) Insert the activity \"check for new document in DMS\" inside the new loop. 3) Configure the loop as recurring with recurrence parameter \"10518984\". 4) Add an input data association so that \"check for new document in DMS\" receives \"checklist completed and signed by Tax Manager and Financial Controller\".",
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The missing activity is added, it is embedded in a recurring loop, and it receives the required checklist data object."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "There are no additional resolution context requirements, and the existing behavior of the process is preserved after the new preliminary recurring check."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one new loop and one new activity with one data input association are introduced."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The change is localized and keeps the structured tree well-formed by adding a simple loop before the existing sequence."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The check is inserted before the process begins creating the resolution proposal, which is a natural position for detecting new DMS documents."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_insert_recurring_dms_check_before_report_analysis",
+      "change_operations": "1) Insert a loop structure in the top-level sequence after the parallel report generation block and before \"Analyse reports\". 2) Insert the activity \"check for new document in DMS\" inside the new loop. 3) Configure the loop as recurring with recurrence parameter \"10518984\". 4) Add an input data association so that \"check for new document in DMS\" receives \"checklist completed and signed by Tax Manager and Financial Controller\".",
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The required activity exists, is recurring through the added loop, and receives the required checklist data."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No stated context requirements are violated, and the existing report generation and decision logic remain unchanged."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The strategy requires only the insertion of one loop, one activity, and one data input association."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process remains block-structured, but the added check is slightly less semantically aligned than placing it at the start."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is placed between report generation and report analysis."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_insert_recurring_dms_check_before_final_notification",
+      "change_operations": "1) Insert a loop structure in the top-level sequence after the exclusive choice block and before \"Sign, store, and notify resolution\". 2) Insert the activity \"check for new document in DMS\" inside the new loop. 3) Configure the loop as recurring with recurrence parameter \"10518984\". 4) Add an input data association so that \"check for new document in DMS\" receives \"checklist completed and signed by Tax Manager and Financial Controller\".",
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The activity is added, made recurring by the loop, and connected to the required received data object."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The existing activities and control-flow structures are preserved, and no additional context requirements are present."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The number of required changes is small and limited to a single insertion point."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "Although the tree remains structurally valid, placing a recurring DMS check late in the process may be less coherent and may delay final notification."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The change is inserted shortly before the final signing, storage, and notification activity."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_partial_add_non_recurring_dms_check_at_start",
+      "change_operations": "1) Insert the activity \"check for new document in DMS\" as the first child of the top-level sequence, before \"Create resolution proposal\". 2) Add an input data association so that \"check for new document in DMS\" receives \"checklist completed and signed by Tax Manager and Financial Controller\".",
+      "evaluation": {
+        "compliance_degree": {
+          "value": "partial",
+          "reason": "The activity is added and receives the required checklist data, but it is not embedded in a recurring loop, so the recurring requirement remains unsatisfied."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No context requirements are violated and the existing process behavior is minimally affected."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one activity and one data input association are added."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The top-level sequence remains simple and no additional control-flow structure is introduced."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The check is placed before the main resolution proposal work starts."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_insert_recurring_dms_check_before_process_start",
+  "best_resolution_reason": "RS1 is recommended because it fully resolves the violation with a minimal and localized change. It adds the missing DMS check in a recurring loop, attaches the required received checklist data, preserves the existing structured process, and places the check at the most semantically appropriate early point in the process."
+}

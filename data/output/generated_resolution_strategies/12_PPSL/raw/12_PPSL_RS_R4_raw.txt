@@ -1,0 +1,94 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_add_missing_targets_to_rejected_branch",
+      "change_operations": [
+        "In the rejected-order branch `sequence (cond: not (data.order.status))`, insert activity `Ship` immediately after `Report Rejected Order`.",
+        "Insert activity `Send Invoice` immediately after the newly inserted `Ship` activity and before the branch rejoins the outer sequence."
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Both exclusive branches would then contain `Ship` and `Send Invoice` after the decision point, so the structural cause of the `leads_to(Fill Order, Ship)` and `leads_to(Fill Order, Send Invoice)` violation is removed."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The context requirement `precedence('Close Bill', 'Report Order')` remains satisfied because `Close Bill` still occurs only after `Report Order`."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only two activity insertions are required, both localized to the rejected-order branch."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The tree remains structurally simple, but the behavior becomes semantically questionable because rejected orders would be shipped and invoiced."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The changes are made inside the middle exclusive decision block that handles accepted versus rejected orders."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_move_targets_to_common_post_decision_path_with_rejection_termination",
+      "change_operations": [
+        "In the rejected-order branch `sequence (cond: not (data.order.status))`, insert activity `Close Bill` immediately after `Report Rejected Order`.",
+        "Insert a `terminate` node immediately after the newly inserted `Close Bill` in the rejected-order branch, so rejected cases do not continue to the common fulfillment path.",
+        "In the accepted-order branch, replace the current `parallel` block after `Fill Order` with the sequence `Produce Part 1`, `Produce Part 2`, `Test Quality`, thereby removing `Ship`, `Send Invoice`, `Receive Payment`, and `Report Payment` from the parallel block.",
+        "Immediately after the outer exclusive block and before the existing `Close Bill`, insert the sequence `Ship`, `Send Invoice`, `Receive Payment`, `Report Payment`."
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "After `Fill Order` occurs in the accepted branch, execution continues to a common post-decision sequence containing both `Ship` and `Send Invoice`. The rejected branch terminates before that common fulfillment sequence, avoiding shipment or invoicing of rejected orders."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "`Close Bill` remains preceded by `Report Order` in both accepted and rejected executions. The rejected branch receives its own `Close Bill` before termination, while accepted cases use the existing `Close Bill` after fulfillment."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "This strategy requires several coordinated operations: adding a branch-local close and termination, replacing the parallel block, and inserting a new post-decision fulfillment/payment sequence."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The resulting process remains block-structured and avoids shipping rejected orders, but it removes the original parallelism between production and invoicing/payment, making the accepted path more sequential."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "Most changes occur around the exclusive decision block and the accepted-order fulfillment section, which are in the middle of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_refactor_accepted_branch_only",
+      "change_operations": [
+        "In the accepted-order branch `sequence (cond: data.order.status)`, replace the `parallel` block after `Fill Order` with the sequence `Produce Part 1`, `Produce Part 2`, `Test Quality`, `Ship`, `Send Invoice`, `Receive Payment`, `Report Payment`."
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "partial",
+          "reason": "This ensures that whenever the accepted-order branch containing `Fill Order` is taken, both `Ship` and `Send Invoice` occur afterwards in a deterministic sequence. However, it may not fully satisfy a structural checker that requires the target activities to appear in all branches of the surrounding exclusive block."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The context requirement is preserved because `Close Bill` remains after `Report Order` in the outer sequence."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one localized replacement of the existing parallel block is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process becomes simpler by removing the parallel block, but this also removes the original concurrency between production and invoicing/payment."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is localized to the accepted-order fulfillment section, which is in the middle of the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS2_move_targets_to_common_post_decision_path_with_rejection_termination",
+  "best_resolution_reason": "RS2 is recommended because it fully resolves the detected leads-to violation while avoiding the main business-quality problem of RS1, namely shipping and invoicing rejected orders. It also preserves the context requirement that `Close Bill` occurs only after `Report Order`. Although it has a higher change cost than the other options and removes some parallelism, it provides the best balance between compliance restoration, semantic preservation, and structural soundness."
+}

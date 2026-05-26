@@ -1,0 +1,120 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_insert_report_payment_in_rejected_branch",
+      "change_operations": [
+        "Insert activity 'Report Payment' in the rejected-order exclusive branch, directly after 'Report Rejected Order' and before the branch rejoins the main sequence."
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "After the change, every path reaching 'Close Bill' contains 'Report Payment' beforehand. The existing accepted-order branch already has 'Receive Payment' followed by 'Report Payment', so the leads_to('Receive Payment','Report Payment') part remains satisfied."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The context requirement precedence('Close Bill','Report Order') remains satisfied because 'Close Bill' is still after 'Report Order' in the main sequence."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one activity is inserted in one exclusive branch. No restructuring of the tree is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The structured tree remains simple and well-formed. However, the inserted 'Report Payment' in the rejected-order branch may be semantically questionable because no payment is received on that path."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is made inside the exclusive decision block before the final 'Close Bill' activity."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_insert_report_rejected_order_in_accepted_branch",
+      "change_operations": [
+        "Insert activity 'Report Rejected Order' in the accepted-order exclusive branch after the parallel block containing production, shipment, invoicing, payment, and payment reporting, but before the branch rejoins the main sequence."
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "After the change, every path reaching 'Close Bill' contains 'Report Rejected Order' beforehand. The existing leads_to('Receive Payment','Report Payment') relationship is not changed."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The activity 'Close Bill' remains after 'Report Order', so the existing precedence context requirement is preserved."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one activity insertion is required."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The tree remains structurally valid, but the accepted-order path would now include 'Report Rejected Order', which is semantically inconsistent with the branch condition."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The modification is applied inside the accepted-order branch of the central exclusive block."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_insert_common_report_payment_before_close_bill",
+      "change_operations": [
+        "Insert activity 'Report Payment' in the main sequence immediately after the exclusive block and immediately before 'Close Bill'."
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Because the inserted 'Report Payment' is placed after the exclusive block, all paths execute it before 'Close Bill'. The existing 'Receive Payment' activity in the accepted branch is still followed by at least one 'Report Payment'."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The inserted activity is still after 'Report Order', and 'Close Bill' remains after 'Report Order', so the context requirement remains satisfied."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "This requires only one insertion in the main sequence."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The structure remains simple, but accepted-order cases would execute 'Report Payment' twice, and rejected-order cases would report payment even though no payment was received."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The change is applied immediately before the final billing step."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_move_close_bill_into_exclusive_branches",
+      "change_operations": [
+        "Insert activity 'Close Bill' in the accepted-order exclusive branch after the parallel block that contains 'Report Payment'.",
+        "Insert activity 'Close Bill' in the rejected-order exclusive branch directly after 'Report Rejected Order'.",
+        "Delete the original common 'Close Bill' activity from the main sequence after the exclusive block."
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "substantial",
+          "reason": "This aligns the business behavior with the intended trace-level rule: accepted orders are closed after payment reporting, and rejected orders are closed after rejection reporting. However, if the compliance checker requires one single predecessor activity to occur on all exclusive branches, the formal violation may remain because neither 'Report Payment' nor 'Report Rejected Order' occurs in every branch."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "Both new occurrences of 'Close Bill' are still after 'Report Order', so precedence('Close Bill','Report Order') remains satisfied."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "This requires two insertions and one deletion, and it changes the placement of the billing closure activity."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The resulting tree remains structured and semantically cleaner than adding misleading report activities to the wrong branch. The main drawback is duplication of 'Close Bill' across exclusive branches."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The main changes are made inside the exclusive block where the alternative order outcomes are handled."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_insert_report_payment_in_rejected_branch",
+  "best_resolution_reason": "RS1 provides full formal compliance with only one localized change while preserving the existing accepted-order behavior and the context requirement precedence('Close Bill','Report Order'). Although adding 'Report Payment' to the rejected branch may require semantic validation, it is less disruptive than duplicating common reporting after the exclusive block and avoids reporting rejected orders on the accepted path."
+}

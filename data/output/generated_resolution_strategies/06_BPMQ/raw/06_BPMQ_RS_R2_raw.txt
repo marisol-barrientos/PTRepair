@@ -1,0 +1,124 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1",
+      "change_operations": [
+        "Insert activity \"add respondent bank to blacklist\" inside the loop body under sequence(cond: !data.record) -> parallel -> loop(cond: data.evaluation_extra), in the existing exclusive branch sequence(cond: !data.evaluation), before activity \"Lookup Partner Banks\".",
+        "Leave the existing post-parallel exclusive branch sequence(cond: not data.evaluation) containing \"add respondent bank to blacklist\" unchanged as a fallback for cases where the loop is skipped or the final evaluation is missing."
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Whenever \"conduct due diligence study\" causes \"not data.evaluation\" to hold, the corresponding exclusive branch now contains \"add respondent bank to blacklist\". The existing post-parallel blacklist step still covers cases where the condition holds after the parallel block or where no due diligence iteration produced a usable evaluation."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy does not remove or alter \"obtain respondent bank annual report\" or \"analyze respondent bank annual report\", preserving R1. It also does not modify the risk-handling branch where \"data.risk\" directly leads to \"terminate\", preserving R3."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one localized insertion is required inside an already existing failure branch of the due diligence logic."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The existing structured tree is preserved. The only drawback is that the blacklist activity may be executed again later by the existing post-parallel blacklist branch, so the activity should be treated as idempotent or duplicate-safe."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is made in the due diligence and evaluation part of the process, after initial request handling but before annual report processing and account opening."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2",
+      "change_operations": [
+        "Insert a new exclusive block immediately after activity \"conduct due diligence study\" inside the loop(cond: data.evaluation_extra).",
+        "Add branch sequence(cond: not data.evaluation) containing activity \"add respondent bank to blacklist\".",
+        "Add complementary branch sequence(cond: data.evaluation) with no activity or an explicit empty continuation.",
+        "Keep the existing following exclusive block with branch sequence(cond: !data.evaluation) containing \"Lookup Partner Banks\" unchanged."
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The condition \"not data.evaluation\" is checked immediately after the activity that can produce or change the evaluation result. If the condition holds, \"add respondent bank to blacklist\" is guaranteed to occur before the process continues."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy does not affect the annual report activities required by R1 and does not change the direct termination behavior after \"data.risk\" required by R3."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "The strategy requires adding a new exclusive decision block with two branches, which is more costly than inserting the activity into an existing branch."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The inserted explicit condition check makes the compliance logic clear but introduces an additional decision point and some redundancy with the existing later blacklist check."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The modification is located in the due diligence loop, which is in the middle screening portion of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3",
+      "change_operations": [
+        "Normalize the post-parallel exclusive block under sequence(cond: !data.record) by replacing branch condition \"not data.evaluation\" with the semantically equivalent explicit condition \"!data.evaluation\" if a single notation is required by the compliance checker.",
+        "Replace the complementary branch condition \"not (not data.evaluation)\" with the explicit condition \"data.evaluation\".",
+        "Keep activity \"add respondent bank to blacklist\" in the branch sequence(cond: !data.evaluation)."
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "partial",
+          "reason": "This mitigates possible ambiguity in the final post-parallel condition check and may help the compliance checker recognize that the blacklist activity follows the final failed evaluation condition. However, it does not fully address the case where \"not data.evaluation\" becomes true inside the due diligence loop before the final post-parallel branch is reached."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No activities required by R1 are changed, and the risk termination branch required by R3 remains untouched."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only condition labels are normalized; no activities or control-flow structures are added or removed."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The process structure remains unchanged. The change only improves condition clarity."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The affected exclusive block is located after the due diligence and risk assessment section but before the annual report processing."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4",
+      "change_operations": [
+        "Insert activity \"add respondent bank to blacklist\" unconditionally immediately after \"conduct due diligence study\" inside the loop(cond: data.evaluation_extra)."
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "substantial",
+          "reason": "The blacklist activity will occur after every due diligence study, so it will also occur whenever \"not data.evaluation\" holds. However, this over-approximates the requirement because banks may be blacklisted even when the evaluation is positive."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "R1 and R3 are preserved, but the strategy may negatively affect already compliant business behavior by blacklisting banks even when the failed-evaluation condition does not hold."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one activity insertion is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The control-flow structure remains simple, but the inserted unconditional activity weakens the semantic precision of the process."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is made inside the due diligence loop in the middle part of the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1",
+  "best_resolution_reason": "RS1 is the best strategy because it fully restores compliance with minimal and localized change. It places \"add respondent bank to blacklist\" exactly in the existing branch where \"not data.evaluation\" is detected, while preserving the current fallback blacklist behavior after the parallel block. It also keeps the resolution context requirements R1 and R3 satisfied and avoids introducing unnecessary additional gateways or broad unconditional blacklisting."
+}

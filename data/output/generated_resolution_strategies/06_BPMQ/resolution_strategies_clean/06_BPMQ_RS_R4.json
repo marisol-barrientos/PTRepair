@@ -1,0 +1,123 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_separate_extra_evaluation_decision_from_due_diligence",
+      "change_operations": [
+        {
+          "operation_id": "RS1_OP1",
+          "operation_type": "modify_activity_write_set",
+          "target": "conduct due diligence study",
+          "details": "Modify the activity inside the existing pre-test loop so that it writes only data.evaluation and no longer writes data.evaluation_extra."
+        },
+        {
+          "operation_id": "RS1_OP2",
+          "operation_type": "insert_activity",
+          "target_location": "At the end of the existing loop body, after the exclusive block containing Lookup Partner Banks and before the loop condition is re-evaluated",
+          "details": "Insert a new activity named 'Determine whether additional due diligence is required' with write: data.evaluation_extra."
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The condition data.evaluation_extra is no longer produced by the same activity that is required to follow it. If the new decision activity sets data.evaluation_extra to true, the pre-test loop repeats and 'conduct due diligence study' eventually executes in the next iteration."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The changes are localized to the due diligence loop and do not affect the annual report activities required by R1 or the direct termination after data.risk required by R3."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one activity write set is changed and one small decision activity is inserted inside the existing loop."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The existing loop structure is preserved. The added activity clarifies responsibility for deciding whether additional due diligence is required and avoids the self-triggering condition problem."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The modification is located in the due diligence section within the branch for respondent banks without an existing record, before the later annual report and account-opening steps."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_change_due_diligence_loop_to_post_test",
+      "change_operations": [
+        {
+          "operation_id": "RS2_OP1",
+          "operation_type": "modify_loop",
+          "target": "loop with condition data.evaluation_extra containing conduct due diligence study",
+          "details": "Change the loop mode from pre_test to post_test while keeping the loop condition data.evaluation_extra and the existing loop body unchanged."
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "With a post-test loop, 'conduct due diligence study' executes before the loop condition is checked for repetition. If data.evaluation_extra becomes true, the loop continues and the activity executes again afterwards."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy does not modify the annual report part of the process and does not affect the data.risk branch where terminate directly follows the risk condition."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only the loop mode is changed; no new activities or branches are introduced."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process remains structurally simple, but the semantics change because due diligence will execute at least once even when data.evaluation_extra is initially false."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is made in the due diligence loop in the middle part of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_replace_loop_with_precomputed_conditional_due_diligence",
+      "change_operations": [
+        {
+          "operation_id": "RS3_OP1",
+          "operation_type": "insert_activity",
+          "target_location": "Immediately before the existing loop with condition data.evaluation_extra",
+          "details": "Insert a new activity named 'Determine need for extra due diligence' with write: data.evaluation_extra."
+        },
+        {
+          "operation_id": "RS3_OP2",
+          "operation_type": "modify_activity_write_set",
+          "target": "conduct due diligence study",
+          "details": "Modify the activity so that it writes data.evaluation only and no longer writes data.evaluation_extra."
+        },
+        {
+          "operation_id": "RS3_OP3",
+          "operation_type": "replace_fragment",
+          "target": "loop with condition data.evaluation_extra",
+          "details": "Replace the loop with an exclusive conditional block: one branch with condition data.evaluation_extra containing 'conduct due diligence study' followed by the existing evaluation/Lookup Partner Banks exclusive block, and one empty branch with condition not data.evaluation_extra."
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The condition data.evaluation_extra is determined before the conditional branch. Whenever it is true, the branch containing 'conduct due diligence study' is selected, so the activity eventually follows the condition."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The changes remain confined to the due diligence fragment and do not interfere with the annual report activities or the direct terminate behavior after data.risk."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "This strategy requires inserting an activity, changing the write set of an existing activity, and replacing the loop with a conditional block."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The resulting structure is still sound, but it removes the repeated due diligence behavior of the original loop and therefore changes the process behavior more significantly."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "All operations are applied in the due diligence part of the process before the annual report and account-opening stages."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_separate_extra_evaluation_decision_from_due_diligence",
+  "best_resolution_reason": "RS1 is recommended because it fully resolves the violation while preserving the existing pre-test loop behavior. It keeps the due diligence activity responsible for producing the evaluation result and moves the decision about whether more due diligence is required into a separate follow-up activity. This avoids the self-triggering condition problem, has low change cost, maintains structural clarity, and does not affect the already satisfied context requirements R1 and R3."
+}

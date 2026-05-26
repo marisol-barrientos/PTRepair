@@ -1,0 +1,84 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_move_rejection_check_after_rating_parallel",
+      "change_operations": "1) Delete the exclusive block immediately following 'Review Respondent Bank rating' inside the annual-report parallel branch. 2) Insert a new exclusive block immediately after the annual-report parallel block and before the existing account-opening exclusive. 3) In the new exclusive block, add branch condition 'data.respondent_bank_rating == \"rejected\"' with sequence: 'handle rejection' followed by 'terminate'. 4) Add the complementary branch condition 'not (data.respondent_bank_rating == \"rejected\")' with an empty continuation so the existing account-opening decision remains reachable for non-rejected ratings.",
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "After the rating is reviewed and the parallel block completes, the process explicitly checks whether 'data.respondent_bank_rating == \"rejected\"'. If the condition holds, 'terminate' is eventually executed through the rejection branch."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The activities required by R1, 'obtain respondent bank annual report' and 'analyze respondent bank annual report', are preserved. The risk-related termination required by R3 is not modified."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The change is localized around the respondent-bank-rating decision and mainly moves the rejection-handling exclusive from inside the parallel branch to immediately after the parallel block."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The resulting structure is clearer because the rating outcome is evaluated after the parallel analysis section completes. No additional nested parallelism or complex control-flow constructs are introduced."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The modification occurs after the annual-report retrieval and within the later rating/rejection handling part of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_add_post_parallel_rejection_guard",
+      "change_operations": "1) Keep the existing exclusive block after 'Review Respondent Bank rating'. 2) Insert an additional exclusive block immediately after the annual-report parallel block and before the existing account-opening exclusive. 3) Add branch condition 'data.respondent_bank_rating == \"rejected\"' with sequence: 'terminate'. 4) Add complementary branch condition 'not (data.respondent_bank_rating == \"rejected\")' with an empty continuation to allow the existing account-opening exclusive to execute.",
+      "evaluation": {
+        "compliance_degree": {
+          "value": "substantial",
+          "reason": "The added guard ensures that if the rejected-rating condition still holds after the parallel block, the process terminates before account opening. However, the original inner exclusive remains, so some conservative compliance analyzers may still report ambiguity around the immediate branch following 'Review Respondent Bank rating'."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The required annual-report activities remain unchanged, and the risk-triggered direct termination path is untouched."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "This requires only inserting a small additional exclusive check and does not move or delete existing process fragments."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The strategy introduces a redundant rejection check, which improves safety but adds some duplicated control logic."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The new guard is placed directly before the final account-opening decision, in the later part of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_sequentialize_rating_review_and_rejection_handling",
+      "change_operations": "1) Replace the annual-report parallel block with a sequence containing 'analyze respondent bank annual report' followed by 'Review Respondent Bank rating'. 2) After 'Review Respondent Bank rating', insert an exclusive block. 3) Add branch condition 'data.respondent_bank_rating == \"rejected\"' with sequence: 'handle rejection' followed by 'terminate'. 4) Add complementary branch condition 'not (data.respondent_bank_rating == \"rejected\")' with an empty continuation so the existing account-opening exclusive can execute.",
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The rating is reviewed in a simple sequence before the rejection decision. If the rejected condition becomes true, the following exclusive branch guarantees eventual execution of 'terminate'."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "Both annual-report activities required by R1 are preserved, and the risk-related termination behavior required by R3 is not affected."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "This strategy modifies the structure of the annual-report section by removing parallel execution between annual-report analysis and rating review."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The structure becomes simpler and easier to analyze, but it changes the original concurrency semantics by making the analysis and rating review sequential."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The change is located in the annual-report analysis and rating-review section near the end of the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_move_rejection_check_after_rating_parallel",
+  "best_resolution_reason": "RS1 is the best option because it fully restores compliance while preserving the intended parallel execution of annual-report analysis and rating review. It removes the ambiguous inner rejection decision and places the rejection handling at a structurally clearer point after the parallel block. It also keeps the existing resolution context requirements satisfied and avoids unnecessary process complexity."
+}

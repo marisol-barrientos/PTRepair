@@ -1,0 +1,174 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_insert_generic_diagnosis_after_verify",
+      "change_operations": [
+        {
+          "operation_id": "OP1",
+          "operation": "insert_activity",
+          "target_location": "inside the loop body, directly after activity 'verify symptoms' and before the following exclusive block",
+          "activity": "diagnosis",
+          "details": "Insert a generic 'diagnosis' activity immediately after 'verify symptoms'."
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Every execution of 'verify symptoms' is immediately followed by an activity named 'diagnosis', so the leads_to('verify symptoms','diagnosis') requirement is satisfied on all paths."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The existing ordering of 'consult' before 'verify symptoms' is preserved. No 'prescribe medicine' activity is introduced, so the currently satisfied precedence requirement involving 'prescribe medicine' remains unaffected."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one activity insertion is required, and no existing branching structure needs to be modified."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process remains block-structured. The change only extends the existing sequence inside the loop."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is applied after the initial consultation and symptom verification, before the diagnostic decision logic."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_insert_generic_diagnosis_after_decision_block",
+      "change_operations": [
+        {
+          "operation_id": "OP1",
+          "operation": "insert_activity",
+          "target_location": "inside the loop body, after the existing exclusive block that follows 'verify symptoms'",
+          "activity": "diagnosis",
+          "details": "Insert a generic 'diagnosis' activity after the exclusive decision structure and before the loop body ends."
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "All paths that execute 'verify symptoms' pass through the following exclusive block and then reach the inserted 'diagnosis' activity."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The inserted activity occurs after 'verify symptoms' and does not affect the existing precedence of 'consult' before 'verify symptoms'. No 'prescribe medicine' activity is introduced."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one activity insertion is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The block-structured process is preserved, but the diagnosis may occur relatively late, after treatment or callback handling in some paths, which may be semantically less clean."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The change is placed after the post-verification branching logic, close to the end of the loop body."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_normalize_existing_diagnosis_labels_and_cover_missing_paths",
+      "change_operations": [
+        {
+          "operation_id": "OP1",
+          "operation": "rename_activity",
+          "target_location": "sequence with condition data.cough",
+          "old_activity": "diagnosis: cold",
+          "new_activity": "diagnosis",
+          "details": "Rename the cold-specific diagnosis activity to the generic required activity name 'diagnosis'."
+        },
+        {
+          "operation_id": "OP2",
+          "operation": "rename_activity",
+          "target_location": "sequence with condition data.fever under not(data.cough)",
+          "old_activity": "diagnosis: strep throat",
+          "new_activity": "diagnosis",
+          "details": "Rename the strep-throat-specific diagnosis activity to the generic required activity name 'diagnosis'."
+        },
+        {
+          "operation_id": "OP3",
+          "operation": "insert_activity",
+          "target_location": "sequence with condition not(data.fever) under not(data.cough)",
+          "activity": "diagnosis",
+          "details": "Add a diagnosis activity for the path where the patient has throat symptoms but neither cough nor fever."
+        },
+        {
+          "operation_id": "OP4",
+          "operation": "insert_activity",
+          "target_location": "sequence with condition not(data.throat)",
+          "activity": "diagnosis",
+          "details": "Add a diagnosis activity for the path where no throat symptoms are present."
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "All possible paths after 'verify symptoms' contain an activity named 'diagnosis'. Existing specific diagnosis activities are normalized to match the required activity name, and previously uncovered paths receive a diagnosis activity."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "All changes occur after 'verify symptoms', so the precedence of 'consult' before 'verify symptoms' is preserved. No 'prescribe medicine' activity is introduced."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "This strategy requires multiple changes across several branches, including two renames and two insertions."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The process remains structured, but branch-level modifications increase maintenance effort and remove specificity from the existing diagnosis activity labels unless that specificity is captured elsewhere."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The changes are applied within the diagnostic decision branches after symptom verification."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_partial_rename_existing_diagnosis_activities_only",
+      "change_operations": [
+        {
+          "operation_id": "OP1",
+          "operation": "rename_activity",
+          "target_location": "sequence with condition data.cough",
+          "old_activity": "diagnosis: cold",
+          "new_activity": "diagnosis",
+          "details": "Rename the cold-specific diagnosis activity to the required generic activity name."
+        },
+        {
+          "operation_id": "OP2",
+          "operation": "rename_activity",
+          "target_location": "sequence with condition data.fever under not(data.cough)",
+          "old_activity": "diagnosis: strep throat",
+          "new_activity": "diagnosis",
+          "details": "Rename the strep-throat-specific diagnosis activity to the required generic activity name."
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "partial",
+          "reason": "The requirement is satisfied only on paths where the existing cold or strep-throat diagnosis activities are executed. Paths with not(data.throat) or with data.throat, not(data.cough), and not(data.fever) still do not lead to 'diagnosis'."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The changes are limited to activity labels after 'verify symptoms' and do not affect the existing context requirements."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only two renaming operations are required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "No control-flow structure is changed, but diagnostic specificity in activity names is reduced."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The changes occur in the diagnostic branches following symptom verification."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_insert_generic_diagnosis_after_verify",
+  "best_resolution_reason": "RS1 is the recommended strategy because it fully restores compliance with a single localized insertion, preserves the existing structured tree and all resolution context requirements, and ensures that every occurrence of 'verify symptoms' is followed by the required 'diagnosis' activity as early as possible."
+}

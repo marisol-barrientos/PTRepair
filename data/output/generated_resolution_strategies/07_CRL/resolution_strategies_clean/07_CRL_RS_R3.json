@@ -1,0 +1,132 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_local_compliance_alias",
+      "change_operations": [
+        "In the sequence with condition data.bank_information_valid, insert activity \"Customer Bank Privilege Check\" with resource annotation \"Credit Broker\" after \"Request Bank Information\" and before the post-processing-resource assignment / credit-worthiness check section.",
+        "Replace the nested exclusive block that only assigns \"post_processing_resource\" when data.loan_amount > 1000000 with an unconditional activity \"Assign post processing to supervisor\" writing \"post_processing_resource\" before \"Check Credit Worthiness\".",
+        "Add resource annotation \"res: data.post_processing_resource\" to the existing activity \"Check Credit Worthiness\".",
+        "Add an alternative compliance label or alias \"Credit Worthiness Check\" to the same activity node currently labeled \"Check Credit Worthiness\", so that both naming variants resolve to the same process activity."
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The missing activity name \"Customer Bank Privilege Check\" is introduced with resource Credit Broker. \"Check Credit Worthiness\" is executed by data.post_processing_resource, which is set to Supervisor before the activity. The alias \"Credit Worthiness Check\" allows the separation-of-duty comparison to resolve to the same credit-worthiness activity, whose executor differs from the Credit Broker executor of the customer bank privilege check."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The added \"Customer Bank Privilege Check\" is placed only on the branch where \"Check Credit Worthiness\" already follows, preserving the leads_to relationship required by R2. \"Evaluate LoanRisk\" remains after both customer bank privilege checking and credit-worthiness checking. R7 is not affected because no new path to \"Evaluate LoanRisk\" is introduced."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The strategy requires one local insertion, one local resource annotation, one simplification of an existing assignment block, and one naming alias. It avoids broad restructuring of the process."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The main control-flow structure is preserved. Replacing the loan-amount-based assignment exclusive with a single assignment slightly simplifies the structure. The alias does not introduce additional runtime behavior."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "All relevant changes occur inside the bank-information-valid branch before the credit-worthiness and loan-risk evaluation section."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_local_duplicate_return_activity",
+      "change_operations": [
+        "In the sequence with condition data.bank_information_valid, insert activity \"Customer Bank Privilege Check\" with resource annotation \"Credit Broker\" after \"Request Bank Information\" and before the post-processing-resource assignment / credit-worthiness check section.",
+        "Replace the nested exclusive block that only assigns \"post_processing_resource\" when data.loan_amount > 1000000 with an unconditional activity \"Assign post processing to supervisor\" writing \"post_processing_resource\" before \"Check Credit Worthiness\".",
+        "Add resource annotation \"res: data.post_processing_resource\" to the existing activity \"Check Credit Worthiness\".",
+        "Insert activity \"Credit Worthiness Check\" with resource annotation \"data.post_processing_resource\" immediately after \"Check Credit Worthiness\" and before the following credit-worthiness decision exclusive."
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The required customer bank privilege check exists and is executed by Credit Broker. \"Check Credit Worthiness\" is explicitly executed by data.post_processing_resource, which is set to Supervisor. The additional \"Credit Worthiness Check\" activity gives the separation-of-duty check a concrete target and is also executed by Supervisor, which differs from Credit Broker."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The inserted \"Customer Bank Privilege Check\" directly precedes the credit-worthiness checks, so R2 remains satisfied for the new activity occurrence. \"Evaluate LoanRisk\" remains after the required checks. No additional condition causing \"Evaluate LoanRisk\" to occur under the R7 condition is introduced."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "This strategy avoids relying on label aliases, but it introduces an additional runtime activity. The control-flow change is still localized."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The process remains structured, but the added \"Credit Worthiness Check\" may be semantically redundant because it duplicates the existing \"Check Credit Worthiness\" task for compliance-name resolution."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "All changes are located in the middle of the process, inside the valid bank information branch before loan-risk evaluation."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_rename_existing_privilege_check",
+      "change_operations": [
+        "Rename the existing activity \"Check Customer Bank Privilege\" to \"Customer Bank Privilege Check\" and keep its resource annotation \"Credit Broker\".",
+        "Insert an unconditional activity \"Assign post processing to supervisor\" writing \"post_processing_resource\" immediately after \"Customer Bank Privilege Check\" and before the outer exclusive branch on bank privilege suspension.",
+        "Add resource annotation \"res: data.post_processing_resource\" to the existing activity \"Check Credit Worthiness\".",
+        "Add an alternative compliance label or alias \"Credit Worthiness Check\" to the same activity node currently labeled \"Check Credit Worthiness\"."
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The originally missing exact activity name is provided by renaming the existing privilege-check activity. The credit-worthiness activity receives the required resource annotation, and the resource variable is assigned to Supervisor before the activity can occur. The alias resolves the naming mismatch between \"Check Credit Worthiness\" and \"Credit Worthiness Check\"."
+        },
+        "resolution_context_consistency": {
+          "value": "low",
+          "reason": "Although this strategy is semantically direct, it may introduce a new R2 issue. Because the renamed \"Customer Bank Privilege Check\" occurs before the outer exclusive, some paths such as suspended bank privilege or invalid bank information may terminate without a later \"Check Credit Worthiness\" activity, potentially violating leads_to('customer bank privilege check','check credit worthiness')."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The strategy mostly changes labels and annotations and adds one assignment activity. It does not require major restructuring."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process structure remains almost unchanged. However, the early unconditional assignment of post_processing_resource may be unnecessary on paths where no credit-worthiness check occurs."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The main change affects the initial customer bank privilege check before the first major exclusive branch."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_full_context_preserving_global_credit_check",
+      "change_operations": [
+        "Rename the existing activity \"Check Customer Bank Privilege\" to \"Customer Bank Privilege Check\" and keep its resource annotation \"Credit Broker\".",
+        "Insert an unconditional activity \"Assign post processing to supervisor\" writing \"post_processing_resource\" immediately after \"Customer Bank Privilege Check\" and before the outer exclusive branch on bank privilege suspension.",
+        "Add resource annotation \"res: data.post_processing_resource\" to the existing activity \"Check Credit Worthiness\" in the valid bank-information branch.",
+        "In the suspended-bank-privilege branch, insert activity \"Check Credit Worthiness\" with resource annotation \"data.post_processing_resource\" before \"Decline due to suspended Privilege\".",
+        "In the invalid-bank-information branch, insert activity \"Check Credit Worthiness\" with resource annotation \"data.post_processing_resource\" before \"Decline due to unsatisfied Condition\".",
+        "Add an alternative compliance label or alias \"Credit Worthiness Check\" to all inserted and existing \"Check Credit Worthiness\" activity nodes."
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The exact customer bank privilege check exists and is executed by Credit Broker. Every occurrence of \"Check Credit Worthiness\" is executed by data.post_processing_resource, assigned to Supervisor. The alias supports the separation-of-duty comparison with \"Credit Worthiness Check\"."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "Unlike RS3, this strategy preserves R2 even after renaming the early privilege check because every path after \"Customer Bank Privilege Check\" contains a subsequent \"Check Credit Worthiness\" activity. \"Evaluate LoanRisk\" remains after the relevant checks, and no additional path to risk evaluation is introduced, so R7 is preserved."
+        },
+        "change_cost": {
+          "value": "high",
+          "reason": "The strategy adds credit-worthiness checking to branches that previously declined the request without such a check. This is a broader behavioral change than the localized strategies."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The structured tree remains valid, but credit-worthiness checks in rejection branches may be unnecessary from a business perspective and increase process complexity."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The strategy starts at the early customer bank privilege check and also propagates changes into multiple later branches."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_local_compliance_alias",
+  "best_resolution_reason": "RS1 is the recommended strategy because it fully resolves the detected violation with the smallest localized behavioral change. It avoids renaming the existing early privilege-check activity, which could otherwise make R2 non-vacuously fail on rejection branches. It also avoids adding a duplicate runtime credit-worthiness activity by using a compliance alias for the naming inconsistency between \"Check Credit Worthiness\" and \"Credit Worthiness Check\". If the process tooling does not support activity aliases, RS2 is the best operational fallback."
+}

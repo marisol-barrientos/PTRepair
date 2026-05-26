@@ -1,0 +1,16 @@
+{
+  "model": "openai/gpt-5.5",
+  "scenario_name": "05_loebbecke_blood_collection",
+  "requirement_id": "R6",
+  "output_prefix": "05_loebbecke_blood_collection_RS_R6",
+  "execution_time_milliseconds": 100813.67,
+  "execution_time_seconds": 100.81,
+  "resolution_context_requirements": 5,
+  "problems_detected": [],
+  "usage": {
+    "prompt_tokens": 1784,
+    "completion_tokens": 5353,
+    "total_tokens": 7137,
+    "reasoning_tokens": null
+  }
+}

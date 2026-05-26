@@ -1,0 +1,126 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_relocate_special_allowance_determination",
+      "change_operations": [
+        "Modify data annotation of activity 'Customer Request Arrives': remove write access to data object 'special_allowance' or replace it with a separate input data object such as 'requested_special_allowance'.",
+        "Modify activity 'Apply Account Policy' so that it writes or finalizes data object 'special_allowance' immediately before the exclusive choice that branches on 'data.special_allowance'.",
+        "Keep the existing exclusive choice unchanged: branch 'data.special_allowance' contains 'Accept Empty Initial Balance', and branch 'not data.special_allowance' contains 'Accept Initial Deposit'."
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The condition 'data.special_allowance' can only become true immediately before the exclusive balance-handling decision. If it becomes true, the branch containing 'Accept Empty Initial Balance' is selected, so the activity eventually follows the condition."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The existing activity 'Initiate Account' remains unchanged, so requirement R2 is preserved. The balance-handling behavior is also preserved if 'Apply Account Policy' is the appropriate point for determining the allowance."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only data-write responsibility is moved from one existing activity to another. No new control-flow structure is introduced."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The process tree structure remains unchanged. Only data annotations and responsibility for determining 'special_allowance' are modified."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The relevant change is located around 'Apply Account Policy' and the following balance-handling exclusive block, which occur in the middle-to-late part of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_add_guarded_recovery_after_balance_choice",
+      "change_operations": [
+        "Annotate activity 'Accept Empty Initial Balance' so that it writes a marker data object, for example 'empty_initial_balance_accepted'.",
+        "Insert an exclusive block immediately after the existing balance-handling exclusive block and before 'Initiate Account'.",
+        "In the new exclusive block, add one branch with condition 'data.special_allowance and not data.empty_initial_balance_accepted' containing activity 'Accept Empty Initial Balance'.",
+        "Add a second default branch with condition 'not (data.special_allowance and not data.empty_initial_balance_accepted)' containing no activity."
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "If 'data.special_allowance' is true and the original branch has not executed 'Accept Empty Initial Balance', the recovery branch ensures that the activity still occurs before the account is initiated."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "Requirement R2 is preserved because 'Initiate Account' remains present and still occurs after balance handling. The recovery branch is guarded, so it avoids unnecessary duplicate execution where possible."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "The strategy introduces a new marker data object and an additional exclusive block, but the modification is localized to the balance-handling section."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The process becomes more complex due to a recovery check and a second occurrence of 'Accept Empty Initial Balance'. However, the added structure is localized and has a clear compliance purpose."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The change is inserted immediately before 'Initiate Account', after the existing initial-balance decision."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_insert_early_special_allowance_handling",
+      "change_operations": [
+        "Insert an exclusive block immediately after 'Customer Request Arrives'.",
+        "Add one branch with condition 'data.special_allowance' containing activity 'Accept Empty Initial Balance'.",
+        "Add one branch with condition 'not data.special_allowance' containing no activity.",
+        "Remove 'Accept Empty Initial Balance' from the later balance-handling exclusive branch, or alternatively keep it only if duplicate execution is acceptable."
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Because 'Customer Request Arrives' writes 'special_allowance', the condition is handled immediately after it can become true. Therefore, whenever the condition holds, 'Accept Empty Initial Balance' eventually executes."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "Requirement R2 remains satisfied because 'Initiate Account' is not removed. However, accepting an empty initial balance before account approval and account opening may conflict with the intended business order."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "A new exclusive block is inserted and the existing balance-handling section may need to be adjusted to avoid duplicate execution."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The structure remains block-structured, but balance handling is split across two locations, which reduces process cohesion."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The new conditional handling is placed directly after 'Customer Request Arrives', near the point where 'special_allowance' is written."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_duplicate_accept_empty_in_all_balance_branches",
+      "change_operations": [
+        "Insert activity 'Accept Empty Initial Balance' into the branch with condition 'not data.special_allowance' of the existing balance-handling exclusive block, preferably after 'Accept Initial Deposit'."
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "substantial",
+          "reason": "The activity 'Accept Empty Initial Balance' would occur regardless of which branch of the exclusive block is taken, which addresses the structural reason for the violation. However, it may over-satisfy the requirement by executing the activity even when 'data.special_allowance' is false."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "Requirement R2 remains satisfied because 'Initiate Account' is unchanged. However, the modified behavior may be inconsistent with the meaning of the non-special-allowance branch."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one activity insertion is required inside an existing branch."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The control-flow structure remains unchanged, but the semantic clarity of the exclusive balance-handling decision is weakened."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The change is applied in the existing balance-handling exclusive block before 'Initiate Account'."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_relocate_special_allowance_determination",
+  "best_resolution_reason": "RS1 is recommended because it fully restores compliance with the condition-eventually-follows requirement while introducing no additional control-flow complexity. It keeps the process structurally clean, preserves the existing 'Initiate Account' activity required by R2, and localizes the compliance fix to the data determination point for 'special_allowance'."
+}

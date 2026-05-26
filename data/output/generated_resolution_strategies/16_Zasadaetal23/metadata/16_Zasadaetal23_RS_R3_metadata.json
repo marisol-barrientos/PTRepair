@@ -1,0 +1,16 @@
+{
+  "model": "openai/gpt-5.5",
+  "scenario_name": "16_Zasadaetal23",
+  "requirement_id": "R3",
+  "output_prefix": "16_Zasadaetal23_RS_R3",
+  "execution_time_milliseconds": 68693.6,
+  "execution_time_seconds": 68.69,
+  "resolution_context_requirements": 4,
+  "problems_detected": [],
+  "usage": {
+    "prompt_tokens": 1693,
+    "completion_tokens": 4083,
+    "total_tokens": 5776,
+    "reasoning_tokens": null
+  }
+}

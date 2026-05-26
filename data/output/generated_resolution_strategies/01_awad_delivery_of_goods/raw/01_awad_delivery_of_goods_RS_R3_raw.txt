@@ -1,0 +1,110 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_move_notify_after_parallel_join",
+      "change_operations": "1. Move the existing activity \"notify customer\" from the credit-card branch, where it currently follows \"pay by credit card\", to the outer sequence immediately after the parallel block and before \"send goods\".",
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "After the move, every execution of \"pack goods\" completes inside the parallel block before the process continues to \"notify customer\". Therefore, \"notify customer\" always eventually occurs after \"pack goods\"."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "There are no explicit resolution context requirements to preserve, and the change does not introduce obvious conflicts with the existing process behavior."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one existing activity is relocated. No new control-flow construct is introduced."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The resulting structure remains simple and avoids duplicate notifications. The notification is placed at a clear synchronization point after payment and packing have completed."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is applied around the parallel payment-and-shipping block, which is in the middle of the process between checkout and goods dispatch."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_insert_notify_after_pack_goods",
+      "change_operations": "1. Insert a new activity \"notify customer\" directly after \"pack goods\" inside the shipping branch sequence.",
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Because \"notify customer\" is placed directly after \"pack goods\" in the same sequence branch, every occurrence of \"pack goods\" is followed by a notification."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No existing context requirements are violated. The existing credit-card notification remains unchanged."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "The strategy requires only a single insertion local to the activity involved in the violation."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "Although structurally simple, this strategy may create duplicate notifications for credit-card payments because \"notify customer\" would occur both in the credit-card branch and after \"pack goods\"."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The insertion is made inside the shipping branch of the central parallel block."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_insert_notify_after_parallel_join_keep_existing",
+      "change_operations": "1. Insert a new activity \"notify customer\" in the outer sequence immediately after the parallel block and before \"send goods\". 2. Keep the existing \"notify customer\" activity in the credit-card payment branch unchanged.",
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The newly inserted notification after the parallel join guarantees that every execution of \"pack goods\" is followed by \"notify customer\", regardless of the selected payment branch."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The existing behavior of notifying credit-card customers is preserved, and no explicit context requirement is affected."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one activity is inserted, and no existing activity needs to be moved or deleted."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The process remains structurally valid, but credit-card cases may receive two notifications, which can introduce behavioral redundancy."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The new activity is inserted immediately after the central parallel block."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_sequentialize_payment_shipping_and_notification",
+      "change_operations": "1. Replace the current parallel block with a sequence containing the existing payment exclusive choice followed by the existing shipping sequence. 2. Move the existing \"notify customer\" activity from the credit-card branch to immediately after \"pack goods\" in the new sequence.",
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Once the payment and shipping parts are sequentialized and \"notify customer\" is placed after \"pack goods\", every execution of \"pack goods\" is followed by the notification."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "No explicit context requirement is violated, but the existing parallel behavior between payment and shipping is removed, which may affect intended process performance."
+        },
+        "change_cost": {
+          "value": "high",
+          "reason": "This strategy requires restructuring the central control-flow construct and relocating an activity."
+        },
+        "structural_quality_impact": {
+          "value": "high",
+          "reason": "The process remains structured, but the change significantly alters concurrency by converting parallel execution into sequential execution."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The restructuring is applied to the central payment-and-shipping block."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_move_notify_after_parallel_join",
+  "best_resolution_reason": "RS1 is recommended because it fully restores compliance while avoiding duplicate customer notifications. It requires only a localized move of an existing activity, preserves a clean structured process, and places the notification at the synchronization point after both payment handling and packing have completed."
+}

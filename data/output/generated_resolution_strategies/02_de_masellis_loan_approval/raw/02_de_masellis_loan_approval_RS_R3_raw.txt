@@ -1,0 +1,119 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_insert_local_preceding_update_request",
+      "change_operations": [
+        {
+          "operation_id": "RS1_OP1",
+          "operation": "insert_activity",
+          "activity": "ask for updates",
+          "location": "In the second top-level parallel branch, insert immediately after 'assess loan risk' and immediately before the inner parallel block containing 'check medical history' and 'check career'."
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Every execution of 'check medical history' is preceded in the same sequential branch by an inserted 'ask for updates' activity, satisfying precedence('check medical history', 'ask for updates')."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No additional resolution context requirements were provided, and the strategy does not remove or reorder existing compliant behavior."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one localized insertion is required. The existing process structure and parallel organization are otherwise preserved."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process tree remains well-structured. The main drawback is that 'ask for updates' appears in more than one location, which may introduce some behavioral redundancy."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is applied in the risk assessment branch, between 'assess loan risk' and the medical/career checks."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_serialize_application_check_before_risk_assessment",
+      "change_operations": [
+        {
+          "operation_id": "RS2_OP1",
+          "operation": "insert_activity",
+          "activity": "ask for updates",
+          "location": "Inside the exclusive branch with condition data.conflicts == \"true\", insert immediately after 'ask to recheck'."
+        },
+        {
+          "operation_id": "RS2_OP2",
+          "operation": "replace_operator",
+          "target": "Root parallel operator",
+          "replacement": "sequence",
+          "details": "Replace the top-level parallel block with a sequence that first executes the current application-checking branch and then executes the current data-retrieval/risk-assessment branch."
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "After serialization, the application-checking branch always completes before the risk-assessment branch. Since both exclusive alternatives now contain 'ask for updates' before the second branch starts, 'check medical history' can only occur after 'ask for updates'."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No resolution context requirements are present. The strategy preserves all original activities, although it changes their concurrency relationship."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "The strategy requires one insertion and a root-level structural change from parallel to sequence, which is more invasive than a local insertion."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The resulting process remains structured, but it removes the original concurrency between application checking and risk assessment, which may reduce process flexibility and throughput."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The main structural modification is at the root of the process tree and affects the early interaction between the two top-level branches."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_move_medical_history_check_into_update_branch",
+      "change_operations": [
+        {
+          "operation_id": "RS3_OP1",
+          "operation": "move_activity",
+          "activity": "check medical history",
+          "source": "Inner parallel block in the second top-level branch, currently parallel with 'check career'.",
+          "target": "Inside the exclusive branch with condition not (data.conflicts == \"true\"), immediately after 'ask for updates'."
+        },
+        {
+          "operation_id": "RS3_OP2",
+          "operation": "simplify_operator",
+          "target": "Inner parallel block that remains with only 'check career' after moving 'check medical history'.",
+          "replacement": "Replace the single-child parallel block with the activity 'check career'."
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "'check medical history' is moved into the same sequence directly after 'ask for updates', so whenever it occurs, 'ask for updates' has necessarily occurred before."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No resolution context requirements are present. The strategy does not introduce conflicts with any stated existing compliance constraints."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "The strategy requires moving an activity across branches and then simplifying the remaining parallel structure."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The resulting tree remains structured and even removes an unnecessary single-child parallel block. However, it changes the scope of 'check medical history' so that it only occurs in the non-conflict branch."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change affects the middle part of the process, involving the update branch and the risk-assessment checks."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_insert_local_preceding_update_request",
+  "best_resolution_reason": "RS1 is recommended because it fully restores compliance with the precedence requirement using the smallest and most localized modification. It preserves the existing parallel structure and keeps 'check medical history' in the risk-assessment branch. Its only notable drawback is the possible duplication of 'ask for updates', but this is less disruptive than serializing the root process or moving the medical-history check into only one exclusive branch."
+}

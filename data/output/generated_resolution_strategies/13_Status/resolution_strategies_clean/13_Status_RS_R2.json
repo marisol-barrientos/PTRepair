@@ -1,0 +1,166 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_local_data_annotations_and_analyse_resource_normalization",
+      "change_operations": [
+        {
+          "operation_id": "RS1_OP1",
+          "operation": "add_activity_data_association",
+          "target_activity": "Create resolution proposal",
+          "data_object": "resolution_proposal",
+          "details": "Add the required data-object association for resolution_proposal to the activity data interface, recorded in the finalize/output set used by the compliance checker."
+        },
+        {
+          "operation_id": "RS1_OP2",
+          "operation": "add_activity_data_association",
+          "target_activity": "Generate consultative report",
+          "data_object": "report_cb",
+          "details": "Add the required data-object association for report_cb to the activity data interface, recorded in the finalize/output set used by the compliance checker."
+        },
+        {
+          "operation_id": "RS1_OP3",
+          "operation": "add_activity_data_association",
+          "target_activity": "generate legal report",
+          "data_object": "report_ld",
+          "details": "Add the required data-object association for report_ld to the activity data interface, recorded in the finalize/output set used by the compliance checker."
+        },
+        {
+          "operation_id": "RS1_OP4",
+          "operation": "update_activity_resource",
+          "target_activity": "Analyse reports",
+          "old_resource": "Tech. MD Position",
+          "new_resource": "Tech.MD Position",
+          "details": "Normalize the resource assignment of Analyse reports so that it matches the resource assignment of Create resolution proposal."
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The already satisfied leads_to and exists conditions are preserved. The three missing data-object associations are added, and the resource equality between Create resolution proposal and Analyse reports is restored by assigning both activities to Tech.MD Position."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "There are no explicit resolution context requirements. The strategy preserves the existing control-flow structure and only changes local data annotations and a likely resource-label inconsistency."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The strategy requires only metadata-level changes: three data associations and one resource-label correction. No activities, gateways, or execution branches are added or removed."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The structured tree remains unchanged in terms of control flow. The impact is limited to activity attributes, so no additional nesting, branching, or synchronization complexity is introduced."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The affected activities are located in the first half and middle of the process, especially around report generation and analysis before the exclusive decision point."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_local_data_annotations_and_create_resource_normalization",
+      "change_operations": [
+        {
+          "operation_id": "RS2_OP1",
+          "operation": "add_activity_data_association",
+          "target_activity": "Create resolution proposal",
+          "data_object": "resolution_proposal",
+          "details": "Add the required data-object association for resolution_proposal to the activity data interface, recorded in the finalize/output set used by the compliance checker."
+        },
+        {
+          "operation_id": "RS2_OP2",
+          "operation": "add_activity_data_association",
+          "target_activity": "Generate consultative report",
+          "data_object": "report_cb",
+          "details": "Add the required data-object association for report_cb to the activity data interface, recorded in the finalize/output set used by the compliance checker."
+        },
+        {
+          "operation_id": "RS2_OP3",
+          "operation": "add_activity_data_association",
+          "target_activity": "generate legal report",
+          "data_object": "report_ld",
+          "details": "Add the required data-object association for report_ld to the activity data interface, recorded in the finalize/output set used by the compliance checker."
+        },
+        {
+          "operation_id": "RS2_OP4",
+          "operation": "update_activity_resource",
+          "target_activity": "Create resolution proposal",
+          "old_resource": "Tech.MD Position",
+          "new_resource": "Tech. MD Position",
+          "details": "Normalize the resource assignment of Create resolution proposal so that it matches the resource assignment of Analyse reports."
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The required data-object associations are added, the existing control-flow relation from Create resolution proposal to Analyse reports remains valid, Analyse reports still exists, and the resource equality condition is satisfied by assigning both activities to Tech. MD Position."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No explicit context requirements are present. The process behavior is preserved because only activity metadata is changed."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The number of required operations is the same as in the preferred strategy, and none of the operations restructures the process tree."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The control-flow structure remains unchanged. However, changing the resource of the initial proposal creation activity may be slightly more sensitive organizationally than correcting the analysis activity label."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "One of the main changes affects the first activity in the process, and the other data annotations occur before the analysis step."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_partial_data_annotation_without_resource_change",
+      "change_operations": [
+        {
+          "operation_id": "RS3_OP1",
+          "operation": "add_activity_data_association",
+          "target_activity": "Create resolution proposal",
+          "data_object": "resolution_proposal",
+          "details": "Add the required data-object association for resolution_proposal to the activity data interface, recorded in the finalize/output set used by the compliance checker."
+        },
+        {
+          "operation_id": "RS3_OP2",
+          "operation": "add_activity_data_association",
+          "target_activity": "Generate consultative report",
+          "data_object": "report_cb",
+          "details": "Add the required data-object association for report_cb to the activity data interface, recorded in the finalize/output set used by the compliance checker."
+        },
+        {
+          "operation_id": "RS3_OP3",
+          "operation": "add_activity_data_association",
+          "target_activity": "generate legal report",
+          "data_object": "report_ld",
+          "details": "Add the required data-object association for report_ld to the activity data interface, recorded in the finalize/output set used by the compliance checker."
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "substantial",
+          "reason": "This strategy resolves all detected data-object violations while preserving the already satisfied leads_to and exists conditions. However, it does not resolve the resource equality issue between Create resolution proposal and Analyse reports."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy does not introduce any new control-flow behavior and avoids changing resource assignments. It is safe if resource ownership cannot be modified without organizational approval."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only three activity-level data annotations are added. No control-flow or resource assignment changes are made."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The process tree structure and resource allocation remain unchanged. The strategy only enriches activity metadata."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The modifications affect the proposal creation and report generation area, which occurs before the analysis and decision portions of the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_local_data_annotations_and_analyse_resource_normalization",
+  "best_resolution_reason": "RS1 is recommended because it fully restores compliance with minimal and localized modifications. It preserves the existing control-flow structure, adds only the missing data associations, and resolves the resource equality violation by normalizing the Analyse reports resource to match the already established Create resolution proposal resource label. This is less disruptive than changing the resource of the initial proposal creation activity and avoids adding unnecessary process complexity."
+}

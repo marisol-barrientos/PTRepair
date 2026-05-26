@@ -1,0 +1,16 @@
+{
+  "model": "openai/gpt-5.5",
+  "scenario_name": "15_WinteretAlER",
+  "requirement_id": "R2",
+  "output_prefix": "15_WinteretAlER_RS_R2",
+  "execution_time_milliseconds": 40768.59,
+  "execution_time_seconds": 40.77,
+  "resolution_context_requirements": 1,
+  "problems_detected": [],
+  "usage": {
+    "prompt_tokens": 1358,
+    "completion_tokens": 2526,
+    "total_tokens": 3884,
+    "reasoning_tokens": null
+  }
+}

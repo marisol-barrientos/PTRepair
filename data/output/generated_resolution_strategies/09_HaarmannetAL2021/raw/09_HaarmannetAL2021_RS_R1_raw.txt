@@ -1,0 +1,84 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_add_explicit_rejected_branch",
+      "change_operations": "1) In the top-level exclusive choice after 'process job', insert a new branch with condition 'data.status == \"rejected\"' containing the single activity 'terminate'. 2) Change the existing fallback branch condition from 'not (data.status == \"accepted\")' to 'not ((data.status == \"accepted\") or (data.status == \"rejected\"))' to keep the exclusive branches mutually exclusive.",
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The process will contain an explicit branch for the condition 'data.status == \"rejected\"', and the first activity in that branch is 'terminate', so the condition_directly_follows requirement is satisfied."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The accepted-status behavior is unchanged, so the existing translation, alignment, and translation-memory update behavior remains preserved. No new 'close case', 'create segments', or automatic memory-update behavior is introduced."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one explicit branch is added and one existing fallback condition is refined. The change is localized to the existing status-based exclusive decision."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The existing structure is preserved and the status routing becomes more explicit. The only minor impact is an additional branch in the existing exclusive block."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The change is applied at the first status-based decision after 'process job', before the main translation and alignment subprocesses."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_refine_existing_non_accepted_branch_to_rejected",
+      "change_operations": "1) Change the condition of the existing branch 'not (data.status == \"accepted\")' to 'data.status == \"rejected\"', keeping its activity 'terminate' unchanged.",
+      "evaluation": {
+        "compliance_degree": {
+          "value": "substantial",
+          "reason": "The rejected case will now directly lead to 'terminate', satisfying the detected requirement for rejected jobs. However, behavior for other non-accepted statuses is no longer explicitly handled unless the domain only allows 'accepted' and 'rejected'."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The accepted path and all currently satisfied context requirements remain unaffected, but other previously terminating non-accepted statuses may become uncovered."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only a single branch condition is modified, and no new control-flow structure is introduced."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The tree remains simple, but the top-level exclusive choice may lose complete coverage for statuses other than 'accepted' or 'rejected'."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The change is applied in the top-level status decision immediately after 'process job'."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_wrap_status_decision_with_rejected_precheck",
+      "change_operations": "1) Replace the current top-level exclusive choice after 'process job' with a new exclusive choice. 2) Add a first branch with condition 'data.status == \"rejected\"' containing the single activity 'terminate'. 3) Add a second branch with condition 'not (data.status == \"rejected\")' containing the original top-level exclusive choice unchanged.",
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The process gains an explicit rejected-status branch whose immediate activity is 'terminate', satisfying the condition_directly_follows requirement."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The original accepted and non-accepted logic is preserved inside the non-rejected branch. The existing behavior relevant to the resolution context requirements is not changed."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "This strategy requires wrapping the existing status decision in a new exclusive structure, which is more invasive than simply adding a branch to the existing exclusive block."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The solution is behavior-preserving and compliant, but it introduces an additional nested exclusive decision, making the process structure more complex than necessary."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The new rejected-status precheck is inserted immediately after 'process job', before the current status-based routing."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_add_explicit_rejected_branch",
+  "best_resolution_reason": "RS1 is the best strategy because it fully restores compliance with the rejected-status termination requirement while preserving the accepted path and all currently satisfied resolution context requirements. It is localized to the existing status-based exclusive choice, has low change cost, avoids unnecessary nesting, and maintains clear mutually exclusive routing for accepted, rejected, and other non-accepted statuses."
+}

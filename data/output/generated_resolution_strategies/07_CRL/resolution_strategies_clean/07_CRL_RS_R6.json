@@ -1,0 +1,149 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_rename_existing_activity_in_high_amount_branch",
+      "change_operations": [
+        {
+          "operation": "rename_activity",
+          "target": "Assign post processing to supervisor",
+          "new_label": "assign post processing to supervisor",
+          "location": "Inside the sequence guarded by condition data.loan_amount > 1000000, before Check Credit Worthiness"
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The required activity label is made to exactly match the compliance requirement and remains on the branch guarded by data.loan_amount > 1000000, so the activity eventually follows whenever that condition holds."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy does not change the ordering of customer bank privilege check, check credit worthiness, or evaluate loan risk, and it does not introduce evaluate loan risk after the gold-customer low-amount condition."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only a single local label correction is required; no control-flow structure or additional activity is introduced."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The process structure remains unchanged. The existing behavior is preserved except for the activity label normalization."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is located in the loan assessment section after bank information validation and before credit worthiness checking."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_replace_existing_activity_with_required_activity",
+      "change_operations": [
+        {
+          "operation": "delete_activity",
+          "target": "Assign post processing to supervisor",
+          "location": "Inside the sequence guarded by condition data.loan_amount > 1000000"
+        },
+        {
+          "operation": "insert_activity",
+          "activity": "assign post processing to supervisor",
+          "attributes": {
+            "write": "post_processing_resource"
+          },
+          "location": "Inside the same sequence guarded by condition data.loan_amount > 1000000, before Check Credit Worthiness"
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "After replacement, the branch for data.loan_amount > 1000000 explicitly contains the required activity before the process continues to Check Credit Worthiness."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The replacement is localized to the high-loan-amount branch and does not alter the required precedence or leads-to relations involving customer bank privilege check, check credit worthiness, and evaluate loan risk."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Two simple operations are required, but they are confined to the same location and preserve the existing data write behavior."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The control-flow structure is not changed. The only impact is replacing one activity node with an equivalent correctly named activity."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The modification occurs in the middle part of the process, within the bank-information-valid path before credit worthiness and loan risk evaluation."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_insert_required_activity_before_existing_assignment",
+      "change_operations": [
+        {
+          "operation": "insert_activity",
+          "activity": "assign post processing to supervisor",
+          "attributes": {
+            "write": "post_processing_resource"
+          },
+          "location": "Inside the sequence guarded by condition data.loan_amount > 1000000, immediately before the existing activity Assign post processing to supervisor"
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The required activity is inserted directly on the branch where data.loan_amount > 1000000 holds, ensuring it eventually follows the condition."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The insertion does not affect the ordering constraints around customer bank privilege check, check credit worthiness, or evaluate loan risk, and does not introduce evaluate loan risk into any new branch."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one activity insertion is required, although it creates a potential duplicate with the existing similarly named activity."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The process remains structurally sound, but the insertion creates two nearly identical consecutive activities, which may reduce model clarity and introduce redundant behavior."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is made in the loan evaluation path after bank information validation and before credit worthiness checking."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_insert_required_activity_after_loan_amount_choice",
+      "change_operations": [
+        {
+          "operation": "insert_activity",
+          "activity": "assign post processing to supervisor",
+          "attributes": {
+            "write": "post_processing_resource"
+          },
+          "location": "Immediately after the exclusive choice that distinguishes data.loan_amount > 1000000 from not(data.loan_amount > 1000000), before Check Credit Worthiness"
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "For cases where data.loan_amount > 1000000 holds, the inserted activity is executed after the loan-amount decision and before Check Credit Worthiness."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The strategy preserves the stated context requirements, but it also causes the assignment activity to execute for lower loan amounts on the bank-information-valid path, which may alter behavior that was previously compliant."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one activity insertion is required, but it is less localized semantically because it affects both high-amount and non-high-amount cases."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The structure remains valid, but the inserted activity is no longer guarded exclusively by the high-loan-amount condition, potentially reducing behavioral precision."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is placed in the central assessment path, between loan amount classification and credit worthiness checking."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_rename_existing_activity_in_high_amount_branch",
+  "best_resolution_reason": "RS1 is the preferred strategy because it is the smallest and most localized modification. The process already contains the intended activity in the correct conditional branch, but its label does not match the requirement evidence. Renaming the existing activity restores full compliance without changing control flow, data flow, resource assignments, or the currently satisfied context requirements."
+}

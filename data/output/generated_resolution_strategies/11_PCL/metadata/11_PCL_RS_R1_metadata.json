@@ -1,0 +1,16 @@
+{
+  "model": "openai/gpt-5.5",
+  "scenario_name": "11_PCL",
+  "requirement_id": "R1",
+  "output_prefix": "11_PCL_RS_R1",
+  "execution_time_milliseconds": 41266.43,
+  "execution_time_seconds": 41.27,
+  "resolution_context_requirements": 1,
+  "problems_detected": [],
+  "usage": {
+    "prompt_tokens": 1524,
+    "completion_tokens": 2719,
+    "total_tokens": 4243,
+    "reasoning_tokens": null
+  }
+}
