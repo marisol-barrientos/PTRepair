@@ -1,0 +1,136 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_insert_consent_before_request",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "Request personal data",
+            "new_activity_label": "obtain data processing consent"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "obtain data processing consent",
+            "new_resource": "data controller"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The missing activity obtain data processing consent is inserted directly before Request personal data, satisfying the precedence requirement. Assigning it to the data controller satisfies the executed_by requirement."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No additional resolution context requirements are provided, and this strategy preserves the existing process behavior while adding the required consent step before personal data is requested."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The strategy requires only two localized operations: one insertion and one resource assignment."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process remains a simple sequence at the beginning. No additional branching, looping, or synchronization complexity is introduced."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The change is applied at the start of the process, immediately before Request personal data."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_repurpose_existing_permission_activity",
+      "change_operations": [
+        {
+          "operation": "move_before",
+          "parameters": {
+            "source_activity_label": "Ask for permission",
+            "target_activity_label": "Request personal data"
+          }
+        },
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Ask for permission",
+            "new_activity_label": "obtain data processing consent"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "obtain data processing consent",
+            "new_resource": "data controller"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The existing Ask for permission activity is moved before Request personal data, renamed to obtain data processing consent, and assigned to the data controller, thereby satisfying both the precedence and executed_by requirements."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "Although no explicit resolution context requirements are provided, moving the existing permission activity out of its original position after Store Data may alter the intended behavior of the later parallel branch."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "The strategy requires three operations and relocates an existing activity across the process, which is more invasive than inserting a new consent activity."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The strategy does not introduce new control-flow structures, but it changes the semantics of the parallel branch by removing Ask for permission from its original location."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The repaired consent activity is placed before Request personal data at the beginning of the process, although it is moved from a later process fragment."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_insert_consent_after_initial_request_partial",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "Request personal data",
+            "new_activity_label": "obtain data processing consent"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "obtain data processing consent",
+            "new_resource": "data controller"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "partial",
+          "reason": "The strategy satisfies the existence and executed_by aspects for obtain data processing consent, but it does not satisfy the precedence requirement because consent is obtained after Request personal data rather than before it."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No explicit resolution context requirements are provided, and the existing process structure is preserved with only one added activity."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one insertion and one resource assignment are required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The strategy adds a single sequential activity and does not introduce additional branching or synchronization complexity."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The change is applied immediately after the first activity in the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_insert_consent_before_request",
+  "best_resolution_reason": "RS1 is the best strategy because it fully restores compliance with both the precedence and executed_by requirements while preserving the existing process behavior. It is minimal, localized, and avoids disrupting the later parallel branch where Ask for permission currently appears."
+}

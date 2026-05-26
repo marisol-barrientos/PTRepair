@@ -1,0 +1,137 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_insert_recurring_check_at_process_start",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "Create resolution proposal",
+            "new_activity_label": "check for new document in DMS"
+          }
+        },
+        {
+          "operation": "embed_post_loop",
+          "parameters": {
+            "start_activity_label": "check for new document in DMS",
+            "end_activity_label": "check for new document in DMS",
+            "condition": "repeat every 10518984"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "partial",
+          "reason": "The missing activity is inserted and embedded in a loop, addressing the recurring part of the requirement. However, the provided operations do not include an explicit add-read or add-receive operation, so the required receipt of the data object 'checklist completed and signed by Tax Manager and Financial Controller' cannot be guaranteed."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "There are no additional resolution context requirements. The change is localized at the beginning of the process and does not alter the existing report generation, analysis, review, or notification behavior."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one activity is inserted and wrapped in a loop. No existing activities are deleted, renamed, reordered, or reassigned."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The strategy adds a small single-activity loop before the existing process. This slightly increases complexity but preserves the overall structure."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The new recurring DMS check is placed before the first existing activity, making it an intake or pre-processing control."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_insert_recurring_check_before_analysis",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "Analyse reports",
+            "new_activity_label": "check for new document in DMS"
+          }
+        },
+        {
+          "operation": "embed_post_loop",
+          "parameters": {
+            "start_activity_label": "check for new document in DMS",
+            "end_activity_label": "check for new document in DMS",
+            "condition": "repeat every 10518984"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "partial",
+          "reason": "The required activity is added and made recurring by embedding it in a loop. The receive requirement remains unresolved because no supported operation can add a new consumed data object to the activity."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No stated context requirements are affected. The existing parallel report generation remains unchanged, and the check is added only before the analysis step."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The strategy requires only an insertion and a loop embedding around the inserted activity."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The added loop is local and does not restructure the existing parallel or exclusive blocks."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The modification is placed after report generation and immediately before report analysis."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_insert_recurring_check_before_final_notification",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "Sign, store, and notify resolution",
+            "new_activity_label": "check for new document in DMS"
+          }
+        },
+        {
+          "operation": "embed_post_loop",
+          "parameters": {
+            "start_activity_label": "check for new document in DMS",
+            "end_activity_label": "check for new document in DMS",
+            "condition": "repeat every 10518984"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "partial",
+          "reason": "The recurring activity requirement is addressed, but the explicit activity_receives requirement cannot be fully enforced with the available operations."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The existing decision structure and earlier process behavior are preserved. No context requirements are given, so no direct conflict is introduced."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only a new activity and a local loop wrapper are added."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process remains structurally simple, although the late recurring check may be less semantically natural than an early intake check."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The check is inserted immediately before the final signing, storage, and notification activity."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_insert_recurring_check_at_process_start",
+  "best_resolution_reason": "RS1 is the recommended supported strategy because it introduces the missing DMS check as an early recurring intake control while leaving the rest of the process unchanged. It is minimal, localized, and structurally clean. Full compliance cannot be achieved using only the provided operations because there is no operation to add a new read or receive data object to an activity.",
+  "alternative_suggestion": {
+    "reason": "The provided change operations include modify_read, but no operation to add a new read or receive statement to an activity that has no existing read annotation. Therefore, the activity_receives part of the requirement cannot be fully represented as a valid supported operation.",
+    "conceptual_solution": "Insert 'check for new document in DMS' before 'Create resolution proposal', configure it to receive or consume the data object 'checklist completed and signed by Tax Manager and Financial Controller', and embed it in a recurring loop with interval or condition '10518984'.",
+    "expected_compliance_impact": "This conceptual repair would fully satisfy both the recurring requirement and the activity_receives requirement."
+  }
+}

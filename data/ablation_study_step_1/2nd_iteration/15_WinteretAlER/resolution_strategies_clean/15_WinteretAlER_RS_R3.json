@@ -1,0 +1,108 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_rename_wait_for_user_input",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "wait for user input",
+            "new_activity_label": "user input"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The missing activity label 'user input' is introduced by renaming the existing semantically equivalent activity 'wait for user input'. Since this activity is already positioned in the timed parallel structure associated with timeout 60 and 'automatic screen lock', the exists and timed_alternative requirements are restored."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The change does not affect the authentication XOR branch or the ordering of 'Unlock screen'. Therefore, it does not introduce a path where 'Unlock screen' eventually follows the condition 'not data.authenticated'."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one localized rename operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The process structure is unchanged. Only the activity label is aligned with the compliance requirement."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The renamed activity is located in the initial parallel timeout-handling part of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_insert_user_input_after_wait",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "wait for user input",
+            "new_activity_label": "user input"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "substantial",
+          "reason": "This introduces the missing activity 'user input' in the same parallel branch as the existing user-input waiting activity. It likely restores the existence requirement and may satisfy the timed alternative relationship if the compliance checker recognizes the inserted activity as the alternative branch activity. However, the original 'wait for user input' remains, creating a less direct representation than a rename."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The authentication decision and the 'Unlock screen' branch remain unchanged, so the existing resolution context requirement is preserved."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one insertion is required, but it adds an additional activity rather than correcting the existing label."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The strategy adds a potentially redundant activity immediately after an activity with nearly identical meaning, slightly reducing process clarity."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The inserted activity is placed in the initial parallel timeout-handling part of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_insert_user_input_before_wait",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "wait for user input",
+            "new_activity_label": "user input"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "partial",
+          "reason": "The missing activity 'user input' is introduced, satisfying the existence part of the requirement. However, placing it before 'wait for user input' may not correctly represent the intended timed alternative behavior, because the inserted activity may occur before the actual waiting behavior rather than serving as the alternative response to the timeout structure."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The change is confined to the initial user-input branch and does not affect authentication-dependent access control behavior."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one insertion is required."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The added activity before 'wait for user input' creates an awkward and potentially confusing sequence of user-input-related activities."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The modification is made in the first parallel block of the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_rename_wait_for_user_input",
+  "best_resolution_reason": "RS1 is the best strategy because it performs the smallest and most localized correction. The process already contains an activity that appears to represent the required 'user input' behavior, but its label does not match the compliance requirement. Renaming it restores the missing activity and preserves the existing timed timeout structure without adding redundancy or altering the authentication logic."
+}

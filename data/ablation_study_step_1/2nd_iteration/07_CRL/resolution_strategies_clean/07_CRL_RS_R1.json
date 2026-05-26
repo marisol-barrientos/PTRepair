@@ -1,0 +1,88 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_insert_email_after_credit_check_and_parallelize",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "Check Credit Worthiness",
+            "new_activity_label": "Send Automated Email"
+          }
+        },
+        {
+          "operation": "parallelize",
+          "parameters": {
+            "first_activity_label": "Check Credit Worthiness",
+            "second_activity_label": "Send Automated Email"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The missing activity Send Automated Email is introduced and then placed in a parallel structure with Check Credit Worthiness, directly satisfying the required parallel pattern."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The change is localized around Check Credit Worthiness. Evaluate LoanRisk still occurs after Check Credit Worthiness, and Check Credit Worthiness still follows the customer bank privilege check on the valid bank information path. No new condition involving customer_status == gold and loan_amount < 1000000 is introduced."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The strategy requires only two simple operations: inserting the missing activity and parallelizing it with an adjacent existing activity."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The strategy adds one small parallel block around two related activities without changing the surrounding XOR decisions or later loan-risk evaluation logic."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The repair is applied in the middle of the process, within the valid bank information branch before loan-risk evaluation."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_insert_email_before_credit_check_and_parallelize",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "Check Credit Worthiness",
+            "new_activity_label": "Send Automated Email"
+          }
+        },
+        {
+          "operation": "parallelize",
+          "parameters": {
+            "first_activity_label": "Send Automated Email",
+            "second_activity_label": "Check Credit Worthiness"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The missing Send Automated Email activity is added and then transformed into a parallel branch with Check Credit Worthiness, satisfying the parallel compliance requirement."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The existing causal path from customer bank privilege checking to Check Credit Worthiness remains intact. Evaluate LoanRisk remains after the parallelized credit-worthiness activity, preserving the precedence requirements. No prohibited data condition is added."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one insertion and one parallelization are required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The modification introduces a compact parallel construct at the point where the missing activity is required, with no unnecessary restructuring of the surrounding process."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change occurs in the middle of the loan processing path, immediately around Check Credit Worthiness."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_insert_email_after_credit_check_and_parallelize",
+  "best_resolution_reason": "RS1 is recommended because it introduces the missing Send Automated Email activity exactly where the violation occurs and parallelizes it with Check Credit Worthiness using only two localized operations. It fully restores compliance while preserving the existing precedence and leads-to context requirements and has low structural impact."
+}

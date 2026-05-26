@@ -1,0 +1,142 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_insert_notify_after_pack_goods",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "pack goods",
+            "new_activity_label": "notify customer"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "After the change, every execution of \"pack goods\" is immediately followed in the shipping branch by a \"notify customer\" activity, so the leads_to requirement from \"pack goods\" to \"notify customer\" is satisfied on all paths."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No additional resolution context requirements were provided. The existing payment behavior is preserved because the original \"notify customer\" activity in the credit-card branch remains unchanged."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one localized insertion is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The structure of the process remains unchanged except for one additional activity in the shipping sequence. However, credit-card executions may now notify the customer twice."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is applied inside the parallel block, directly after \"pack goods\" in the shipping branch."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_move_existing_notify_after_pack_goods",
+      "change_operations": [
+        {
+          "operation": "move_after",
+          "parameters": {
+            "source_activity_label": "notify customer",
+            "target_activity_label": "pack goods"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Moving the existing \"notify customer\" activity after \"pack goods\" ensures that whenever \"pack goods\" occurs, \"notify customer\" occurs afterwards."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No explicit resolution context requirements are violated. The strategy also avoids duplicate customer notifications."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one move operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The change moves an activity out of the credit-card payment branch into the shipping branch. This resolves the violation but changes the original placement and conditional execution of the notification."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The source and target activities are both inside the central parallel block."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_insert_notify_after_send_goods",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "send goods",
+            "new_activity_label": "notify customer"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "\"send goods\" occurs after the parallel block containing \"pack goods\". Therefore, inserting \"notify customer\" after \"send goods\" guarantees that every execution of \"pack goods\" is eventually followed by \"notify customer\"."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No resolution context requirements are present, and the existing behavior inside the payment and shipping branches is preserved."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one insertion is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process structure remains simple and sequential after the parallel block. However, credit-card executions may still contain two customer notifications."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The change is applied after \"send goods\", near the end of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_move_existing_notify_after_send_goods",
+      "change_operations": [
+        {
+          "operation": "move_after",
+          "parameters": {
+            "source_activity_label": "notify customer",
+            "target_activity_label": "send goods"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "\"notify customer\" is moved to a point after \"send goods\", which occurs after \"pack goods\". Thus, every occurrence of \"pack goods\" is eventually followed by \"notify customer\"."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No explicit context requirement is violated, and the strategy avoids duplicate notifications."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one move operation is needed."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The process remains structurally simple, but the notification is removed from the credit-card branch and becomes unconditional after goods are sent."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The resulting notification is placed after \"send goods\", near the end of the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_insert_notify_after_pack_goods",
+  "best_resolution_reason": "RS1 is recommended because it fully restores compliance with a single localized change directly at the violation point. It preserves the existing credit-card branch behavior and does not restructure the parallel or exclusive blocks. Its only drawback is the possibility of duplicate notifications on credit-card paths, but no context requirement forbids this."
+}

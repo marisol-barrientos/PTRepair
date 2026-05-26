@@ -1,0 +1,158 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_context_preserving_full_repair",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Evaluate LoanRisk",
+            "new_activity_label": "evaluate loan risk"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "evaluate loan risk",
+            "new_resource": "Manager"
+          }
+        },
+        {
+          "operation": "embed_activity_in_xor",
+          "parameters": {
+            "target_activity_label": "evaluate loan risk",
+            "condition": "not (data.customer_status == gold && data.loan_amount < 1000000)",
+            "mode": "skip"
+          }
+        },
+        {
+          "operation": "add_write",
+          "parameters": {
+            "target_activity_label": "Check Credit Worthiness",
+            "added_statement": "if data.customer_status == gold && data.loan_amount < 1000000 then low_risk = true"
+          }
+        },
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Sign officially Loan Contract",
+            "new_activity_label": "officially sign loan contract"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The activity required as 'evaluate loan risk' is made explicit and assigned to Manager. The signing activity is renamed to the required label 'officially sign loan contract' while retaining its existing Manager resource assignment. Therefore both executed_by requirements are satisfied."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The repaired 'evaluate loan risk' remains after both 'Check Customer Bank Privilege' and 'Check Credit Worthiness', preserving the precedence-related context requirement. The added XOR guard prevents 'evaluate loan risk' from executing when data.customer_status == gold and data.loan_amount < 1000000, preserving the context requirement that this condition must not eventually lead to evaluate loan risk."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "The strategy requires five localized operations: two renames, one resource assignment, one XOR embedding, and one compensating data write. This is more costly than a simple relabeling, but still limited to the affected loan-risk and signing area."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The strategy introduces a local XOR skip around the risk evaluation and adds a conditional write to maintain downstream use of low_risk when the risk evaluation is skipped. This slightly increases model complexity but avoids broader restructuring."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "Most changes are located in the middle of the process around credit worthiness and loan risk evaluation. One label repair occurs later in the contract-signing path."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_minimal_direct_relabel_and_resource_repair",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Evaluate LoanRisk",
+            "new_activity_label": "evaluate loan risk"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "evaluate loan risk",
+            "new_resource": "Manager"
+          }
+        },
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Sign officially Loan Contract",
+            "new_activity_label": "officially sign loan contract"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Both required activities become present with the expected labels. The loan-risk evaluation is assigned to Manager, and the contract-signing activity already has Manager as its resource, which is preserved by the rename."
+        },
+        "resolution_context_consistency": {
+          "value": "low",
+          "reason": "The precedence context remains satisfied because the renamed loan-risk activity stays after the customer bank privilege check and credit worthiness check. However, the exact activity 'evaluate loan risk' may now execute when data.customer_status == gold and data.loan_amount < 1000000, which risks violating the existing negative context requirement R7."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only three simple localized operations are required: two renames and one resource modification."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The control-flow structure is unchanged. The strategy only corrects labels and resource assignment."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The main repair is in the middle of the process at loan-risk evaluation, with an additional late label correction in the contract-signing branch."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_partial_repair_preserving_context",
+      "change_operations": [
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "Evaluate LoanRisk",
+            "new_resource": "Manager"
+          }
+        },
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Sign officially Loan Contract",
+            "new_activity_label": "officially sign loan contract"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "partial",
+          "reason": "The contract-signing requirement is satisfied by renaming the existing Manager-executed signing activity. The existing loan-risk evaluation is assigned to Manager, but the exact required activity label 'evaluate loan risk' is still not introduced, so the detected existence issue for that activity remains unresolved."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No exact 'evaluate loan risk' activity is introduced, so the negative context requirement R7 remains unaffected. The existing position of the semantic loan-risk activity also remains after the bank privilege and credit worthiness checks."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only two operations are required, both local and simple."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The process structure is not changed; only one resource assignment and one label are modified."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "One change occurs at the middle loan-risk evaluation point and one occurs later in the contract-signing branch."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_context_preserving_full_repair",
+  "best_resolution_reason": "RS1 is recommended because it fully restores the violated executed_by requirements while also preserving the currently satisfied context requirements as far as possible. Although it has a higher cost and moderate structural impact compared with the minimal relabeling strategy, it avoids introducing a likely R7 violation by preventing 'evaluate loan risk' from executing for gold customers with loan amounts below 1000000."
+}

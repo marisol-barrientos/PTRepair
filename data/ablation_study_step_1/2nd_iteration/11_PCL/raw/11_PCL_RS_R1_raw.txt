@@ -1,0 +1,108 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_move_identity_check_to_common_path",
+      "change_operations": [
+        {
+          "operation": "move_before",
+          "parameters": {
+            "source_activity_label": "Identity Check",
+            "target_activity_label": "Approve Account Opening"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Moving Identity Check to the common path before Approve Account Opening ensures that whenever the condition data.state == \"new\" holds, Identity Check will eventually occur after the XOR branch has completed. This also covers cases where data.state may be influenced within the branch."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy preserves the existing Initiate Account activity required by R2 and does not remove or rename it. No new conflict with the context requirement is introduced."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one localized move operation is required. No activities are added or deleted."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process remains a simple sequence with the existing XOR structure preserved. The main behavioral impact is that Identity Check is now executed for all cases, not only new customers."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The change is applied around the customer identification and account approval part of the process, before the account opening and initiation activities."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_copy_identity_check_to_common_path",
+      "change_operations": [
+        {
+          "operation": "copy_before",
+          "parameters": {
+            "source_activity_label": "Identity Check",
+            "target_activity_label": "Approve Account Opening"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Copying Identity Check to the common path before Approve Account Opening guarantees that Identity Check eventually occurs after the condition data.state == \"new\" becomes true, while retaining the original Identity Check inside the new-customer branch."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The required Initiate Account activity remains unchanged, so the satisfied context requirement R2 is preserved."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one copy operation is needed. However, the process gains an additional activity instance."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The structure remains valid, but new-customer cases may execute Identity Check twice: once inside the data.state == \"new\" branch and once again before approval. This introduces some redundancy."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The copied activity is inserted before Approve Account Opening, still in the early customer validation section of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_prevent_state_update_inside_new_customer_branch",
+      "change_operations": [
+        {
+          "operation": "remove_write",
+          "parameters": {
+            "target_activity_label": "Enter New Customer Information",
+            "removed_variable_name": "state"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "substantial",
+          "reason": "If the violation is caused by Enter New Customer Information influencing data.state after the XOR condition has already been evaluated, removing its write to state prevents the condition data.state == \"new\" from becoming true inside only one branch. Then the existing Identity Check in the data.state == \"new\" branch is sufficient. This is substantial rather than full because the provided structured tree does not explicitly show a write statement on Enter New Customer Information, although the violation evidence suggests it influences the condition."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy does not affect Initiate Account and therefore preserves R2."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one data-write modification is required, without changing control-flow structure."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The process control-flow tree remains unchanged. Only the data behavior of one activity is modified."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The change is applied inside the initial customer-classification branch."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_move_identity_check_to_common_path",
+  "best_resolution_reason": "RS1 is recommended because it fully restores the condition_eventually_follows requirement with a single low-cost operation while avoiding duplicate Identity Check executions. It also preserves the existing Initiate Account activity required by the resolution context. Compared with RS2, it avoids redundancy; compared with RS3, it is more robust because it resolves the violation through control-flow placement even if the exact data-write source of data.state is uncertain."
+}

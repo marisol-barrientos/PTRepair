@@ -1,0 +1,147 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_add_report_payment_to_rejected_branch",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "Report Rejected Order",
+            "new_activity_label": "Report Payment"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "After the change, every path reaching Close Bill contains Report Payment beforehand: the accepted-order branch already contains Report Payment, and the rejected-order branch receives a new Report Payment after Report Rejected Order. The existing leads_to requirement from Receive Payment to Report Payment remains satisfied."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The context requirement precedence('Close Bill', 'Report Order') remains satisfied because Report Order still occurs before the exclusive choice and before Close Bill on all paths."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one localized insertion is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The existing sequence, exclusive branching, and parallel structure are preserved. The only drawback is that the rejected-order branch now contains a payment report activity, which may be semantically questionable."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is applied inside the exclusive branch before the final Close Bill activity."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_add_common_report_payment_before_close_bill",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "Close Bill",
+            "new_activity_label": "Report Payment"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The inserted Report Payment is placed on the common path immediately before Close Bill, so Close Bill is always preceded by Report Payment regardless of which exclusive branch was taken. The leads_to relation from Receive Payment to Report Payment is also satisfied in the accepted-order path."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "Report Order still precedes Close Bill on every path, so the resolution context requirement is preserved."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one insertion is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The structure remains simple and no branches or loops are added. However, accepted-order traces may now contain two Report Payment executions, and rejected-order traces receive a Report Payment activity."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The change is applied immediately before the final Close Bill activity."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_add_report_rejected_order_to_payment_branch",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "Report Payment",
+            "new_activity_label": "Report Rejected Order"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "After the change, every path reaching Close Bill contains Report Rejected Order beforehand: the rejected-order branch already contains it, and the accepted-order branch receives it after Report Payment. This satisfies the alternative precedence condition. The leads_to relation from Receive Payment to Report Payment remains satisfied."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The added activity occurs after Report Order, so Close Bill is still preceded by Report Order on all paths."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one activity insertion is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process structure is preserved, but the accepted-order branch now contains Report Rejected Order, which may be semantically inappropriate."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is made inside the accepted-order branch before the process rejoins the common path."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_move_report_payment_to_common_path",
+      "change_operations": [
+        {
+          "operation": "move_before",
+          "parameters": {
+            "source_activity_label": "Report Payment",
+            "target_activity_label": "Close Bill"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Moving Report Payment to the common path before Close Bill ensures that every execution of Close Bill is preceded by Report Payment. In the accepted-order path, Receive Payment still occurs before the moved Report Payment, so leads_to('Receive Payment', 'Report Payment') remains satisfied."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "Report Order remains before both the exclusive branch and Close Bill, so the context requirement is preserved."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one move operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "No new activities are introduced, but Report Payment is moved out of the payment-handling branch onto the common path. This changes the behavioral meaning of rejected-order executions and modifies the original placement of payment reporting."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The resulting activity placement is immediately before Close Bill near the end of the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_add_report_payment_to_rejected_branch",
+  "best_resolution_reason": "RS1 is recommended because it uses a single localized operation, preserves the existing accepted-order behavior including the Receive Payment to Report Payment relation, keeps the overall process structure unchanged, and maintains the resolution context requirement. It directly addresses the detected issue that Report Payment is missing from one exclusive branch, although the business meaning of reporting payment for a rejected order should be reviewed.",
+  "alternative_suggestion": {
+    "reason": "The likely intended business rule is branch-dependent: accepted orders should be closed after payment is reported, while rejected orders should be closed after the rejection is reported. The provided process change operations cannot modify the compliance rule or the interpretation of exclusive-branch-aware disjunctive precedence.",
+    "conceptual_solution": "Refine the compliance requirement into branch-aware conditional rules, for example: if data.order.status holds, Close Bill must be preceded by Report Payment and Receive Payment must lead to Report Payment; if not data.order.status holds, Close Bill must be preceded by Report Rejected Order. Alternatively, improve the compliance checker so that the disjunction is evaluated over complete traces rather than requiring one predecessor activity to appear in all exclusive branches.",
+    "expected_compliance_impact": "This would likely resolve the violation without changing the process model, while preserving the intended distinction between accepted and rejected orders."
+  }
+}

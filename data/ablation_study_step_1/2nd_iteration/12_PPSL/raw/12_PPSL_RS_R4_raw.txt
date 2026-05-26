@@ -1,0 +1,167 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_copy_missing_activities_to_rejected_branch",
+      "change_operations": [
+        {
+          "operation": "copy_after",
+          "parameters": {
+            "source_activity_label": "Ship",
+            "target_activity_label": "Report Rejected Order"
+          }
+        },
+        {
+          "operation": "copy_after",
+          "parameters": {
+            "source_activity_label": "Send Invoice",
+            "target_activity_label": "Report Rejected Order"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The activities Ship and Send Invoice are added to the exclusive branch that currently lacks them. This addresses the violation evidence that these activities do not occur in all exclusive branches after Fill Order."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy does not move or remove Report Order or Close Bill, so the existing precedence requirement that Close Bill is preceded by Report Order remains satisfied."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only two localized copy operations are required."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The process structure remains valid and localized to the rejected-order branch, but adding shipping and invoicing behavior to a rejected-order path may be semantically questionable."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "Both changes are applied inside the exclusive branch in the middle of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_remove_rejected_order_branch",
+      "change_operations": [
+        {
+          "operation": "remove_branch",
+          "parameters": {
+            "target_activity_label": "Report Rejected Order"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Removing the rejected-order branch eliminates the exclusive branch in which Ship and Send Invoice are absent. The remaining branch contains Fill Order followed eventually by both required activities."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "Report Order still occurs before Close Bill, and neither activity is modified."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one branch-removal operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "high",
+          "reason": "Although structurally simple, this removes the process behavior for rejected orders entirely, which is a significant behavioral loss."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The removed branch is located inside the central exclusive decision structure."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_move_required_activities_to_common_suffix",
+      "change_operations": [
+        {
+          "operation": "move_before",
+          "parameters": {
+            "source_activity_label": "Send Invoice",
+            "target_activity_label": "Close Bill"
+          }
+        },
+        {
+          "operation": "move_before",
+          "parameters": {
+            "source_activity_label": "Ship",
+            "target_activity_label": "Close Bill"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Moving Send Invoice and Ship to the common sequence before Close Bill makes them occur after the exclusive branch on every path, including paths where Fill Order occurs."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "Close Bill remains after Report Order, so the existing precedence requirement is preserved."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "Two move operations are required, and both relocate activities across structural boundaries from the accepted-order branch to the common suffix."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The result avoids duplicate activities, but it changes the original ordering inside the accepted-order branch and may weaken the intended relationship between invoicing, payment, production, and shipping."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The target location is immediately before Close Bill near the end of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_copy_required_activities_to_common_suffix",
+      "change_operations": [
+        {
+          "operation": "copy_before",
+          "parameters": {
+            "source_activity_label": "Send Invoice",
+            "target_activity_label": "Close Bill"
+          }
+        },
+        {
+          "operation": "copy_before",
+          "parameters": {
+            "source_activity_label": "Ship",
+            "target_activity_label": "Close Bill"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Copies of Send Invoice and Ship are placed in the common suffix before Close Bill, ensuring that both required activities eventually occur after the exclusive decision."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy leaves Report Order and Close Bill in their original relative order, preserving the context requirement."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only two copy operations are needed and no existing activity is removed or reordered."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The original accepted-order behavior is preserved, but accepted orders may now execute duplicate Send Invoice and Ship activities, while rejected orders may also be invoiced and shipped."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The copied activities are inserted before Close Bill, near the end of the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_copy_missing_activities_to_rejected_branch",
+  "best_resolution_reason": "RS1 is recommended because it directly addresses the violation evidence with the smallest localized change to the branch where Ship and Send Invoice are missing. It preserves the existing accepted-order path and keeps the Report Order before Close Bill context requirement intact. Its main drawback is that it adds shipping and invoicing behavior to the rejected-order branch, so domain validation is advised.",
+  "alternative_suggestion": {
+    "reason": "The most semantically appropriate repair may require changing the compliance interpretation rather than the process tree. The provided operations modify the process model but do not support refining the formal rule or making the leads_to requirement explicitly conditional on the accepted-order branch.",
+    "conceptual_solution": "Refine the compliance requirement so that Ship and Send Invoice are required only for the branch where data.order.status is true and Fill Order is actually executed. Under that interpretation, the rejected-order branch would not need Ship or Send Invoice.",
+    "expected_compliance_impact": "This would likely resolve the apparent violation without introducing semantically questionable shipping or invoicing behavior for rejected orders."
+  }
+}

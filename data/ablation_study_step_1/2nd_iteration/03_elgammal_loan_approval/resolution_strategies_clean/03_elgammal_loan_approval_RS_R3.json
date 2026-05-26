@@ -1,0 +1,163 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_minimal_full_repair",
+      "change_operations": [
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "judge high risk loan",
+            "new_resource": "branch office manager"
+          }
+        },
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "judge high risk loan",
+            "new_activity_label": "take final decision"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The resource assignment of \"judge high risk loan\" is corrected to \"branch office manager\", and the missing activity \"take final decision\" is inserted directly after \"judge high risk loan\"."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No resolution context requirements are provided, and the change is localized to the violated fragment without affecting other branches or existing compliant behavior."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only two localized operations are required: one resource annotation update and one activity insertion."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The existing process structure is preserved. The inserted activity is placed in the existing high-risk loan branch and does not introduce additional gateways, loops, or complex control flow."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change occurs inside the loan evaluation and approval section, after initial request handling and before contract initialization or settlement."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_reuse_existing_supervisor_step",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "delegate to supervisor",
+            "new_activity_label": "take final decision"
+          }
+        },
+        {
+          "operation": "move_after",
+          "parameters": {
+            "source_activity_label": "take final decision",
+            "target_activity_label": "judge high risk loan"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "judge high risk loan",
+            "new_resource": "branch office manager"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "After renaming and moving the former supervisor delegation step, \"take final decision\" directly follows \"judge high risk loan\", and the required resource assignment is added."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "No explicit context requirements are violated, but the existing activity \"delegate to supervisor\" is removed semantically through renaming, which may affect intended high-risk loan handling behavior."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "This strategy requires three operations and reorders an existing activity, making it more invasive than simply inserting the missing activity."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The control-flow structure remains valid, but the semantic clarity of the high-risk branch may be reduced because the supervisor delegation step is replaced by a final decision step."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "All changes are located in the high-risk loan handling branch in the middle of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_resource_only_partial_repair",
+      "change_operations": [
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "judge high risk loan",
+            "new_resource": "branch office manager"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "partial",
+          "reason": "The executed_by requirement is satisfied, but the directly_follows requirement remains violated because \"take final decision\" is still missing."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The change only updates the resource annotation of an existing activity and does not alter control flow or existing behavior."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one metadata-level operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The process structure is unchanged."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The modified activity is located in the high-risk loan branch in the middle of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_direct_follow_only_partial_repair",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "judge high risk loan",
+            "new_activity_label": "take final decision"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "partial",
+          "reason": "The directly_follows requirement is satisfied because \"take final decision\" is inserted directly after \"judge high risk loan\", but the required resource assignment for \"judge high risk loan\" remains missing."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No explicit context requirements are affected, and the insertion is localized to the violated branch."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one activity insertion is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process remains structurally simple. One sequential activity is added without changing gateways or branch conditions."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The insertion occurs in the high-risk loan branch before the subsequent approval-status decision."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_minimal_full_repair",
+  "best_resolution_reason": "RS1 is the preferred strategy because it fully restores compliance with both violated requirements using the smallest localized change set: assigning \"judge high risk loan\" to the required resource and inserting the missing \"take final decision\" activity directly after it. It preserves the existing process structure and avoids unnecessary reordering or semantic loss."
+}

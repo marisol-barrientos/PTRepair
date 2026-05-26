@@ -1,0 +1,126 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_rename_activity_to_required_label",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Assign post processing to supervisor",
+            "new_activity_label": "assign post processing to supervisor"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The required activity label is missing only because the process contains the same activity with different capitalization. Renaming it to the exact required label ensures that when condition data.loan_amount > 1000000 holds, the required activity eventually follows on that branch."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The repair does not change ordering, branching, resources, writes, reads, or control-flow behavior. Existing satisfied requirements involving customer bank privilege checks, credit worthiness checks, and evaluate loan risk are preserved."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one localized rename operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The process structure is unchanged. No additional branches, activities, loops, or dependencies are introduced."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is located in the nested loan evaluation branch after bank information validation and before credit worthiness checking."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_insert_required_activity_after_existing_activity",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "Assign post processing to supervisor",
+            "new_activity_label": "assign post processing to supervisor"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The required activity label is inserted directly after the existing similarly named activity inside the branch guarded by data.loan_amount > 1000000. Therefore, the required activity eventually follows whenever the condition holds."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The ordering constraints in the context remain satisfied because the inserted activity is before Check Credit Worthiness and Evaluate LoanRisk. However, the process now contains two nearly identical activities, which may cause semantic redundancy."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one insertion is required, but it adds a new process step rather than correcting the existing label."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The control-flow structure is preserved, but a redundant activity is introduced in the high-loan-amount branch."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The insertion is made in the loan amount branch before credit worthiness and loan risk evaluation."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_replace_existing_activity_with_required_activity_and_preserve_write",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "Assign post processing to supervisor",
+            "new_activity_label": "assign post processing to supervisor"
+          }
+        },
+        {
+          "operation": "add_write",
+          "parameters": {
+            "target_activity_label": "assign post processing to supervisor",
+            "added_statement": "post_processing_resource"
+          }
+        },
+        {
+          "operation": "delete",
+          "parameters": {
+            "target_activity_label": "Assign post processing to supervisor"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The required activity label is introduced in the branch where data.loan_amount > 1000000 holds, and the original differently capitalized activity is removed. The write to post_processing_resource is preserved on the replacement activity."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The replacement keeps the activity in the same local branch and preserves the write needed by later resource assignment. The context requirements concerning credit worthiness and loan risk ordering remain unaffected."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "Three operations are required: inserting the correctly labeled activity, restoring the write behavior, and deleting the old activity."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The final process structure remains essentially equivalent to the original, but the strategy is more invasive than a direct rename."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "All changes are localized to the high-loan-amount branch before credit worthiness checking."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_rename_activity_to_required_label",
+  "best_resolution_reason": "RS1 is the best strategy because it fully restores compliance with a single localized change, preserves all existing control-flow and data behavior, avoids duplicate activities, and does not risk violating the already satisfied resolution context requirements.",
+  "alternative_suggestion": {
+    "reason": "The violation appears to be caused by case-sensitive label matching rather than a true behavioral absence. Changing the compliance checker or requirement normalization cannot be represented using the provided process change operations.",
+    "conceptual_solution": "Normalize activity labels during compliance checking, for example by using case-insensitive matching so that 'Assign post processing to supervisor' and 'assign post processing to supervisor' are treated as the same activity.",
+    "expected_compliance_impact": "This would likely resolve the violation without modifying the process model, because the required activity already exists on the branch guarded by data.loan_amount > 1000000."
+  }
+}

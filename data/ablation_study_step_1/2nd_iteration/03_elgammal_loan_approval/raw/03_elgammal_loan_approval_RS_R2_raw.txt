@@ -1,0 +1,122 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_insert_notify_directly_after_check",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "check credit worthiness",
+            "new_activity_label": "notify customer"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The new 'notify customer' activity is inserted immediately after 'check credit worthiness', so the directly_follows requirement is satisfied in the structured tree."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "There are no additional resolution context requirements, and the change does not remove or reorder existing compliant behavior."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one localized insertion is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process structure remains unchanged except for one additional sequential activity. However, it may introduce an additional customer notification before the credit outcome is determined."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is applied inside the loan evaluation branch after the loan amount check."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_insert_notify_at_start_of_credit_outcome_branches",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "evaluate loan risk",
+            "new_activity_label": "notify customer"
+          }
+        },
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "decline due to bad credit worthiness",
+            "new_activity_label": "notify customer"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "substantial",
+          "reason": "After 'check credit worthiness', both credit-result branches begin with 'notify customer'. This makes 'notify customer' the next executed activity on each branch, although it is still separated from 'check credit worthiness' by the XOR branching structure rather than being a direct sibling in the sequence."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No existing activity is removed or reordered, and there are no additional context requirements to preserve."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Two localized insertions are required within the same credit-check fragment."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The existing branching structure is preserved. The main drawback is possible redundant customer notification in the approved-good-credit path, which already contains a later 'notify customer' activity."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "Both insertions occur within the credit-worthiness evaluation part of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_rename_immediate_credit_outcome_activities_to_notify",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "evaluate loan risk",
+            "new_activity_label": "notify customer"
+          }
+        },
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "decline due to bad credit worthiness",
+            "new_activity_label": "notify customer"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "substantial",
+          "reason": "The first executed activity after 'check credit worthiness' in both credit-result branches becomes 'notify customer'. However, the XOR gateway remains between the activities in the structured tree, so this may not satisfy a strict tree-level direct-sibling interpretation."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "No explicit context requirement is violated, but renaming core business activities removes the original meanings of credit-risk evaluation and bad-credit decline handling."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only two rename operations are required."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The control-flow structure is not changed. The impact is semantic rather than structural."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The renamed activities are located immediately after the credit-worthiness check in the middle of the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_insert_notify_directly_after_check",
+  "best_resolution_reason": "RS1 is the recommended strategy because it fully restores the directly_follows requirement with a single localized insertion and does not require deleting, moving, or renaming existing process behavior. Although it may introduce an additional customer notification, it is the lowest-cost and most structurally direct repair."
+}

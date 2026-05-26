@@ -1,0 +1,108 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_copy_blacklist_after_lookup_partner_banks",
+      "change_operations": [
+        {
+          "operation": "copy_after",
+          "parameters": {
+            "source_activity_label": "add respondent bank to blacklist",
+            "target_activity_label": "Lookup Partner Banks"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "When the due diligence branch evaluates the condition equivalent to 'not data.evaluation' and executes 'Lookup Partner Banks', the copied 'add respondent bank to blacklist' activity will eventually execute afterwards. The existing blacklist activity remains available for the later exclusive branch guarded by 'not data.evaluation'."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy does not affect 'obtain respondent bank annual report' or 'analyze respondent bank annual report', so R1 remains satisfied. It also does not modify the risk branch where 'data.risk' directly leads to 'terminate', so R3 remains satisfied."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one localized copy operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process structure is preserved. The only impact is the introduction of a duplicated blacklist activity in the branch where the non-evaluation condition is first observed."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The change is applied in the early due diligence and respondent-bank evaluation part of the process, before the annual report analysis."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_copy_blacklist_before_lookup_partner_banks",
+      "change_operations": [
+        {
+          "operation": "copy_before",
+          "parameters": {
+            "source_activity_label": "add respondent bank to blacklist",
+            "target_activity_label": "Lookup Partner Banks"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The copied blacklist activity is placed immediately inside the branch selected when the evaluation is missing or negative. Therefore, whenever the condition 'not data.evaluation' becomes true in that branch, 'add respondent bank to blacklist' executes before the branch continues to 'Lookup Partner Banks'."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The annual report activities required by R1 are unchanged, and the direct termination after 'data.risk' required by R3 is untouched."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one activity-copy operation is needed."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The strategy preserves the existing control-flow structure but introduces a duplicate blacklist activity. It may slightly alter the business ordering because blacklisting occurs before partner bank lookup."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The modification is made in the early due diligence branch of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_rename_lookup_partner_banks_to_blacklist",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Lookup Partner Banks",
+            "new_activity_label": "add respondent bank to blacklist"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The branch triggered by the condition equivalent to 'not data.evaluation' would directly contain an activity labeled 'add respondent bank to blacklist', so the required activity would eventually occur whenever that branch is taken."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "R1 and R3 remain unaffected. However, this strategy removes the original 'Lookup Partner Banks' activity semantics, which may affect unstated business behavior."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one rename operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The control-flow structure is unchanged and no additional activity or branch is introduced."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The renamed activity is located in the early due diligence part of the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_copy_blacklist_after_lookup_partner_banks",
+  "best_resolution_reason": "RS1 is recommended because it fully restores compliance with the condition_eventually_follows requirement while preserving the existing 'Lookup Partner Banks' behavior and avoiding changes to the annual-report and risk-termination context requirements. It is minimal, localized, and has only low structural impact."
+}

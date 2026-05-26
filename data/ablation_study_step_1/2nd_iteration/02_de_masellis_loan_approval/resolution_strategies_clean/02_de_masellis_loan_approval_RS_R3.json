@@ -1,0 +1,148 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_insert_update_before_medical_check",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "check medical history",
+            "new_activity_label": "ask for updates"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "A new occurrence of \"ask for updates\" is placed directly before \"check medical history\" in the same execution branch. Therefore, whenever \"check medical history\" occurs, an \"ask for updates\" activity has occurred before it."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No additional resolution context requirements were provided. The change is local and does not remove or reorder existing compliant behavior."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one activity insertion is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The existing parallel and exclusive structures remain intact. The only structural impact is the addition of one activity immediately before the violating activity."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The change is applied inside the later risk-assessment part of the process, immediately before \"check medical history\"."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_insert_update_after_assess_loan_risk",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "assess loan risk",
+            "new_activity_label": "ask for updates"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "\"assess loan risk\" occurs before the nested parallel block containing \"check medical history\". Inserting \"ask for updates\" after it ensures that \"ask for updates\" always precedes \"check medical history\"."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No context requirements are at risk. The strategy preserves the existing process structure and only adds one activity before the medical-history check can occur."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The repair requires a single insertion operation."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process structure remains unchanged except for one additional sequential activity before the nested parallel risk checks."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The modification is located in the risk-assessment sequence, shortly before \"check medical history\"."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_sequentialize_application_before_risk_and_complete_update_path",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "ask to recheck",
+            "new_activity_label": "ask for updates"
+          }
+        },
+        {
+          "operation": "sequentialize_parallel",
+          "parameters": {
+            "first_activity_label": "check application",
+            "second_activity_label": "retrieve data"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Sequentializing the top-level parallel branches makes the application-check branch execute before the risk-assessment branch. Adding \"ask for updates\" after \"ask to recheck\" ensures that both XOR outcomes in the first branch contain \"ask for updates\" before the branch containing \"check medical history\" starts."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No explicit context requirements are violated. However, the strategy changes the concurrency semantics of the original process, so it is less conservative than a local insertion."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "The strategy requires two operations and changes the execution relation between two large process fragments."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The repair removes top-level parallelism between the application-check branch and the risk-assessment branch. This simplifies ordering but may reduce intended concurrency."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The change affects the top-level structure starting from the early activity \"check application\" and the beginning of the second branch at \"retrieve data\"."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_delete_medical_history_check",
+      "change_operations": [
+        {
+          "operation": "delete",
+          "parameters": {
+            "target_activity_label": "check medical history"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The precedence violation is removed vacuously because \"check medical history\" no longer occurs, so it cannot occur without a prior \"ask for updates\"."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "No explicit context requirement is violated, but deleting a risk-checking activity may conflict with implicit business or risk-assessment expectations."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one deletion operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The structure is simplified by removing one activity from the nested parallel block, but the business completeness of the risk-assessment fragment is reduced."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The deletion is applied in the later risk-assessment part of the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_insert_update_before_medical_check",
+  "best_resolution_reason": "RS1 is the preferred strategy because it fully restores the violated precedence requirement with a single, localized insertion immediately before the violating activity. It preserves the existing parallel and XOR structures, avoids changing global process ordering, and does not remove any existing behavior."
+}

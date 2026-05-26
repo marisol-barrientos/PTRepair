@@ -1,0 +1,154 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_sequentialize_rating_check_after_analysis",
+      "change_operations": [
+        {
+          "operation": "sequentialize_parallel",
+          "parameters": {
+            "first_activity_label": "analyze respondent bank annual report",
+            "second_activity_label": "Review Respondent Bank rating"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "By converting the parallel annual-report analysis and rating-review branches into a sequential fragment, the activity that writes respondent_bank_rating is placed in an unambiguous ordered path before the exclusive branch that tests data.respondent_bank_rating == \"rejected\". Therefore, when the rejected condition becomes true, the branch containing terminate is eventually reached."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The activities required by R1, obtain respondent bank annual report and analyze respondent bank annual report, are preserved. The earlier risk-based branch satisfying R3 is not modified."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one localized structural operation is required, affecting the annual-report analysis and rating-review fragment."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process remains well structured. The main impact is the loss of parallelism between annual-report analysis and rating review, which may increase execution time but improves ordering clarity."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is located in the middle part of the process, after obtaining the annual report and before the final account-opening decision."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_move_rating_review_before_parallel_fragment",
+      "change_operations": [
+        {
+          "operation": "move_after",
+          "parameters": {
+            "source_activity_label": "Review Respondent Bank rating",
+            "target_activity_label": "obtain respondent bank annual report"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Moving Review Respondent Bank rating immediately after obtaining the annual report ensures that the write influencing data.respondent_bank_rating == \"rejected\" occurs before the later conditional rejection handling. Thus, if the rejected condition holds, the subsequent branch containing terminate can be reached."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The required activities from R1 remain present. The data.risk branch and its direct terminate behavior from R3 are untouched."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The strategy uses a single move operation and does not introduce new activities or branches."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The process remains structured, but the rating review is extracted from its original parallel branch. This changes the timing of the review relative to annual-report analysis and may reduce intended concurrency."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change occurs around the annual-report review and rating-decision section of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_direct_termination_on_rejection",
+      "change_operations": [
+        {
+          "operation": "delete",
+          "parameters": {
+            "target_activity_label": "handle rejection"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "substantial",
+          "reason": "Deleting handle rejection makes the rejected branch lead directly to terminate, strengthening the path from data.respondent_bank_rating == \"rejected\" to terminate. However, it does not address all ordering ambiguity caused by the surrounding parallel structure, so it may not fully resolve the analyzer's concern in every interpretation."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy does not affect obtain respondent bank annual report or analyze respondent bank annual report from R1, and it leaves the risk-based direct termination required by R3 unchanged."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one activity is removed."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The structure is simplified by removing an intermediate activity. However, the business handling step for rejection is lost, which may be undesirable from a process-quality perspective."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is located inside the rating-rejection handling branch in the middle-late decision section."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_add_final_rejected_termination_branch",
+      "change_operations": [
+        {
+          "operation": "add_xor_branch",
+          "parameters": {
+            "existing_branch_condition": "data.record or (data.eval and data.rating)",
+            "new_branch_condition": "data.respondent_bank_rating == \"rejected\"",
+            "new_activity_label": "terminate"
+          }
+        },
+        {
+          "operation": "modify_condition",
+          "parameters": {
+            "target_activity_label": "open bank account",
+            "new_condition": "(data.record or (data.eval and data.rating)) and not (data.respondent_bank_rating == \"rejected\")"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "substantial",
+          "reason": "This adds a later safety branch that terminates the process when data.respondent_bank_rating == \"rejected\" and prevents opening the account under that condition. It mitigates the violation even if the earlier rejection branch is not selected. However, because the existing negative branch of the final XOR may still overlap with the new rejected branch depending on XOR semantics, this is less clean than directly repairing the ordering issue."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The activities required by R1 remain unchanged, and the risk-based direct terminate branch required by R3 is not modified."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "The strategy requires two operations: adding an XOR branch and modifying the existing account-opening condition."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The strategy introduces an additional decision branch, increasing complexity. It improves safety by preventing account opening for rejected ratings, but it is less localized than repairing the rating-review fragment directly."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The change is applied to the final decision point before process termination."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_sequentialize_rating_check_after_analysis",
+  "best_resolution_reason": "RS1 is recommended because it directly addresses the reported ordering problem while preserving the required activities and the existing risk-based termination behavior. It requires only one operation, keeps the model structurally clean, and avoids deleting business-relevant rejection handling or adding extra conditional complexity.",
+  "alternative_suggestion": {
+    "reason": "The available operations do not provide a precise way to move an entire conditional rejection-handling block as a unit or to attach a boundary/error event to the rating review.",
+    "conceptual_solution": "Model the rejected rating as an explicit exception or boundary event on Review Respondent Bank rating that directly routes to handle rejection followed by terminate. This would make the rejected condition and termination path explicit and independent of parallel-branch interpretation.",
+    "expected_compliance_impact": "This would fully satisfy the condition_eventually_follows requirement while preserving the rejection-handling activity and avoiding ambiguity introduced by the current nested parallel structure."
+  }
+}

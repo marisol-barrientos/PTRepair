@@ -1,0 +1,129 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_add_customer_brochures_output_to_existing_activity",
+      "change_operations": [
+        {
+          "operation": "add_write",
+          "parameters": {
+            "target_activity_label": "provide customer brochurs",
+            "added_statement": "customer_brochures"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The existing activity 'provide customer brochurs' is already assigned to resource 'customer_advisor'. Adding a write statement for 'customer_brochures' makes this activity produce or send the required data object, satisfying the detected requirement."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The change does not alter ordering, branching, resources of existing compliance-relevant activities, or the handling of 'customer_data'. Requirements R1, R4, R6, and R7 remain unaffected."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one localized data-flow change is required."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The control-flow structure is unchanged. The repair only enriches an existing activity with the missing data production."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The modified activity occurs near the beginning of the process, immediately after 'new customer arrives'."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_rename_and_add_customer_brochures_output",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "provide customer brochurs",
+            "new_activity_label": "provide customer brochures"
+          }
+        },
+        {
+          "operation": "add_write",
+          "parameters": {
+            "target_activity_label": "provide customer brochures",
+            "added_statement": "customer_brochures"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "After renaming, the activity still keeps its existing resource assignment 'customer_advisor'. Adding the write statement for 'customer_brochures' makes it the required sending or producing activity."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy does not affect the activities or constraints involved in R1, R4, R6, or R7. It only corrects the label and adds the missing data output."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Two simple localized changes are required: one label correction and one data-output addition."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The process structure is not changed. The rename also improves label clarity by correcting the apparent spelling error."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The affected activity is located at the start of the process before the first exclusive branch."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_insert_dedicated_send_customer_brochures_activity",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "provide customer brochurs",
+            "new_activity_label": "send customer brochures"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "send customer brochures",
+            "new_resource": "customer_advisor"
+          }
+        },
+        {
+          "operation": "add_write",
+          "parameters": {
+            "target_activity_label": "send customer brochures",
+            "added_statement": "customer_brochures"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The newly inserted activity explicitly sends or produces 'customer_brochures' and is assigned to 'customer_advisor', satisfying the violation."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The inserted activity is placed before the branching part of the process and does not interfere with the ordering, resource, or condition-based requirements in the resolution context."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "The strategy requires three operations and introduces a new activity, making it more costly than modifying the existing brochure-related activity."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The structure remains sequential and simple, but the new activity may be somewhat redundant because an existing brochure-provision activity is already present."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The new activity is inserted near the beginning of the process, directly after the existing brochure-related activity."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_add_customer_brochures_output_to_existing_activity",
+  "best_resolution_reason": "RS1 is the best strategy because it fully restores compliance with a single localized change. The existing activity 'provide customer brochurs' is already assigned to 'customer_advisor' and semantically corresponds to the missing brochure-sending behavior. Adding the missing 'customer_brochures' output resolves the violation without changing the process structure or affecting the satisfied context requirements."
+}

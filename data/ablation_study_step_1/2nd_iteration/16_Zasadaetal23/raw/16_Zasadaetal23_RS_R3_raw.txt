@@ -1,0 +1,156 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_add_send_to_existing_customer_branch",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "update customer data",
+            "new_activity_label": "send custody account contract"
+          }
+        },
+        {
+          "operation": "add_write",
+          "parameters": {
+            "target_activity_label": "send custody account contract",
+            "added_statement": "custody_account_contract"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The violation arises because the activity sending the custody_account_contract does not occur in all branches of the exclusive choice. Adding a send activity to the branch for existing customers ensures that the custody_account_contract is produced or sent in every branch following the relevant part of the process."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy does not change the ordering of conduct risk disclosure, conduct investment advice, conclude custody account, or update customer data. Therefore, R1, R4, R6, and R7 remain preserved."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The strategy requires two localized operations: inserting a new activity and adding the required data write to it."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The existing process structure is preserved. Only one additional activity is added to the already existing alternative branch."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is located inside the first exclusive branching structure, after the initial customer-arrival and brochure activities but before risk disclosure and investment advice."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_copy_send_after_exclusive_join",
+      "change_operations": [
+        {
+          "operation": "copy_before",
+          "parameters": {
+            "source_activity_label": "send legitimation & custody account documents",
+            "target_activity_label": "conduct risk disclosure"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Copying the existing send activity to the point immediately before conduct risk disclosure places a custody_account_contract sending activity after the exclusive structure. As a result, the send activity is reached regardless of which branch of the exclusive choice was taken."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The existing branch behavior is preserved, and the required orderings and resource assignments from R1, R4, R6, and R7 are not modified."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one process change operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The strategy introduces a duplicated send activity. This avoids disrupting the existing branch but may create redundant sending behavior, especially for new customers who already execute the original send activity."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The copied activity is inserted after the first exclusive structure and before conduct risk disclosure, which is in the middle part of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_move_send_after_exclusive_join",
+      "change_operations": [
+        {
+          "operation": "move_before",
+          "parameters": {
+            "source_activity_label": "send legitimation & custody account documents",
+            "target_activity_label": "conduct risk disclosure"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Moving the existing send activity to a position after the exclusive choice ensures that the custody_account_contract is sent after the branch rejoins and therefore occurs independently of the selected branch."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The listed context requirements are not directly violated. However, the send activity is removed from its original position in the new-customer branch, which may affect the intended business ordering around opening the custody account."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The repair uses a single move operation."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The strategy avoids duplication, but it changes the internal ordering of the new-customer branch by delaying the document sending until after the branch completes."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The moved activity is relocated from the first exclusive branch to the point immediately before conduct risk disclosure."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_add_direct_send_after_conclude_custody_account",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "conclude custody account",
+            "new_activity_label": "send custody_account_contract"
+          }
+        },
+        {
+          "operation": "add_write",
+          "parameters": {
+            "target_activity_label": "send custody_account_contract",
+            "added_statement": "custody_account_contract"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "substantial",
+          "reason": "This strategy creates an explicit send of custody_account_contract directly after conclude custody account, which satisfies the intended causal relation for executions where conclude custody account occurs. However, it may not fully satisfy a branch-sensitive checker if the checker still requires the send activity to occur in all branches of the surrounding exclusive structure."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The change is confined to the new-customer branch and does not alter the satisfied requirements concerning risk disclosure, investment advice resource assignment, custody-account conclusion precedence, or update customer data."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The strategy requires two localized operations: inserting a send activity and adding the corresponding data production statement."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process structure remains unchanged except for one additional activity placed directly after the activity that triggers the compliance obligation."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is made within the first exclusive branch, after customer identification and before later advisory activities."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_add_send_to_existing_customer_branch",
+  "best_resolution_reason": "RS1 is recommended because it directly addresses the detected reason for the violation: the custody_account_contract send does not occur in all exclusive branches. It preserves the existing new-customer behavior, keeps the currently satisfied context requirements intact, and avoids moving or reordering existing activities. Although it adds one activity, the modification is localized and structurally simple."
+}

@@ -1,0 +1,176 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_full_localized_repair",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Check Customer Bank Privilege",
+            "new_activity_label": "customer bank privilege check"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "Check Credit Worthiness",
+            "new_resource": "data.post_processing_resource"
+          }
+        },
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "Check Credit Worthiness",
+            "new_activity_label": "credit worthiness check"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "credit worthiness check",
+            "new_resource": "Supervisor"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The renamed bank privilege activity now matches the required activity label and keeps its Credit Broker resource. The credit worthiness activity is assigned to data.post_processing_resource. The additionally inserted credit worthiness check activity provides the missing activity referenced by the executed_by_return comparison and is assigned to Supervisor, which differs from the Credit Broker resource of the customer bank privilege check."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The customer bank privilege check remains before the credit worthiness check and before Evaluate LoanRisk, preserving R2. The change does not introduce a path where Evaluate LoanRisk follows the gold-customer and low-loan-amount condition, so R7 remains unaffected."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "The strategy uses four localized operations: one rename, one resource modification, one inserted activity, and one resource assignment for the inserted activity."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process structure is not reorganized. The only structural addition is a single activity placed directly after the existing credit worthiness check, keeping the repair localized, although it introduces some semantic redundancy."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The main changes occur in the loan assessment section after bank information validation and before loan risk evaluation."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_minimal_resource_and_label_repair",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Check Customer Bank Privilege",
+            "new_activity_label": "customer bank privilege check"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "Check Credit Worthiness",
+            "new_resource": "data.post_processing_resource"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "substantial",
+          "reason": "This resolves the missing customer bank privilege check label and assigns the existing credit worthiness activity to data.post_processing_resource. However, it does not create an activity named credit worthiness check, so the executed_by_return comparison referencing that activity may still fail."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The ordering between customer bank privilege check, credit worthiness checking, and Evaluate LoanRisk is preserved. No new branch or condition is introduced, so R7 is not affected."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only two operations are required, both directly modifying existing activities."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "No activities, branches, or control-flow structures are added or removed. The process topology remains unchanged."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The modifications affect activities in the early-to-middle loan assessment part of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_full_repair_with_resource_initialization",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Check Customer Bank Privilege",
+            "new_activity_label": "customer bank privilege check"
+          }
+        },
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "Check Credit Worthiness",
+            "new_activity_label": "Set post-processing resource for credit worthiness"
+          }
+        },
+        {
+          "operation": "add_write",
+          "parameters": {
+            "target_activity_label": "Set post-processing resource for credit worthiness",
+            "added_statement": "post_processing_resource = Supervisor"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "Check Credit Worthiness",
+            "new_resource": "data.post_processing_resource"
+          }
+        },
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "Check Credit Worthiness",
+            "new_activity_label": "credit worthiness check"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "credit worthiness check",
+            "new_resource": "Supervisor"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "This strategy resolves the missing customer bank privilege check label, assigns Check Credit Worthiness to data.post_processing_resource, creates the missing credit worthiness check activity, and ensures the return/resource comparison differs from the Credit Broker resource of the customer bank privilege check."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The added resource-setting activity is inserted immediately before the credit worthiness check and does not change the required ordering for R2. No new condition leading to Evaluate LoanRisk is introduced, so R7 remains preserved."
+        },
+        "change_cost": {
+          "value": "high",
+          "reason": "Six operations are required, including insertion of an additional setup activity and an additional credit worthiness check activity."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The strategy improves robustness by ensuring data.post_processing_resource is explicitly initialized before use, but it adds two activities and therefore increases process size and administrative complexity."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The changes are concentrated around the credit worthiness assessment section before Evaluate LoanRisk."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_full_localized_repair",
+  "best_resolution_reason": "RS1 is recommended because it achieves full compliance with the detected violation using fewer changes than the more robust initialization strategy. It preserves the existing control-flow structure, maintains the satisfied context requirements R2 and R7, and localizes the repair to the affected bank privilege and credit worthiness assessment activities.",
+  "alternative_suggestion": {
+    "reason": "Some of the violation evidence appears to be caused by label mismatches, such as Check Customer Bank Privilege versus customer bank privilege check and Check Credit Worthiness versus credit worthiness check. Label aliasing or semantic activity matching cannot be represented using the provided process change operations.",
+    "conceptual_solution": "Configure the compliance checking layer to treat semantically equivalent activity labels as aliases, while still applying the required resource annotation change to the credit worthiness activity.",
+    "expected_compliance_impact": "This could eliminate false missing-activity findings caused only by naming variation, but it would not by itself repair the missing data.post_processing_resource assignment."
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "model": "openai/gpt-5.5",
+  "scenario_name": "13_Status",
+  "requirement_id": "R1",
+  "output_prefix": "13_Status_RS_R1",
+  "execution_time_milliseconds": 66887.77,
+  "execution_time_seconds": 66.89,
+  "resolution_context_requirements": 0,
+  "problems_detected": [],
+  "usage": {
+    "prompt_tokens": 2923,
+    "completion_tokens": 3974,
+    "total_tokens": 6897,
+    "reasoning_tokens": null
+  }
+}
