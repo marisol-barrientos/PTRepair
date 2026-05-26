@@ -1,0 +1,8 @@
+{
+  "resolution_strategies": [
+    "Replace the activity \"ask to recheck\" in the branch with condition data.conflicts == \"true\" by a permitted alternative activity, such as \"ask for clarification\". This is a localized change that removes the prohibited activity while preserving the exclusive-branch structure and the behavior for conflict cases.",
+    "Delete the branch sequence with condition data.conflicts == \"true\" that contains \"ask to recheck\", and change the remaining branch containing \"ask for updates\" into the default or unconditional branch of the exclusive block. This fully resolves the absence violation, but conflict cases will now proceed to \"ask for updates\".",
+    "Replace the entire exclusive block after \"check application\" with a single activity \"ask for updates\". This removes \"ask to recheck\" and simplifies the process by making all cases continue with \"ask for updates\".",
+    "If the process-tree notation supports silent or skip activities, replace \"ask to recheck\" with a silent skip activity inside the data.conflicts == \"true\" branch. This removes the prohibited activity while preserving the conditional routing structure. If skip activities are not supported, this strategy is not valid."
+  ]
+}

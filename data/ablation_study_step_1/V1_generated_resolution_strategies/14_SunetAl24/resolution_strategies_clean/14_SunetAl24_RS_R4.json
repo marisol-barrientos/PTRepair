@@ -1,0 +1,8 @@
+{
+  "resolution_strategies": [
+    "Insert a new activity \"obtain data processing consent\" immediately before \"Request personal data\" in the top-level sequence, and annotate it as executed by resource \"data controller\". This directly satisfies both the precedence requirement and the executed_by requirement with minimal structural change.",
+    "Rename the existing activity \"Ask for permission\" to \"obtain data processing consent\", move it from the parallel branch to immediately before \"Request personal data\" in the top-level sequence, and annotate it as executed by resource \"data controller\". This avoids adding a duplicate consent-related activity while ensuring consent is obtained before personal data is requested.",
+    "Insert a new initial sequence fragment at the start of the process containing \"obtain data processing consent\" executed by \"data controller\", followed by the existing \"Request personal data\" activity. Leave the rest of the process unchanged. This preserves the current process behavior after the initial compliance step.",
+    "If the existing \"Ask for permission\" activity must remain in its current position for operational reasons, add a separate activity \"obtain data processing consent\" executed by \"data controller\" immediately before \"Request personal data\" and keep \"Ask for permission\" unchanged. This fully resolves the detected violation, though it may introduce some semantic redundancy."
+  ]
+}

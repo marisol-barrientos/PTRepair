@@ -1,0 +1,7 @@
+{
+  "resolution_strategies": [
+    "Insert activity \"archive order\" in the top-level sequence immediately before \"terminate\", resulting in: ... send goods; archive order; terminate. This satisfies both exists(\"archive order\") and directly_follows(\"archive order\", \"terminate\") with a minimal localized change.",
+    "If archiving must occur only after goods are dispatched, insert \"archive order\" directly after \"send goods\" and directly before \"terminate\" in the existing top-level sequence. This preserves all existing ordering and parallel behavior while resolving the violation.",
+    "If \"send goods\" and order archiving should be treated as the final completion phase, replace the final segment \"send goods; terminate\" with the sequence \"send goods; archive order; terminate\". This is equivalent to inserting the missing activity before termination and keeps \"terminate\" directly following \"archive order\"."
+  ]
+}

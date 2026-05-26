@@ -1,0 +1,55 @@
+{
+  "id": "gen-1779804056-jrhMR5yppEXZTDrJYuq4",
+  "object": "chat.completion",
+  "created": 1779804056,
+  "model": "openai/gpt-5.5-20260423",
+  "provider": "OpenAI",
+  "system_fingerprint": null,
+  "service_tier": "default",
+  "choices": [
+    {
+      "index": 0,
+      "logprobs": null,
+      "finish_reason": "stop",
+      "native_finish_reason": "completed",
+      "message": {
+        "role": "assistant",
+        "content": "{\n  \"resolution_strategies\": [\n    \"Minimal local annotation update: add data input/receive annotation data.sim_card_status to the existing activity \\\"Activate Sim Card\\\" and add resource annotation \\\"telephone company\\\" to the same activity. This directly satisfies both activity_receives('Activate Sim Card','data.sim_card_status') and executed_by('Activate Sim Card','telephone company') without changing the control-flow structure.\",\n    \"Make the required data explicitly available before activation: annotate \\\"Send Sim card\\\" as producing/sending data.sim_card_status, then annotate \\\"Activate Sim Card\\\" as receiving/consuming data.sim_card_status, and assign \\\"Activate Sim Card\\\" to resource \\\"telephone company\\\". This preserves the sequence and clarifies the data dependency between sending and activation.\",\n    \"Insert a new activity immediately before \\\"Activate Sim Card\\\", for example \\\"Receive Sim card status\\\", which produces or forwards data.sim_card_status; then annotate \\\"Activate Sim Card\\\" as receiving data.sim_card_status and executed by \\\"telephone company\\\". The modified fragment becomes: \\\"Send Sim card\\\" -> \\\"Receive Sim card status\\\" -> \\\"Activate Sim Card\\\". This is useful if the status must be obtained from an external system before activation.\",\n    \"If \\\"Activate Sim Card\\\" is currently assigned to another resource in the implementation, replace that resource assignment with \\\"telephone company\\\" and add the missing receive annotation data.sim_card_status to \\\"Activate Sim Card\\\". This resolves the violation while avoiding duplicate activation activities or unnecessary branching.\"\n  ]\n}",
+        "refusal": null,
+        "reasoning": null,
+        "reasoning_details": [
+          {
+            "type": "reasoning.encrypted",
+            "data": "gAAAAABqFaegFrDkliGosUvdPs6LHkOIsvRco_G6nWQ5PAB2aMlsS46xnzWe8AX_6hszAXs_12SbNx29AfsY9F_ODM9HquJf2Aq3iTzPYcOEoHhdgX2lOlrLbWW3me-MtwPyObdYhe12ihqTDSzXqP3xArcMsbmvVoNpO3v4v7rHy1wgZStgiRBvy33EVhSy3wiMw_i5xg4x--AydI4_-h8I67c8LlT_UhUmDoGDRbYSakdxeSzsMgIhJpuN5xdDyciHQVnEPV7VH1jlME2x0rnKZ2QOPnS4zFvp9CSd51E57iEadRa7Qshlm5KLSk45hyN8LyGRSMdHqoy0gssigqkaMQmcI4ZJKM3p4zO8keZdVv5-0cEEEZZd_g9NgOMYTkpCSNGvXNsWO2ZNV8pcdUYo8gN_3CRCbo-yUiOywH0-XY8qM-0pIRJGYa_qfUc2KS6eq9YIKlg7xRUlP2OS4Wzt6I_afY61DTVjQ1PPCv7-DPzBjkXmCqwNv1QojtQx4GSTUm5lnIUAPt5OLR9BIy7HMgbzff5CDnl7co8JhP45-OJPYdiFNJ7oYjFrl6mlW8tYu7P34funwUolJTWqiT4WEBxvDfKgOn0Fqa49kLfW3pOfj5ZEoPlzLemPfZuVwGJ0vAy03nfrhYGdvY27DN2p7VTrFrjjRUd03x-s8uA86k9MLmXzGzKbwMWVKrhJD0drqAbV93sQCHbxbsTy5TSkJbUGxHFYeVHrCy4mYduwX1hrQCSnpqRVgXVOonYI8GF4f-xC-J3DNenmG-lAN4Wfpvfy0CWB2pIAa9w-1mpqNCZpZCZR81C9OTUHMdajFanl-doVDFkjMQwXdXOSBpGQ1G2RDQ1Lpjk4EpSz3kT6k8MdT3fbDF2q0q4wr5RuPbqXn1yMK0hhBk3pBQqW76CZsQt_7yjrtaZkh41wPxwz2gpi06xZPCwPfxoSi501O9o3t7qTwiZSkyyHu_hbinPMZUSnbGIS-qQ3_JnXiSp-N24saI107gykYFJlseI9RVWSmsPBufrGiTXTGf6A0Ist2dCjShNOcIkrzZae0vaSxFJbpEGxlnkyDjp5k5jDuXXUtQACKmtkHb7t0zYLaGT_C4D7AXlncMcOfE0dZnCckKmvudu1oLJubcYYYzxXu4DtmoU96T4sieui7KFaexxJyNTL64HHCa7n-mS3BllfesnwjoNICMiomBFelkDnFZjtlhCWWPmeddQfsisrTng-kjuyHmQa6mlrXZe4fMjbvF4Rs3H_klqXYt_-J0IJAnikd3FIFBQ1SF_Mhzhzzpwp1sqab8oRxOVODZ9uLkwpfGb3TSj_8cu0ACdUo96ffA-nLzC8jjqtHLUHFyQEKJCKKqi44ECgQhZN3BHeTG3wzXT8iBl1tgOp50fMxM3QsoOFfzDgE_oCiClQLC8PlgR4CA9Lcs4komRLXRHThCgResydSOmoTLw5B_VUn03bINYasip3nCFhJulU4b7z4JqVRtTRZNjuopJjmrdMy_fwTsE4D5kLFWNbVdTH0IkHQ2ohy506IRN-dCiCUCTrbAlPEJQhyhvQaJfKdy7YDhZwXM-YOBN1XF510zUnnaDpT8217OLFcAshofl4HtTkId2QNL-xtGErtrbruPIXOea5zE0m8vRfuBBIJZnSFAmVMC8Ujdn2U2vvFWNuA5_bcbJWSFmTkjJ3yAcODv7BDRmYe8NyYF4FvuMbvRARU-16mvD6TYWAbn1BpltO9uWl1Ux26ahTLQ1opBOKATUug0P8zoTJB81VD36ABlnTD_GMzUwJodUl9ezRifzC6yZXued_zmUsLxEdwoYL7PeKlSu_MLG1gDljqR_krp1-BkBIR0NAIk7lo46Q4LXdAVynnmZm5PwCtW1HA-AF0Uts72-weFnseNCFojRJB8W9bHYaimURUfgdYd-RbQc9oWMLY-HtFJdAvHebZlOi4Oy95A0iAhSKGOFqtbDA81EgZWatsbNYhZWy0eJvIQ4URmB9oeJ-3V8_9msqmFduTO0ktEJt_wQvVlagaQ-H6COFuOqwsFN2E_lpNVufYu3OdLFaW5fqsF9K7AIKyoSy3YCOhZ4es_w98GXKMnNNU5I4vrejESLnjam84cqCIZJj7MVEFOavGUWrvD9XapZnsrO-rhCYWOLcD-aZQ9_0MsebeFYp4Dq1ZLu5sSISyQ3b5JDS5hgkAmvRUcfzfRwisRF7zTIZO6VTuFy35Dy_ZR_GgG-jAykII_G5kGYx0tfPFBhe69DOKgF8j3JzT20wRSIRaprYBHdvEj44q-0zztVFgJ9yuO1KudT180ZB1iX01olbhen0AzEYBNkpy7mhuKdgQGJMHgjeY3kC7-oQHBXfJku-jAk1nMoyrR5HLpNG9YmxiDE9q4NlWkyfJHkCJtdLHJDEdwgg2dTwxSg0hShxaEzTyZq-Rb-7VoCK85SCyxmKRvi6AVz5GO1vHlS3fz5AaNSaTRccJ8_1A97PmDxz327stJM_851gveygJe1Gk7ihh_44iaCgEaA7aZAq3qVdY_nKWV_xyiK9pL20bR8ZtsD5qAJ0PTAhwPKFozR_PNW-x7ZuFkHCXhppMSIyzfIB_6PrSlbAPOZ0c0PCrFxZi8jPCkperdrOUprQ5NcUaRUaR8vya-M64mtdNbYsbYNKp5DZAlT2e6xk66MhHTrssMlZB0KLsza_EB95gdj29gy8COu37giUrHJ3kwJ8D8_OCWB89gH6K3MyxGApL3rjuogSm4ioC9tIDjyfB0lvrVNONk0mPNIKfx7csFD_OexZVLYBbG7vNJIG9E4rAfWAhCHQaJS314ivgfAq_oO9_8qucb9oixT2URZ8kDNwZzWPN8uXnyRsvyKme7HonQLifdoRzU1zaKoFoq_dgLXZLh6v8cbZ-fbn8-Qn4JP576xwNdeYVzalX5vPpOFeTL4TySZsLtsiOiwjGrPtKErBsfbKFseeHUnhal-oHiQbipUyHmBAiB0q2-rFtw1iyXDPV7dyKLp79H8HlwttfSLs6DtMHYdYXpeW7dqmd8X98xkHDrJL-KpyQK4D2_uGBLszGoDurfoVpuGh7WJxA0s48Oo31Fo2n-tqVxF4eZrTmY3zCe78CMolEkJ3PSbDTU4nKvfJZXniaj83YbqynUlz2Vbvka3YIXYITg8VaGMqGYa8gXsDjKpQRCi9Q9beRV6HFtG_VrGaTcT7cOoDibaBuotTKbKbi6fSWk7lAvQjU_qqP5r1-kGp56EioZNaaizcsF2vcPh_U5J4FIiBewrV0fycoJfRmIPoUSPjhN9qL6_Fa9Q91JrE5Kv6rmorkKstJZHS3HRnXV0othOf",
+            "format": "openai-responses-v1",
+            "id": "rs_0855a2878d7e656c016a15a798fd108194bcc48a1f7a57dda5",
+            "index": 0
+          }
+        ]
+      }
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 1024,
+    "completion_tokens": 646,
+    "total_tokens": 1670,
+    "cost": 0.0245,
+    "is_byok": false,
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "cache_write_tokens": 0,
+      "audio_tokens": 0,
+      "video_tokens": 0
+    },
+    "cost_details": {
+      "upstream_inference_cost": 0.0245,
+      "upstream_inference_prompt_cost": 0.00512,
+      "upstream_inference_completions_cost": 0.01938
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 334,
+      "image_tokens": 0,
+      "audio_tokens": 0
+    }
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "id": "gen-1779803154-sGlmgVxN5XjcibazdAmb",
+  "object": "chat.completion",
+  "created": 1779803154,
+  "model": "openai/gpt-5.5-20260423",
+  "provider": "OpenAI",
+  "system_fingerprint": null,
+  "service_tier": "default",
+  "choices": [
+    {
+      "index": 0,
+      "logprobs": null,
+      "finish_reason": "stop",
+      "native_finish_reason": "completed",
+      "message": {
+        "role": "assistant",
+        "content": "[\n  \"Full compliance, minimal local change: In the high-risk loan branch sequence `delegate to supervisor -> judge high risk loan -> exclusive(...)`, add Resource = \\\"branch office manager\\\" to activity `judge high risk loan`, and insert a new activity `take final decision` immediately after `judge high risk loan` and immediately before the following exclusive decision on `loan.status == \\\"approved\\\"`.\",\n  \"Full compliance, structured replacement: Replace the activity node `judge high risk loan` in the high-risk loan branch with a sequence containing `judge high risk loan` annotated with Resource = \\\"branch office manager\\\" followed directly by a new activity `take final decision`. Keep the existing following exclusive approval decision unchanged after this new sequence.\"\n]",
+        "refusal": null,
+        "reasoning": "**Deciding on resolution strategies**\n\nI’m thinking about presenting the final decision based on the user's request. It seems like I should focus on providing a valid JSON array of resolution strategies as strings, which works better since they asked for a list. I’ll avoid including any unnecessary context or partial alternatives unless absolutely necessary. It’s essential to stick to valid JSON and maintain minimal formatting to keep it clean and straightforward.",
+        "reasoning_details": [
+          {
+            "type": "reasoning.summary",
+            "summary": "**Deciding on resolution strategies**\n\nI’m thinking about presenting the final decision based on the user's request. It seems like I should focus on providing a valid JSON array of resolution strategies as strings, which works better since they asked for a list. I’ll avoid including any unnecessary context or partial alternatives unless absolutely necessary. It’s essential to stick to valid JSON and maintain minimal formatting to keep it clean and straightforward.",
+            "format": "openai-responses-v1",
+            "index": 0
+          },
+          {
+            "type": "reasoning.encrypted",
+            "data": "gAAAAABqFaQgrvfCWWjC4cfBkjy-mcDuHL074SRAyiGtPsW3rCDvQ0CJuUJdMrhs-wl5GaaYNOVr_qMYijEWggFysCyhO3mf4sz5eoJ5uX0oz5NZp-DAZyaPUF5M1Yh9tvtTsYhhYwhkFlNCPAO5nbT28oPRxVQr6S83UeaxjRuNV3SdGW8RYORZvG8WdG7PiKb7kz9ceTgOpQalSBS42pQtPo3YSRy8vRTxNdu1NY_hDJK5pL4g-jobLi-u_XbAVvXegax5UPOKL0nF0B_HnQwJddsh6A1mhXtTqafXlL0RzyJltzKJzvHH_vYrQ2WqOVMCpU_U12rtP7FUEpJHvnYl9Gv8OsjNN2C4INcfUat6k70xzINK8EMG_QbYJvJnryiDPRVFss9UIIShTZg6BEqiOy8cbOyBFr4EDOHXATwedz_HGKxwFtIOFbiTvv-PiBsIIboupcmLBIcUJPqtwDVJsC4T_D6DCrVMQMxn0xuWif-fRFG0JuIjhnot9BXjVrfgQmJAvJWBuFc2Dga2NxlluhfAyK8ko465Jhrs6RFNnY1cpMo6C1DNuV1s7WAuleWkghdEvAnRVACqnQg0ImVgr52TqLkwvozW1ykED_yqY-99FTpoukE_VDMiixdcQbpHqH7QfIVcWwvqTF4VpKw4z7kbYqNANKwZmJoqZzw7bMs2pR7ltRAoF_uqCJhuBfpIPyB8NPX1KK5FRvoXAqqaTZ1dOIbpJ7xNURSXNlq7ND2HZc-ptNq48V9piDwrYbEGSPOCIrgdsLanvqK_40YuVDl60cbFWhS3ELFz1eQwMQAgMjbY-mI2ySavZKecFeh58X3DaO36fNZbdvHJm-tAnaZ-zVjTAd8Bp0jzChv1RxtFl7QlrwDKLDZ6C2cfQby_ktqsHSLgtgRxIYboulsr-TfJm203QxfjImZFuqfyu_aZXL_bRlLfbhNpvnKmlmUBMUGxoQ8gdMNFoODAEMUNOqoxhYfnZzZWG0L217OwiIv5VPFOUtkkj6reWxqtrrzDFBksAuu02CjRKG3iHIUVNsOE60TQXLDPI8HHtNV_mRKvWbxkP3lqruUoSCyF4LQLiFquf0y-d91YzqbSzo8cbU8aGgygNEdtJAv3JLz5XM2gWMjsM7bRcsAOAXIx1hm2MTHG0kdkbzaHT85C2UnEekJ46EP_GiQoRhct9csVFzNenzkImdvn9cnUUZEp0hQ87U-Z4_A1Iys_xj1_Cu9g-nd4U8eJH2Nq2GTh2-PWbhy_pg36dkymBXFqpnUSY84oVOnIY59gBUV8ZNhmWSzznO3BIkVjkby1k2Aa7o5AsJ7h1YRhIFzgb-eMbSaxLqy3xfzFWtOyNJ1jqOWvZ6qigpmb-p5l_p78ggP4Vw6--Cb0kygt8RFjKTugDbkPrhDDNJcXJFlZUKwuMsUtdW5ERe5KTUvFhjZ4qCUb_jSYh7PyK-HoMM4Ktzo9qgtbWvvF1DFBGIgOouMD2sxbvrZaGA6XhjNzZ2Ktx6ka2Rj8DgCKAgaSXMv4NjA7ZQRpzDBQynTMc0M9gqN3PWRpTDTNg0Ap3OfWhNmp8MvoPNsA5K9Dq7EubEA0WbaCO0e_aBPriEyc873LBLp6GWgtON0G4TdBDyodnzH9NOEWURG6Lt-vwf9o3md6V7gyKXzIbAUiPT8kp1ERcpbggoICps9gcsrJmPX8-Hqils89eHFfUEYubADjZ0BFFgLQLFLgqmGs5ObaQcuDOFjcQD1tGFvRKDiArlGrAPN4DCPk408EwYye3j3e18lRYZSC_8dXuQTv1-GJU9p9aSBpYRO8gWrZr5oMLKGaykKBDSKz1NT1Pe2qv5d2XXUpygFT-Zkdui3WqfkmANJC51QR8vUT9F0L2N4Sv5Pb8PmEbz2uxpNywa4nEyBQeG7Yc9-6xnWld8LUHPf8wYOqMTfinJTq2ugVAB1n7c4hNlqFWWLBfPAjXlVm_pcTWsZOQP5Yie4edIIr333YMI0_BL0ocaFFChJmusEq9b3LX5V6jVSfmh-7BARVS6f1AbR78-up9xywjN6jEm7UWVtIC5W1ExcKs9gs4pkIyA7ZiuF6fNoPESrgBaGGoJMo9Ti0cWoJ8BJ_SkLHnMIWy0cjlGlb9yNMMx2E4RURP79bAiQiKwlY-8sSSa63uvzGeQ6avH2S6x3CRvFyawfj_ELQmslAE5jdVjxgdacdNb18yaqo8wqGPVQXge5t7WDVn6aCxfoiSxGbx7s5AZIzT9PuE1Rz-Hl4EA4bsPhiAlCPkS2o9guBDmZAF2Rp03_7B89WQsrkxQGhe6cxclvfNC0tPHdt_HI-ZS86nWxT08CBaF797FgPO4JpSFlQoNvn190JsfjLkTVNTr6ERh_SQ_QCI4LtBcYlier4uGxP2tIUUa9TBhOgK9dvOo9rC7D6o_m30mpWIL_VGCLyU6wwKflrdeVTLfXfBAnnz3uZeL4CPr-snR6jzXdp6wKknrKfPCNuznu_hnaAH9kn3yByQY8t4X8zPubFt2i3ldDe9lWZevtEFdxqF9qaiOGQJ_AI10GxHd2ncCIrwiWOMvz6-uKm1c0DPBfWSHjAufbZcecMmNYH_H6Fqy-uGoezniOjGBSiAdw5wLbQ7XRLNDVW2MqLC6EyIS3OfRdnyh5KYrJs3bz5wbi0sgWnNe6WFUxlRR-cSsknCRVI8I3UF28EcwejuD7KeA27QF4BTSImCquY0psG3hufh9tkj-0RQk9Yju4rOIn3ZOC19LvuM_dotp1gsflHfRHBe_He-5cm0vTmWyzlY5grlbJsJ3e9wq6g9FkxnfbT9hoB7c4nPMDrOOi9iXUWmWJeiHdCGSJ2z53pDpPv80FxZzxspxOHWkrr6O5a_MjRJNKV9t0wBsRjKXV4kOBWINJ2OGbx56HHJN4Ikkn5hCXkY5Bcsre_v5MrynBXrE5AaRZHBR6yEKDiX3qs96JSmvH2uACP5Ij9HDvm_aBlbT0RFwkn0hYptmTd4rv5ahxxtRYPB9GfN5-bx-sEqO_LtjTRBh1E_Udocj2spyvNoQYtqej2iEdTNTyNFEpO99CJRl7OMuG5ED4gi56BeD9mThVbsFXlKXvbsODdrNrtGpj05JFaSftIjnofFoZzlnJZmaNHlafYKm8CFSBWvZXbsrRX9AAFSikdZ-_wlSgNO152niwuHEoYLkqHDnJtP78V9A5Y2lihIdIiFYxHTeri-kN7JRXuutOyV0j3WqNMWRR1WEfhmWBn3a77YYrI0eLy4-CzkSULdC_E_QxWHq-8JaH7jJpVlID3AcyLeKXZNTwgcEms7TBS359kMVOBSgxEyXczk0Q5BwF2GsotmhcAOIePfkpzdiDvTUWpavQx-ka4dR5QVDovSu_Hsgg3QSiIB4ku-UW_dRaLrn8MQfefY_cFmF8dmnEF52pSgzjuKYfOFsdP7SVT4Zh97vs9A_ot5P2G3PHmOkAsObvr24_OblwM3Sfkq5zO7CcIc3AsCerND1bdLcPJ_zX1JCNBvbkRQ9_r8T3Y8luYIBRYT87TY789Qo212l49kzA0yMkxeC9Eeh1SYdnuhj7MPHOXrcQ1nR_3XxeokskxxMGT5bP-LThzB7sJPLJOkfnerbI8lelwHIbM2-bwjuVGjv9RihWYDhlsiOON_GIfUgN8yPOySfEMKExuUN2746lJxTvhVDs3KSWGy9BOzSS6LB1z6B2VZMMWLaPueSv_Bgebj5nJ8smuD_K1aIaNzWgccGOjUcammdGUy7MQgGD8U2XKMiYEZkCWCypgu7AhB3HFfnfzo-Sha4Y2otFpFLFrUjMjGhynzsVFejY_Q91zknUHupWe6DJ8H_m19cknlQlyAOPJJpuGYaeLYS8wt8Nt4MD2oogkWq74QXsE5aezK26Qh_gFDra8j3ygX9iV3I5CfrbTkfkqAkk4edAY05bmPrBZmyQKiuurK7QvA0lGRKcdLvfmI_HzX85k_mt1vmG27wji67QbpozIHUCB6N5wzD-fkzUc0jCG5YmY91jMsRUVkJ4xHQW10bB7IrFK9CMxNimtwqFIFk8Ml0h_4YS_XIr1t_UZej5RkMQwWYrPCl-c9-lzr2EDntS_LFW_6g8ajy4_Eo-leL9Lc2BTNgoQjr3kKWqUlfSzgYcOkaMv-a5Wv6xVaesZftyAMSzvc8kRlm3ZKQTGpnyHrvAoedWwpjiamlKwDtOsoWFjgWpAG-MXslJmgJtwgv67IVn7s3sR4uuqvnttpkjtJOg7A5RYKEOsB38whsMZXUFpkrqL1IyT4qlnwnAYf7qf2jbK8rh5TkwJV0MoUqVhRP6UVzgadQrrVz3ypMoQvpXUmZ3GGv9cRi_wfIKp0N3HchP1Xk8-EwhEKcSJuAczWiRmn1B7_5_UM__EeDDNONnaSpHX4jDC_U3xVC4It3YLBvKetvvkoDQbOP2DIJfVemQEMxfuuqTnixRSDkNtP44xOFndzGUUvV86Cpj4Nc7cTIKP731z62mvgWDIkZpMAA5Yo_nDSRm2Nza8vbw8RDkbfgAObc8jXj0SzRiP1u8bjb5q632pFy9cGLkqCfzDclt5S0hIjYEeC8y1dRVXLocCUkEyOcwNvWeKXuUdhpDbrWKGcthRzyqgRs_1kAoynbfZ5I1Wo4eihmhRYrv2znEq-srWqN8=",
+            "format": "openai-responses-v1",
+            "id": "rs_0a35814df16b4ece016a15a41372788194a2c6acbb5dada84a",
+            "index": 1
+          }
+        ]
+      }
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 1205,
+    "completion_tokens": 671,
+    "total_tokens": 1876,
+    "cost": 0.026155,
+    "is_byok": false,
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "cache_write_tokens": 0,
+      "audio_tokens": 0,
+      "video_tokens": 0
+    },
+    "cost_details": {
+      "upstream_inference_cost": 0.026155,
+      "upstream_inference_prompt_cost": 0.006025,
+      "upstream_inference_completions_cost": 0.02013
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 516,
+      "image_tokens": 0,
+      "audio_tokens": 0
+    }
+  }
+}

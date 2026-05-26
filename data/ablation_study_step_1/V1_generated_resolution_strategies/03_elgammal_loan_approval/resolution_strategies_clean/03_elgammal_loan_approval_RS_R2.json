@@ -1,0 +1,7 @@
+{
+  "resolution_strategies": [
+    "Insert activity 'notify customer' immediately after 'check credit worthiness' in the sequence under condition loan.amount == \"lower equal 1M\", before the exclusive split on loan.credit. Keep the existing later 'notify customer' activities unchanged to preserve current approved-loan behavior.",
+    "Move the existing 'notify customer' activity from the loan.credit == \"good\" branch so that it directly follows 'check credit worthiness', before the exclusive split on loan.credit. This satisfies directly_follows but changes the timing of the customer notification in the low-amount approved path.",
+    "Insert a new activity such as 'notify customer of credit check result' directly after 'check credit worthiness' and treat it as the required 'notify customer' step, while retaining the existing final 'notify customer' activities after contract sending. This resolves the direct-follow violation with minimal structural change, though it introduces an additional notification."
+  ]
+}

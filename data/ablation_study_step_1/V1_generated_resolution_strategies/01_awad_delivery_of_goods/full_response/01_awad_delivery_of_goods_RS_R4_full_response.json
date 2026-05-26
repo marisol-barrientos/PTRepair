@@ -1,0 +1,55 @@
+{
+  "id": "gen-1779802996-Si5Htr6CHW4x9YOnCb0s",
+  "object": "chat.completion",
+  "created": 1779802996,
+  "model": "openai/gpt-5.5-20260423",
+  "provider": "OpenAI",
+  "system_fingerprint": null,
+  "service_tier": "default",
+  "choices": [
+    {
+      "index": 0,
+      "logprobs": null,
+      "finish_reason": "stop",
+      "native_finish_reason": "completed",
+      "message": {
+        "role": "assistant",
+        "content": "{\n  \"resolution_strategies\": [\n    \"Insert activity \\\"archive order\\\" in the top-level sequence immediately before \\\"terminate\\\", resulting in: ... send goods; archive order; terminate. This satisfies both exists(\\\"archive order\\\") and directly_follows(\\\"archive order\\\", \\\"terminate\\\") with a minimal localized change.\",\n    \"If archiving must occur only after goods are dispatched, insert \\\"archive order\\\" directly after \\\"send goods\\\" and directly before \\\"terminate\\\" in the existing top-level sequence. This preserves all existing ordering and parallel behavior while resolving the violation.\",\n    \"If \\\"send goods\\\" and order archiving should be treated as the final completion phase, replace the final segment \\\"send goods; terminate\\\" with the sequence \\\"send goods; archive order; terminate\\\". This is equivalent to inserting the missing activity before termination and keeps \\\"terminate\\\" directly following \\\"archive order\\\".\"\n  ]\n}",
+        "refusal": null,
+        "reasoning": null,
+        "reasoning_details": [
+          {
+            "type": "reasoning.encrypted",
+            "data": "gAAAAABqFaN4QfN17EfGKuK7Sb5Zc316ez1sdnRumHeCkgJOuagiYHnvZeNA2dNjZCsuLDfPg5_VaVkjIJwoZpNa_Yc49YFok2zrFFumaOlobloWehlpVampopKLhL2O4Ih043SkeIQvV-WrymhMWH03xdHseK8E7muttpkpr65We7mrazikbRq6ebJJk5iptQjgFW8RANF4rZS5LJ1ZdvJYHVO5M6hWZeWsh6uVZJ-ObTx3590QiX1Jw2EgUdGOLUcOR3ZBaDll8Yi-TYMk5tJg7FgXQA50f4_zPabz0ekRYZolJONUfxtfAwql8Fe7QEgTDwKzQag1_O4bb6x7dQeigOa4rptQds0Mv27hnU6GxYY-CVBOHE5krCFPWOlUFsTinVKa64gwm3gJMu7tlFYlF5_DokWc1af83qPYnrKDi0Jh5AHzxbatJvghUkO2j-XvZTwaAbqO5_KpbbyIp0RzibOzJfTFLVReRML3JVUmeg5OKohgO_-YWI_cLTTMvA_uU0Ip75OJiaDtlI0WCxzqGT8VOXHcK1Zsk3lTsdIy8eUrBjNmCnQQGCUaFkiEfg8lQiEop8SevP0uGSri71Yv5qekUj2YQm8C6oAntfEEYb8790QD2Z7O-RPPeE2gKoqVr5fVKNJTS9S3373j389trr_IIOxvU0iDUkznwskhyve4hl06s6iBEpmTU0GuCV4eWUmLDLNdY5X0YJc0gD0WWw4qtGg7TR0l17vbM2cW2aRIpMQdLh1GeVmnQahB5gJAblTA_TeS8hABRd_JYenhGkZoP4PAHolvMdxg0oz9_zP-bVk4-Y2PwJtyIsLv1pvj7Xut7tPZPUczIOi4p3E1LaIlFn7KOEuIV5VMgZraAG2Ss24x5AQ-KrxF-RUehgwd0trkfUumm2AB92aKF2-3Jz1GFgcAOWMwdxsWMYfAzhxkRtyhNfTATIKlRdibNl-D-1XpA5RXJPhwNSizvwKjLzYfPJUcVR5SQ_BBJC0788Z4nTcuJFnHf7gQSKibCrECMUedlo8ntbpgdGlhaZaw7loQUofKJG9KpyHQhHN-3-uPyRLLHAslzQXEN7DpLnVssrGxSyhV-pwvkVYImg5kLS1p79_ONtRnj4grCqL7p4hL3chnHYso0VJx5FIcM2MZBBIiGH3TAgIraTZfPGFOLoSK9hpb6iXk24GkTtJ_iYZ8v_x0YxTmmBd46ZTIhIzhLvGUOxX7DVZRUSqjEYz0oxGMSyv2oBaWTcFmheyXzeHNF3JZwJBgYChcfX_wLEoFWq7Imas-B6It_3QjKsJs8w0J5_Cmrxnk8uaTDX5z4j4yS-VvGa-wnJwN5ZZy3pjh65vijg_1dgUbZTb1DaZE3yjB22kSsSnceL2QORcbM-HmnXVXmelwbJvfnhChVYCAeX0Sa47CgvRjACq5-If-HTPpv9ZywinBuMBztcqJ6jfXvLEpj2E6AY2YGvlClhjPdf9tP2SLvo1KRub8qWC_7pSqNe3MFbLJ_gwslnGvr5kC0VaYPl1cI-nbKzQictczmzCULIY-7Egp4yiah3RpG8_QtNgj_L8mF1AGnByloFyEBZOExOo5UoM-pJ6sVjcqZOlLSAYmezrp_f62kUpK-EOQ3z6lRMBHEpiv1xFpiInPLr2-fAXOwCzPuuucw-6ucEuWd5d5tyg0aQpOaLLSiUa_rqP2XRA8rMiiw4eaN_u-fXKdr81ayI_9SwuSjLVtBSG6LdvdeK4QeCyQsG-43Tn5DGEkm5Vj7OTCFfjRpDA0I2VfwmUKkxYKeSNd6s9LT5wt12p6-HFyvbcyLLpkuBLLN3212zui-klmdxNParM9ooee1jjIZaNEdE490yHz026cCzjLOL71Wro74DyoTb-U7t2dBRWN8XO5-F3cprTGfgI9rXyo8VlJ75R1bhDtz8LbNMu5ph5gSdw8Gnnolp6hiLcqNFbEe3x44gV8sJvbDpCWJETOLwguiQzl92Q1KW0L-EsRS79EEuplDxAB6_MQ-r2J-w==",
+            "format": "openai-responses-v1",
+            "id": "rs_097204b3eec43cdb016a15a374f0188194ad27d2a2f369adbc",
+            "index": 0
+          }
+        ]
+      }
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 1017,
+    "completion_tokens": 335,
+    "total_tokens": 1352,
+    "cost": 0.015135,
+    "is_byok": false,
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "cache_write_tokens": 0,
+      "audio_tokens": 0,
+      "video_tokens": 0
+    },
+    "cost_details": {
+      "upstream_inference_cost": 0.015135,
+      "upstream_inference_prompt_cost": 0.005085,
+      "upstream_inference_completions_cost": 0.01005
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 147,
+      "image_tokens": 0,
+      "audio_tokens": 0
+    }
+  }
+}

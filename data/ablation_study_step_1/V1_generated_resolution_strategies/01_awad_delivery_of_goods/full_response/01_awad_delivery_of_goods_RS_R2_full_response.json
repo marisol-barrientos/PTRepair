@@ -1,0 +1,55 @@
+{
+  "id": "gen-1779802931-3Phh8CnWbSk7H0Ew9A1L",
+  "object": "chat.completion",
+  "created": 1779802931,
+  "model": "openai/gpt-5.5-20260423",
+  "provider": "OpenAI",
+  "system_fingerprint": null,
+  "service_tier": "default",
+  "choices": [
+    {
+      "index": 0,
+      "logprobs": null,
+      "finish_reason": "stop",
+      "native_finish_reason": "completed",
+      "message": {
+        "role": "assistant",
+        "content": "{\n  \"resolution_strategies\": [\n    \"Move 'pack goods' out of the parallel shipping branch and place it immediately after the parallel block, before 'send goods'. The parallel block then contains the payment choice in one branch and only 'provide shipping address' in the other branch. This ensures that both 'pay by credit card' and 'pay by bank transfer' complete before 'pack goods' is executed.\",\n    \"Replace the current parallel block with a sequence: first execute the exclusive payment choice, then execute 'provide shipping address', then execute 'pack goods', followed by 'send goods'. This fully satisfies the leads_to requirements because packing always occurs after either payment activity, but it removes the existing parallelism between payment and address collection.\",\n    \"Keep the parallel block, but move 'pack goods' into the payment branch after the exclusive payment choice, and leave 'provide shipping address' as the other parallel branch. Structurally, the parallel block would contain one branch with the payment alternative followed by 'pack goods', and another branch with 'provide shipping address'. This ensures that 'pack goods' occurs after both possible payment activities while preserving some parallelism.\",\n    \"Duplicate 'pack goods' inside both payment alternatives: place one 'pack goods' after 'pay by bank transfer' in the bank-transfer branch and one 'pack goods' after 'pay by credit card' in the credit-card branch, then remove the original 'pack goods' from the shipping-address branch. This satisfies the violation locally, although it introduces duplicated packing logic and is therefore less preferable than moving a single 'pack goods' after the parallel block.\"\n  ]\n}",
+        "refusal": null,
+        "reasoning": null,
+        "reasoning_details": [
+          {
+            "type": "reasoning.encrypted",
+            "data": "gAAAAABqFaNAwWJf6rFJG2Cj2NkGcOhQzeJ5HSesSA-vY3Lci2b7wVx-x2KF_qk7_FCHWAJy4ZuEeDWAFi1klLAHDfK7yH2l9L3fjjXZDkHVcCfYCmcmZWG4DRPQyp63hH5ubOBAiKorKM6gi4J9jix0j1x1Z0sGGEsqQw-PtzB8CXmbHC-oIiAGK_7CqgNb-zK4UH6A6lsvFY4E3q_kQP9Zj1JRnu7c8kCahf-sZBkVdV-IZMFEXTf0IWsKhydJrdiU9TZCysAU4tQFI9p-g0qj-ctJc3mKjyuIE5uS8X_qOPS48EY6VerFN5YbEOLS2P5XQWUsfMRZOwAC9lgb4NzsVon-hWHFBwfTxd0yIUJ3i4VyPknxY6J0EZ2DELgGrWX9Hdc3fqjOMjjlMU8ZVnB8IBxipCimNALyUzHC43Jjo9WmtrvI7QPMMes88jcBguwNPis3aWpcdJPutCPIksqKjkjdj6niz0VOShg-uJy6WQ33_auRJKxVJgdiTlAuyGuoDs34j0qlbScWFBz201IdGkvfs0_mSEWdYSZh5G0i-PmJVEcPItW1IupKqey36I_TFelD-q2LVrFZ35hfQ1Uka6SDvKnDI7A2SKY6ePbcd4EuWGV5OLDaTHvdwRkQOiivnDklq7sYs8w8ktoDbBxbgGsyT5o62383__fgmkzzG4ZyVAAWhhIELna5_c2An-5j_zrGwtW2N4zGvuWj6zc2eym_ieV-hyaij4ohCq4B1m55uNcYYMd3Ae9SUyGPyBZ8rKvOL-x0GzzOJRqHt0INwvXDvSQzPiyFLo3nkEpcZr7O9Gh_2MfNOv7lJZeID-OamkUACkUqRQWqhKOrmBzh2MPwEKd8Z_ZIa2KKEY6BOIuFrQ8wei4qJdxqEBjPcaxfSOE6sYEaPXmTGEyMJ8ToLSO3jo-fklTVqtIPxSgNcyabPK2xGB-1lEiLVMwVR_bNl44_qLNW5gHRcwOmQC_mb1YW7wOPm9VfszVBPvnjbmPwu6jqNO3nuNe3maeKOVlozo-CA0pzIFgG5nkGIjpg02-gAYuENng9Nibzzo_wA71Db-xIDyeF4DLJJTsIPz0uIXu7xQtQY3u7uPiiNcwZlSNE57rGkDrdOdWQ4XyF6XZCIcbNv0nIw4QZs-3CwtnYVH0o6M7lxy0vT29jgu4PM9W3z3dQSFAlhSqRPClxYqRShVa_ZIEjT64Pz3tgbREi6Cbqe41Hr7pJhnOBsJX6NtJZBgIT5KT2m8bUn3coXFgoNlfyWDWH1VMiEV9ahyRi0N_113n1A0Yd5b-pSUMJAvVN10xpHuH1KIc6RRCyo0uHnm8Drl-In4uuJuvv0veEyYKhrNOqvGSGNOoh2-ViaCt9KgGaghyPPdyoPWfodqxRT9cTm_BjuUmYQzTWX92qIeQmDondSbyoqQBhFvj3IAaJBrCFyW4S7Vz-40iSdnG4oRtfUAVPfRXYW6ZjJhr4vxgECjWhlzCPoYAP-SZmRagEK1mcMEkmvPAm7En9nCi39QYrQZjnwfFJEav_KnS76VjDRIM8wsKSLhxQbfHOQ4GFX8uqXBplASESP-DL5VJ-v0r6wiaCddDVbrAxb1jcmQhH7uny7_QftgT0lgjgQMMXDAWyphB5WYzn9IfvpRIV3E2FbqDR3zF_mLXn3kYnKeXb1p7GwBDzjnYAI3LBE85FhkwWjgxJ4FiytSBf7AmAKZNqdwTAIG6HvQhosKoevIG8P8i8mdByRlmYhyyAqpcz-1fXFKI5sfaJEH0TKsk68uNBKmYagDf7yGeH8VRZu73TYHHLSq_tah6sME-nFexqN_Ir-N3YBYZthw8YzP_30_-VBfUqj543Fy3IkjVnqiDjFCX_rTUvH3MCbvRYutEDYf4AIaqgWgSsq1yfSwp9SovdpEBBbh5MF-dq-JB_tXCPttkncpwLiZOEQJTparXQcqtnAKCwU-XL5iBzEG6jeYfjNTr-QrgG0di97nKIsDQMq_EASoWqGoqQZjZur9SognTHWylxKBVnGoV9b7Y2SqPbn1GNZLITpxaTdOSWyH20UGcUPEPFMtEucSXasFZ9vwQNjtwm9eNQlLfwNw8TEDND1Le73xMsf7JaGIzBW8iO5v9SNAcQXzc5R1gIpP2SBbq1M7BDFEB9PR6hbFzn3EUDqMxLsMvNZugRFrrLSxeWm1WsCiZBJ1rKdmPJIgyGyQ8_80P7N7nKQEd7eGcWSNh2qfSB1HVyMietp-wjztXlWUB6gxK00gC9rDcTwwye87eWQP6CazzolDYHI2qCUhxZMb-SJSjMMMO4CofN-NNdHZafd0tzWOXBsXhcJa2RF3E0JMnRiTAvqj5L8cFowZIAbuM-UAwpllR21gSG8ztypqHcgbInA9PleOqezFzWc7qI_MB4yoEaN0fknqiTHiFYbkTITmGyYVVNGbxIZ8v7ihGMXpbUowkSAWel8ikU8jRCI-ogKhpXnRMP5tEgQNA5Lr7vNnCl2TYB5lDNnIkWgwmj97FgJaY3hZyIOWGu_2QMMKUu4peU9bzh5SpH-II_UEvUhxlc9W5yJzbn84CH3ruY7SOSlzENsaQnTGYYC1Lc3sfmNmYCi_7WG97_8CXROpZS3NTzBmqRJC5v29hGboPTsC50BZ3cWqIRkQq9SYpdzpHh1h4G1KF375RUpmTHYbXkYOaX1SpB35ZLEJ_D3dz0XQO8hjsj9yagwBEjIKiFHo4YAvLtoAyGTtxIClXiU0pc-oFaao8442csQS2SQhnvFPa-sqbwwkiTKfAx1NjPVl9_NnDOIUbs1yn0EuRfP3xtSLne6w1xiHnblGodVkRqBi38DM78-Tc9xRwrjOCss0WMOdCiwM9_1ByRWb3VBgEzZ4ybQlCTw9biKI69Gb-c_3CP-W-RCxM57zop2h-iFA5oEWisIqE3idkCImQyzrIGojCnvW5iFac5k64AAAMAASQJ_ayNd-ubtBr4X1Z88DOHGyuZjp1JkJ0Y2jzh6l_7N-IcTOZQXKagUey_GpBf-0zenF74oeI5YlRFOaAq7krBnDTxCvZN9ZJFuNEkuhdneObAcH9ie-VPbJzTM57-c_gG0gDO4JeHdDXER3INrCBdXkQPfh2u7Pi0b8zxksYJ2u_pTjZEv6shZkKEIofMnefvaRMJGQoA24gxnzgmRWKWvPnu-GeiMxDSkpEtE70U1BAQUj46TcHAW4_8yu2ycqy1gudl7HcEbXWREjgnNbg4w_QzwAmcVrD-lFuVE0Dj0DTUVVG7cDHkanlLYYqHs7wmJElcErSTn7dAMFiawUW6RLsLjMuRsfr0oRUb9nsiVsebChYxoU1wqZzXsYdbgEH_90UZkVsnUpLs9MuFnPHWxaOd_Ry28AfBwpVBkA0RWc9bLVEN7qKIErdsDLGKZkVCbNAY1wVIHlW6-l65wieFJTWd0SSzaXdtL6fJuXUxaeS4uQpAlRwMJZyt28bGW4LnVrn2eLzdssyTH6tb5oT4f_DmanU7f_xZ9gT1_AILYECiSljI52AwRY7PPnrXMjYhLbOr2FsDJggp648O705258LqBat_afu_tS4fAXb2Wtr9ZM4NLFDXlTlDVrSC4eC-InWvhTMc0NcSUhQRkIto1JrGFY9u5Lg_3SVM6iMi2gZgewW2CMW-2A_rChxGo8D477CsbbeR2EjfRsIAV2NXl5u3v2VWJTv3kpq9-TkTwWIkF_ACCYgcM6TmpQT6N1F3htCMaudUvl4hlwTe1GWvZ5lNs-xNUXWVjFHSWWfspD7sYbiXUA5NZwy2aTcQ8FPcQ5JpzAn8bASyQzJU0RSGoypS1kfOKoLaX6rzaPfo3O7DUJZquPst8Xrliaedmxme9RMIl_HH1LqjkmTgpIeGX880a-Ya5ZIPHisISK_JzmdmyxGX0L2RBZR72hApnQWVpZRf089I9cigqpV6HJOc2SM__UWfpHHyDVd2tBAuGGhi5iMjToH1sQthuoOzXKsciAcsYd9KSYrUu9yvYDjbktFb-nhkjVh-jxc04zm0XgBxjRAU2mF4BNPSpncfenQufRs_w6Mwzvyp6NhLsNJzpTEErBUv_yNqzpM0SU26SqVqVyKTSMR3a02vSXXYZzDaBYqksDCW-m3gP6J5NCYHhl7rmlob69wm9mjyE5QKOGYimNC1E7yLssVqt3PGul2uaPuauBh17yDlgWcyG1l2GXCXBuNawvcLtrYL8Ah1QX7K5Caen_GWgII9RtIoWk8aet1eJsL4QS3TFbKyeBQvAxhD-2qt7ZmDVmnyZkD4cEItLv9q-p2SPj2ujORXXtNmzlgKhQf1oIkUYKbeOl_uN2_ASoYhriLrvaFtZ5mG5j9MY7kR6O4tlhveq9Ov_3zPfFiy8cPd9WaQ0oevdUnT5806cL87iggaQi9zCYYYUfXYFVEH0sqlJnzJrtd8fzQraw5YTp_mM1A7-fCSz6f7p0V24V_KKS_cDd_DwEOu_Tdtg0MxJZAHK1aNDjajyyWfrqMjd7RRcq5b2yR8bZmye5mfo9XSVb5VUbqsqML3-Y-2T9aw9MHJUQvsTdyVt7lBsLTZH0WX0lJkMSAHgLPYFXL4_2RsZxoNkOe3irIBA92O1gPuVeq0YbJ-COLZ0UmHTG1_rn0h2f2et-DAcvimMC02GaHkeOAE91ONAk8WsL4gwyHTxX7FrqVfmExv",
+            "format": "openai-responses-v1",
+            "id": "rs_0b8826c4be613b49016a15a33481fc81938fd047eb02ffcf1f",
+            "index": 0
+          }
+        ]
+      }
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 1028,
+    "completion_tokens": 854,
+    "total_tokens": 1882,
+    "cost": 0.03076,
+    "is_byok": false,
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "cache_write_tokens": 0,
+      "audio_tokens": 0,
+      "video_tokens": 0
+    },
+    "cost_details": {
+      "upstream_inference_cost": 0.03076,
+      "upstream_inference_prompt_cost": 0.00514,
+      "upstream_inference_completions_cost": 0.02562
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 516,
+      "image_tokens": 0,
+      "audio_tokens": 0
+    }
+  }
+}

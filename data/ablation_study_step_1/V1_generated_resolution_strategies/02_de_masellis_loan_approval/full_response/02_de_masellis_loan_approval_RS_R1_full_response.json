@@ -1,0 +1,61 @@
+{
+  "id": "gen-1779803003-FURjI0hBhd8zgpKoCSDf",
+  "object": "chat.completion",
+  "created": 1779803003,
+  "model": "openai/gpt-5.5-20260423",
+  "provider": "OpenAI",
+  "system_fingerprint": null,
+  "service_tier": "default",
+  "choices": [
+    {
+      "index": 0,
+      "logprobs": null,
+      "finish_reason": "stop",
+      "native_finish_reason": "completed",
+      "message": {
+        "role": "assistant",
+        "content": "{\n  \"resolution_strategies\": [\n    \"Replace the activity \\\"ask to recheck\\\" in the branch with condition data.conflicts == \\\"true\\\" by a permitted alternative activity, such as \\\"ask for clarification\\\". This is a localized change that removes the prohibited activity while preserving the exclusive-branch structure and the behavior for conflict cases.\",\n    \"Delete the branch sequence with condition data.conflicts == \\\"true\\\" that contains \\\"ask to recheck\\\", and change the remaining branch containing \\\"ask for updates\\\" into the default or unconditional branch of the exclusive block. This fully resolves the absence violation, but conflict cases will now proceed to \\\"ask for updates\\\".\",\n    \"Replace the entire exclusive block after \\\"check application\\\" with a single activity \\\"ask for updates\\\". This removes \\\"ask to recheck\\\" and simplifies the process by making all cases continue with \\\"ask for updates\\\".\",\n    \"If the process-tree notation supports silent or skip activities, replace \\\"ask to recheck\\\" with a silent skip activity inside the data.conflicts == \\\"true\\\" branch. This removes the prohibited activity while preserving the conditional routing structure. If skip activities are not supported, this strategy is not valid.\"\n  ]\n}",
+        "refusal": null,
+        "reasoning": "**Considering tree validity**\n\nI need to process the structured tree's validity. Perhaps the sequence can't be empty, and it might be better to replace the leaf with a \"skip\" if that’s supported. The PST shows activities, but no skip is visible. It makes sense to suggest removing the activity and its exclusive branch while adjusting the condition to avoid inconsistencies. \n\nI’ll form strategies, possibly using JSON for resolution strategies like replacing the activity or deleting sequences while preserving validity. It keeps things minimal and localized.**Refining activity strategies**\n\nI need to simplify things by removing the entire exclusive block and keeping just the \"ask for updates\" activity after checking the application. Both conditions lead to an acceptable continuation, which is more straightforward.\n\nIf business requires no action when conflicts are true, I’m thinking about replacing the branch with a silent skip or termination, although that could impact parallel processes. It seems I might need to clarify whether the tree language supports skips, but the user wants valid strategies, so I’ll specify compliance clearly.",
+        "reasoning_details": [
+          {
+            "type": "reasoning.summary",
+            "summary": "**Considering tree validity**\n\nI need to process the structured tree's validity. Perhaps the sequence can't be empty, and it might be better to replace the leaf with a \"skip\" if that’s supported. The PST shows activities, but no skip is visible. It makes sense to suggest removing the activity and its exclusive branch while adjusting the condition to avoid inconsistencies. \n\nI’ll form strategies, possibly using JSON for resolution strategies like replacing the activity or deleting sequences while preserving validity. It keeps things minimal and localized.**Refining activity strategies**\n\nI need to simplify things by removing the entire exclusive block and keeping just the \"ask for updates\" activity after checking the application. Both conditions lead to an acceptable continuation, which is more straightforward.\n\nIf business requires no action when conflicts are true, I’m thinking about replacing the branch with a silent skip or termination, although that could impact parallel processes. It seems I might need to clarify whether the tree language supports skips, but the user wants valid strategies, so I’ll specify compliance clearly.",
+            "format": "openai-responses-v1",
+            "index": 0
+          },
+          {
+            "type": "reasoning.encrypted",
+            "data": "gAAAAABqFaOKdhNx1y6BdxVXi3XmqZS9i2epxX0mTw6NI0EI3ZOlv186FNelFImybztRAQ6Bb_NlpMOmbUG_16izfwzIor2nwNkdwfFlIG4dy1TL8RhYyrYxwnar1HhEY4x5bi7ThcNW0fXIdWn1hap7wg4EAEf8QLuKURy177UQd_RZj5DQ9kgdMIDd6F_dienZnRRSwbZMuDp4t5p7orQwry2RRsW5FHVlIi_UEwtdI9C40O2JI8W6NfhJZSG1ewMcHZmfI8Yu2cnnis4W2AYaebMbtnkSashOZy_AOVVhCaqFAronxKtdfsQAp5g_Fq9OZFGzsjBzS5kaCdzpLo_LUZk6M0rMFStmAFyl2xDMHu-h2qOZIMPTpuUBfvti6TuOolVHl6mdNrR_0E-d45-0F7kh6jwZIV-AUiNjn17P0po5Qqi9AHvk1zsb_zaM1M02PLQGwhi8F-vAvaBfgfn38i4MW42mWU1eCvJhDXaRkAG2y_-HEFkuLtckQ3LRrpEZhc2ixxSql2ZBxoHXvZrs9THhzCDvXs6EDW6DRQSfVgN-7kOcBp3QVvsyG14uvDV2G8-ybNuiMP8hyh_ju8kOHfGWPtnYmvFR44oy2KIYLANZk4p_h-t0G6Hmu9YeRTe_ITgliXwg4iqPD0vfEjAM0TrhoDCCVgpjPcetcHXh3Rp5B3KXqI4JYSF4yaF5WdnLrwU61FbZ7Xb1WHTGjYsOKVW24gM_ZBeqT_OY5FBX1u1QjHcCtMHvVGD4QFZoOE_iO94rwr5zjhhnliJbgZ8JHalbrbJ4rLUimb8xJRBZcgQGItPrjRArYOUj8yo-8eUZ9hnNxzAP29TsmzpKh2EeZDmm6s-pW_5s4lgO1fQDVsT0JwKnbyJ9IFAVTwdJQO63cSe8fg0BRJsk2PjXiH0PxgxbVtiY8qiJSLycvbkogn4eD73iNGSi2JWf-RMkiNcPw7DKIWUSzTqKgt5TBaRPlsDuwwdnTrXiFnyOubSmwJsMYiW1mkM8F04iH6WmMwSCjVA2FnwYagdtDBD6gTJ3TenJVPuOWOlLElu4-zehM5vvvC5Fe5JR9LSFLjxR1Umu5576xAUQuq2uVAFlL7JG4-3oPFv__1jYEiujhwRorWnP0IXXSHEol2TbZN-g2lHINJvz6G-yQec7iGE2ZG7YeCkjqQTVH6aAcECyv9v2SHOPm07_cr-5NanTVMNBrwZIRK4oR5MhmZjrYJtAS4iYBrOfCvzbT27xmVfTlyijfZ4TgDwlH2Wo_mW1OqheNSXKUgPAByglwq0yqu15cBgRiiS83rxigloZ4zfmwASZc6bqXqLjZ3ohfSlFebamkC3hW4_OdKD9-o8xSKMDxNpWq6SqQ1jySI3XYW2li3O83f_XOeKlaS7tz7cNHY3xUgs0_qkPMmHaHcw21kvfu-LHriWXoq7dxnjjdCBkCp9fX-vkzwm8PQOl2CN5ufysvdPh1n5qPMjGtyK7TA0hfYGnQTs6YY3ve8dE2R7D0SRnhJ6bWADCeZ4eZE63Amz4Ly93SqBe1mcEsruviCSiGOxSw2GfmzEqp6DpD23Y8ZihRp7FjB_68V3s8vdCvz_i3MgNNEXC2PrhSN1mZX8GE_EWzsZ00QKfUsVkhOId7pz8NYJNxs2Z1A9K_ju5fVZKQYPzvIf4fsnMOffz5f3PfUnmWk8txkVFCWqAI4lr9IMtw7AlS3SgVBbFU6M6SyQdJKwrZZgSVpL5L4aqZhtfph3RLNq3F8j6w4K9IkLvDJ3B7SW84ufuMlRe3p3D2HjkK71tON-uNozYgZLnQOqYfMOcqZdykwSZ4Smxb0bqeE7DWasbm8uvWWq2Rsr5OVezkZThpEZEFNV6cUWdk5OxOC7Rvomgpl3OM-Kyuk-2P95u0ANFmoY8sRdkgfyytbe5ZlLM1yp9HfmCOoS3inViVUSR1GATjeulZc2BbfowFE-HlRS_MuhCFFrFV4cFeSnUY8Q2yNrAGjq5SdfYFUyHGwZ9TL3N5gRExH0wvupYhEvJDharkdceYEZJRAUbyHisi6gJpTyVJiCmHgEkFS3aKdad3c0snoB1u3XyxR06SCRNZrJKZ1pVoC282TgwN5tM8ZfqvKcKmhl1FImPg8ST13qmb4jl69kHPhYJI7lKF6IZEMsiui3yZ1dYua05GR-jOC7ayEV5rZXpPK1HSrAVm6EqWunaig4K5YLUVP9MhUg3F7t9PfLO10vqmg9av16AljoD9AEEHYNUc4L3eNB-qtaLwhzsDt_zahv-UPxxgfbaJVjy7HWJ2oX56ngu_D0UfrCmknpuaHpUsx4HC8LqtORkqBTfeXC3TFl7quCQywDqGN0sAN-raXq-OQPQcOVhBnsl73z3eTAwZjAb1Sxj-bEv0aiOxVbe4FW8r2_6pFtLsmlB8WCBjJQmQLAI7LOKEYXrE0GRZZ-OoOv3mSy7vHtsaHmJgC1uZSQzaQNhlKTVAo4eB8b6Ek04x-ON6bke2qmARBFvWZxQ94zcdxdEDOJbuxCw2XjRSf4TbIvr1Gp2_9pHmapm-UXq-ryo_gupNhjp9EEXPNsEo33yJZCbkaCrvcxfltzPIbyYpFGuVZHz31xtwk0I7HCM51w9PD6NG2lKRfJdxe8tsr2K7enPwdBIxKkw0GW6SikpQM_aI0SCCB4OdM5cdpOVjrxFixOKYKDnA-MRid_nSjp9IGZc3LCK3CRnCbJ_FZDZvkF77cVANB4_lPM15xv_FEz6ZauN8LtWnwPH7qyhVJQy4AHg-WvV-ZXx4SerdlpE7zD9iO-RFpvBSdWzXgZS8ZWoNh1Gu2qFZLbGqxiEXLEvBwr9UqU9x8lXy1hlb-pHAME4NmriVUoA6h7kYfUFLJsNe0KgqugJJAGftIvHPF9ewmuUG2ltVkIeS5fQHNlL38Q0CV4_lh7NtQ8sboSeYrsoPX4XTcByp0uPdIU7xFMxDgdg-J4-LB8DpQtvlx9foGf-nbfPEpfy1ShpMoaFbQ8Bcsnw9wH7iEDLkO8uQW6-HwDw8gjbylZuUhJJdn8N3O0TDhCPJ7uOXkxrjlLx_e_RRWf8dJzbLgIwza0J2iJce9f7FzLaubH7ZqkpPzP81cGK2O0-rZ4lrknsCTSnSouXRWhcWs5RRxemAloAUNgAtmnYedb5xeU8tRO9i58K30BZgGBoVcVEsyKF5vHA7H9hevC3WCAV_mMA1gg-5NThteY5Bg4dFhjOtaFdkrrXcxwtVaacwy-Lw77-cT6g4olAObYVLGhMPAx6JTyBAfVJwkK60Y2NLy_Vez0gYkZnMk9h9UDeUplhr-XaPZIr85Vh_d15Q-evbJozjL9hmE9IyXfSbWv4w2bvpAltnXJUWw2vC0JUNFpyrhdrfT1xJChbJRVVWIFDhjOgR4NmohMnFjv80YhgUVU7yrb865jpBfr3ZsI3p1bUowje08-6QH1WmgQDqIlcyQBRHahvhC-azL9iSaybE4B2p2T1Dt2CVWqDLBkX5wypobKSlMOAEA4rWR2L_lXmzayXiVs-b5mgoCoewyQUmyNun8XLrko6rubeBVii4i0TKDwG9jPjrism5sxxHXpYANU_nU_tSVAuLZr_57R_TZKQul_spOTGqk92bef_RetitTS98WaNPw6uRcCYbQYRCemdQrwT0DVjWGEOPdyWpqAEhckO05tF1j_kKb0y63V_ewWY6875gl5x0kp6QU44qfJD2Kq5egujE7JxpAvuuYmWEHqWa7JiNNoz9f5Y3EdscaUt_Z93ym3U_LqCgrBrxyVX-N8b1LbmyaLlAW-I2054cmpJfWYVTegKnu1ZqB0uZBSRYo3qwMutbFYtJhdEIPVHdxxbYPqx5kyypp62ATPnwIMR9yY8Krd5RwcHixQhA7pCaCwKjffOP1xfRKV3ZOLouhwpZbs-58UG_HuFrN95Tzn-CABM7KLEsLzHup7KaXURx6W2_zjI8uofC5P-Mq1EmoFW8_7d4pUEDyMRM0BPCZq6udVEcOgITXOdlB6M9Gjv6NPuTsAU61bIouj8C0Qh3TdQtG-wwJH0vB1P10LP-n8YsOBdGxBVxGnXSUfSiLAKgM2eiWdVFLftL5gCkagagTXXnO5bkWBYwfrHJcybeuLgdJHZBx5oOqNcTQsyivd7mm2A1RpCwfL8mSZuLc6d0jYhDO1bRsogOvpU6Un6wO3_XyKPnhqokmhm9HJV-QSdLgnU1GvZLFrbiOmaTRlQSqIfIcfTT0wiUkYSm2X5N40fXB1KkTAuWyiAZA6deEUOXPgGQ28xp7jqaVuGfrLW-bv8cBMDAt60G11HyBuMYV2G3OR3LAVujaXVSHE8uE5sNDFpP6EKwEvw89fACUwlRwf5h5XC2XchxqCepVXfoMor3eTLZ_p1w0oY2BjkaqWsVC8SSY3lp4GlLchLPLFQ5V96GqTE7ZsKagp7ndDvKBzlPjqCtGKsYvPd9cLGPW6sGV02LyIFu1dRaI5WCDmJoazCdo32ZI6WxngTrM9OI1fwRBLVEmcf6h2AWWdHDT0Or94F7Be1kv0cLB4tTPsm7QhAOkJfG5yiOhVahBZgrr-JQJnCpm05SiVezU_hvUqQL3c=",
+            "format": "openai-responses-v1",
+            "id": "rs_022be7c0758dbe9c016a15a37cb48481948545443953663360",
+            "index": 1
+          }
+        ]
+      }
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 981,
+    "completion_tokens": 767,
+    "total_tokens": 1748,
+    "cost": 0.027915,
+    "is_byok": false,
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "cache_write_tokens": 0,
+      "audio_tokens": 0,
+      "video_tokens": 0
+    },
+    "cost_details": {
+      "upstream_inference_cost": 0.027915,
+      "upstream_inference_prompt_cost": 0.004905,
+      "upstream_inference_completions_cost": 0.02301
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 516,
+      "image_tokens": 0,
+      "audio_tokens": 0
+    }
+  }
+}

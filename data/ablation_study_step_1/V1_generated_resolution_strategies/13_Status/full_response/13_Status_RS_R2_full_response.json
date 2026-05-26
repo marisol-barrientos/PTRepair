@@ -1,0 +1,55 @@
+{
+  "id": "gen-1779804021-1wvWui6OuL0P7A7vF689",
+  "object": "chat.completion",
+  "created": 1779804021,
+  "model": "openai/gpt-5.5-20260423",
+  "provider": "OpenAI",
+  "system_fingerprint": null,
+  "service_tier": "default",
+  "choices": [
+    {
+      "index": 0,
+      "logprobs": null,
+      "finish_reason": "stop",
+      "native_finish_reason": "completed",
+      "message": {
+        "role": "assistant",
+        "content": "{\n  \"resolution_strategies\": [\n    \"Strategy 1: Keep the existing control-flow unchanged. Add data object resolution_proposal to the finalize/output data of activity \\\"Create resolution proposal\\\". Add data object report_cb to the finalize/output data of activity \\\"Generate consultative report\\\". Add data object report_ld to the finalize/output data of activity \\\"generate legal report\\\". Normalize the resource assignment so that \\\"Analyse reports\\\" is executed by exactly the same resource as \\\"Create resolution proposal\\\", for example change \\\"Analyse reports\\\" from \\\"Tech. MD Position\\\" to \\\"Tech.MD Position\\\".\",\n    \"Strategy 2: Keep the existing control-flow unchanged. Add data object resolution_proposal to the finalize/output data of activity \\\"Create resolution proposal\\\". Add data object report_cb to the finalize/output data of activity \\\"Generate consultative report\\\". Add data object report_ld to the finalize/output data of activity \\\"generate legal report\\\". Normalize the resource assignment in the opposite direction by changing \\\"Create resolution proposal\\\" from \\\"Tech.MD Position\\\" to \\\"Tech. MD Position\\\", so it matches \\\"Analyse reports\\\".\",\n    \"Strategy 3: If the two resource labels \\\"Tech.MD Position\\\" and \\\"Tech. MD Position\\\" are intended to denote the same role, keep the process structure unchanged and resolve the violation by canonicalizing the resource label globally to one spelling. Then annotate \\\"Create resolution proposal\\\" with output/finalize data resolution_proposal, \\\"Generate consultative report\\\" with output/finalize data report_cb, and \\\"generate legal report\\\" with output/finalize data report_ld.\",\n    \"Strategy 4: Partial-compliance alternative if resource reassignment is not allowed: keep the current activity ordering and add the missing data objects resolution_proposal, report_cb, and report_ld to the corresponding activities' finalize/output data. This resolves the data-related parts of the violation and preserves the existing process behavior, but the executed-by equality requirement remains unresolved because \\\"Create resolution proposal\\\" and \\\"Analyse reports\\\" still have different resource labels.\"\n  ]\n}",
+        "refusal": null,
+        "reasoning": null,
+        "reasoning_details": [
+          {
+            "type": "reasoning.encrypted",
+            "data": "gAAAAABqFaeDi3QFoAkyW3RBXV94FCPQ0vAEWKq_6jvLj2qn8Tt6iBZA6t5xJPZZRY7JucDWqGAeIKaUMzU159cAJa0OyP_YYuiemzGr_jrormdHBHbzkDGxx2pMwBC6q9ggtpwSgCF8-U0E0OJoK6IFsE1K8GXl1OO_2lNe_WCVIEyHBuij0i2_PJc5Gew8Fr_rEd3UGKvWVZmrxMD1zKhPqO17eyf0fquN8ZEbrSINoGQDlWdV5g-rDm6Ilz9UOM0o54F9EXJ21LJSLwxTO7mByovRsGQDGc1UVwcgOnoKXGYm60NbD1_D2wePKrOPUnyYfRJvdnG1pWf80letQ1fTqgHEH9iXuD2H3WbNLSvpiVTjbwSsiLCfghfP7JWuksZl9oUD6HYlu_iXJ7KXmjU5VTqYB9Tn6LBT3FGvFptINu3aCfqD_jxiT00x_mt39j_nGtbJoDdJAFluEVWS32LWyhN_je6Fnwp72rmWHoUKOBKwOb4tg1-mIJDTB1wuIXurdMO1FNSqZnuyyvQ7sEYyyWvqyfYc-FkLD_clfR_wnNSsyD65L-9mPN4rqy8arcUod-B0_4gHQiNuIqTrB2wa-nLpN5qDtzohyLUm085aWYRr8_D9kIOmoA3Thun5VG344qUMRbKssrkT95ptJ-sDIz23D2hC29puoYuJO9Nxbnpr_dgpGmDvKbfkDphPA_doX2pWvkqjyPBURrXE55Fogui-rhn7Pnm5AWCgu-NvkkuLQTdtHaEtc1APBm3-ctoa_9jK8Kc8FqJ0uRwlGOLIkbr_vw-FnFdCwLAEXP35fDwV9w-Vig-yb3yPRmGI4LNf_LyDTADHrOrWqGZ9sfKuYCAuSKHmtmJ9p4VZ-NeYeR8LhQCNy7iwiXniq0RPdBufH9bLrydaI9k14Qhy0x5AcJwHDTRMDLRLRcvj48f1yjdJ1IpgOPxq0MwsVC2wxbrt-V8_234P1fAtbNMmwi9aHpfX4TBbxQj-lODAFHhUWGDSSKlNarxRlDCvfnZv7v8bLVhkiou1wVNp_xSqUlNSl84p1xdWvq3l2MevYVWYd2AKDl8afJV8b6UIs52V9CxgJoQbCMCTcP4c8SErPlae2ExAQ6XM-uiRmY_dQLGmDcqsoobrENDa0kBIZpTZTJsvdPITE_vsuqc-zQIBaD8SSZejoZADrSjA16sWjE3PUw0WBElC292ByuhwIlQhVgHwR82SxruY3rb0CELNjogasTLjQxgI65B-sxRzXXEduC30h6Fl3jgRH_FTLeL7TjY3CZQw-7hrkMzqpxkUaBNEOE_4vwgIph-COpI8ujtjTutI6r_OzPhNu5fy7BirnsnZxGqTD_gRHb9VDq6WFhXCtfChw4gUIZK11DCSA2jqGO4Z723o_-IwE8y5N6jdcNX72w2SPsRepu1STuDg0Kkc3Pqd5db4BDaxnZf1kPlreHfRKoFPbp-2IkGO0JYmQ_y7WjoamiILEtcgaiBR_y-qy7vwP0Yg9bDVSY3qyWZCQN8VARfwdR6STu-rkcrnQoML4qA6CKgAThuYBe38LCbaWpsXb3bjZP8RlqGdmB5jZ-K_v_sSwBAxZV1Pm3_whF2QuJC-71VQDHLj1L2FBRX_jTfI_7pceDRg-yHlUYXOMkUN2hQJN8CXsB73glMs8o2cT40O-e0VTpLI0P0Rcryz42JIUgafMd3KW8a_jDv6wLIGncj7I4vCmOLsa6mPu_EQxM3qrn90yEOUJ66qjxjc6WOh2553klrRnm6FrpAUAYYTdKI9auKOerHAq_sLTMGH42t3vTvXLbxbkLyWSdWY8cUCzL-1RFu1Om_fDTiEE126kbBdmm5PnJlbMKBEscNTkal_c-3A4HFOEqrkAPuTK4O_ts3KkNymdDuZfjp_qAAh4eFFqntuN0EuOYE_IPNchS4awBbAKtc2mTxbMRlnWxESZPNY9kKDwv6bmIzMojZ5roDCxHTd6Mhl1SsvREpzv7ww2ePW-AzR2-Z6O_2D7Pv22EC7BSJBGJug9SbpFzLB_vZLM8Amuv0uPnCLAs02BoQ-Kmbwo2cnW8PazvUeBH25RpoKmKwWKvmbCzGN1hRyDTRnCkW-AoAYy_U2mAIgOvG6CswNk9YrtQkNBp9uE7b6Bj9A-Eo0BKJ2zhvluxzOL7ubTFO5MTJMgm65uuvYU8erLUrondiyWFqGPcuY1LdV40jX8QTGuWkRXG0tByRaFwbKmTiC34NjTRm0a8hIjVFgHxHbtN8DvFt902P93wZ4MiBWKFKZWi2vi2FDqJE8z5lYK8QR1VcZlssPBtlva9SVUmAALkiS-2hWOsR4SC0jhcc_pVl110Ycae9ejB1AMG7w580SvYqSqAqHFm5mdB6jW87aiKFHsI2rFv_71WBAiB1W_0JP63omvZP2PeCcEQ8MleRotUAPU4DvOU6nIEi0ol-gCViGdN80gvBsGtoVb6xnty2dfrwqJwA6g5-Aw1qwryq8uecnt6nROxSL_2igLbsFcqlKqsbg763Kiwrit8_7ntBVpw_9QRnJO6Vew89-lPdfVNuDR9atGdq_DxGV41XdmeN7d_804QlWYkZLKHdj5vj8qq_L2Xw1wiXGbhaoe7rRvZsBO01A6v1zc1UeGWN2CzdYbWkBWBhs43ppervUozwzTYXDTlzpBZv7YXaeMPZLtOLMQWYB9h7L5y0QA6aXasAzIrwNHobEBSsYk6ZLop-yE-b-8rI346f-5DpsmgkdhO8csWX8ugC3MtLJyBizgz34CN6J7GDB74eIp43vfechiDrIwltpQhTJZOFnBFikqaLYmLY4PvCTBSKTxXuGkgDl4zT9_15ehYYmfLio07osg2lAmAuVNS3sH6f4gElZRymVki8u_qNRtVbX8QvATegsv5HV_kCTiDUun-u1JxPA8szLyXtrualgJeIo80ZGWiP9Yr05kFF6M56NUl4x94Q2_U7l0fs9LdLzdmeRXZ_-lGIjBqFkjS3GZFvlyPWN2vzS1nQEFRNDV9by1vPmXqrD1jZRZz45JeV6Bq7HNtP4G3V9gcByX7yG_DPWaU2_jvw8yzTiRDYrcYj6kWGW11TDOZNxjjtfSLx55A67YKC43C_DdVInjJ8x8bQElf39M4NhejPMS_hnfSZQ0ZYER0DS1WNAOav4uIhRA1Z-8gJE8TU15KRXoaZ4s3pUF4fbVlW1S-QcabLQcegdBvyqpfNLyxIIK4zUWO3yHF0ew3II4DdoHEDWPFI5a67ce1A8PWO4HdxaMfJ_KIWLe-_PQuuehyd_v1FW-uusdWmfY0474qFhtOPnx4_aBqe7k49827ZtpGoMLxFTjCx1gCgQH7XkMZkh9NqzNB7Am4kvVC_cfayERiCSKng4ngYKCJ4uSn3lmaKFdTzBLUyIt9gp5PVAMMNp296e1GYypwXB4ahS_CltzRDVRmpKw540ttRzrCKI1qSSfZ_KthKqUtUrk2l08qmPZaZ_xNHIjNzEAPraL9PHKgTHw05t7DrKwpqPKbvfKEnCtlpkU2Gj1Z3O-VLh2sMXyKCe1M8InkgR_DYqu3V5QYLbLq7-GNawK1g3WR0zBgPTxHxluo0VuvxK8IMA5cAvgNSEYkoHnXYGTsshkGkSs3iPXDes0tuWmfPRXjygM95C646COIhwywH8_Kj-9jxiqeXb6pNU1iUvnXSOzgj88wvrbTfcImGOzVQFG7OClmmNiZq7DoZwjaU9vnW9ofBBZ4oiDSassF-V8kUU581_MNaf3vviQsHZXV7W12-nMoXwCuLtMi8pKyr0dXF-uHhLhpzLTiKoEbH3pnwsSGuOmNpiRFzgUDxvZIR_9fGMVCiY6AwztIEpD1XFGn9rhu9ycexd1sfQjCP259x9RxUHI8kACdp-zpwlKrYvgDP-nYFMfU0xSRdDy20kfdH-JbAof2IgbjPUhkJix89W1f5svKuqFV81LJcpXj54_WPpKZy5fIIXwTmO92EJFAbzaSvK4t1hCd06BDtb7f51KFW7mcEqV3chygy34nrmWIlisXFG-guuTn3cImy2t_d9FeJMHWd370FdDgIqIcfzlsy3YTWjAVMv1xBSa2nE5Hq7Ex7AYFDDfow12Q3R5rCnw2QDj2vd8HId3WwJ9g-wOT83SQ7rSezQPSL0rb2nI6fi3bDkuShFDw9n5JeAMXWfJi_KEQZW34OjknT3Ell2DEVbPBnnhas4wL3pKA4WoM2-nYyK3byEbVr3POMhnb3X7lwgAM5xC3Mpn3D_Ri5lMHA1dBQz2il_68YOi8_xMLtkB5fbJFOwEfhfqJ-8nmYYVzCpgzU9oSiBkndD5dRi_7DmCTpGe0SoWO9oLSWTUWBrLuGBk7QXTdPNEs0zwsVJ3lJZ9ZwHApugSao3q3MLFHItJczltyW_YByrEj3nt28nmF4FOHGSiGbiHW5fJ8tBvZu3ytDqVQehrCrZGYode14z77kimFbBVwL2-e-kXrXRNWTPhGU5lnnZ3UUeAuLwTfnixgHhUe45hjbd5DdRA_GbtrZ12ee104EnOchH106UU1iM66p61bsHKnt6Bc2GoebTvx0IwwshcjOrEvV28HGetU83TrILlDBzepb_Vw1oSKXFgxrrLJ4ymRx7zpNcxz6frDajHVTbDbzNL2x_a1Naz8m-ytSYmI8Z9WqvQxR79J9dRkq-Jhgm-Mfiprup7qOI5wV7CTgqh-Dqeg==",
+            "format": "openai-responses-v1",
+            "id": "rs_01050dc328dd2aab016a15a776ae948196a5fc3cf0822aba46",
+            "index": 0
+          }
+        ]
+      }
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 1214,
+    "completion_tokens": 942,
+    "total_tokens": 2156,
+    "cost": 0.03433,
+    "is_byok": false,
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "cache_write_tokens": 0,
+      "audio_tokens": 0,
+      "video_tokens": 0
+    },
+    "cost_details": {
+      "upstream_inference_cost": 0.03433,
+      "upstream_inference_prompt_cost": 0.00607,
+      "upstream_inference_completions_cost": 0.02826
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 516,
+      "image_tokens": 0,
+      "audio_tokens": 0
+    }
+  }
+}

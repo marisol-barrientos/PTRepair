@@ -1,0 +1,55 @@
+{
+  "id": "gen-1779803169-w0W4w4Eym5lQMOfgwZcM",
+  "object": "chat.completion",
+  "created": 1779803169,
+  "model": "openai/gpt-5.5-20260423",
+  "provider": "OpenAI",
+  "system_fingerprint": null,
+  "service_tier": "default",
+  "choices": [
+    {
+      "index": 0,
+      "logprobs": null,
+      "finish_reason": "stop",
+      "native_finish_reason": "completed",
+      "message": {
+        "role": "assistant",
+        "content": "{\n  \"resolution_strategies\": [\n    \"Insert activity \\\"clear package status\\\" with resource \\\"regulatory authority\\\" in the held-status branch immediately after \\\"route package\\\" and before \\\"handle package\\\". The held branch becomes: assess package -> route package -> clear package status -> handle package. This satisfies condition_eventually_follows because the activity occurs when package.status == \\\"held\\\", satisfies precedence because \\\"route package\\\" occurs before it, and satisfies executed_by by assigning it to the regulatory authority.\",\n    \"Insert activity \\\"clear package status\\\" with resource \\\"regulatory authority\\\" in the held-status branch after \\\"handle package\\\" and before the exclusive block rejoins at \\\"update status\\\". The held branch becomes: assess package -> route package -> handle package -> clear package status. This satisfies the required eventual execution after the held condition and preserves the required precedence because \\\"route package\\\" still occurs before \\\"clear package status\\\".\",\n    \"If \\\"clear package status\\\" should occur only after all held-package handling is complete, add it as the final activity inside the sequence guarded by condition package.status == \\\"held\\\", with resource \\\"regulatory authority\\\". Do not place it after the exclusive gateway outside the held branch, because then it would also execute for non-held packages where \\\"route package\\\" did not occur, violating the precedence requirement.\"\n  ]\n}",
+        "refusal": null,
+        "reasoning": null,
+        "reasoning_details": [
+          {
+            "type": "reasoning.encrypted",
+            "data": "gAAAAABqFaQvEIVegIwVz47q6gVtYx31MvWeEeH8VGQ8x3_1XENvJTi5Wk64aJheSJy0ZK9HE0Sc4ctuZi8NxM_RdvPbNutJKJIaBZBqMqDFD_uBGBFLMgZfM47p5otT4l3SmWhqlEjETfJqEqa8wk2Riq0LDpF3_vUA8XmEc5APatvf211CGPDtTdaKUwvfmRdCpcHxAtmqlz1XqztlPpX28QKWYF42G738uVl8YvSavkMG341z1gQp4ZILxfjrJcPW9ZWOTBTFTMNlXP3sTqX5rJ6LPEIjw_nHORauBNGExfHT3nqbJTZNe4TO0UVYt7XQXWFdD3e0efkCnKp1wwPPVfG5lfFJa4SqfzGxr8kKZ2qWJxN3YwoPELq0myfC3AoRDFiVfeoCiTQwWwssSKwsH-MZ9Tpt-TIylZGUM_rzToK0r4ta5uV01ge9ZZK1LpQp_GdOsYSnCsHqdbDzNZrQ9UMYoUgFtoTLmGhlrIdsrtupSG9yrbl5Ixq-JQPtOtL5JHytHx2PKjFETmtTU5rZzfUsHt_Ob9bconu6cnDrGTb-zgxMVBtyBlyoBooxb6VZQEI8ZN4Y7BSuPmoJB04gqhqKyf_Rii18WRqnzEAzuCD6YVyME3ie4GDJBM-t_QWlkAVK9X_gZgodZ5LomZryW0b3Rzdh44XLQkPPHy3iuCT93--S49jflMyy8rpbY0BtvoDagq7ELveGw5CCGnf7tpy19XVPNaAq4Jr3RVJH3vrRV-UTgKFFvcDXtsGW12UVOQXK31Ay5ldBbdZm0TQ3ipx3xBQpLs6mO8SsLvL67PsaaAPLXm-eFSINVI3Dou-wNe2eJAfNYcnsp45uyS3DRQIcO32eDGmpvK2d6oEaGcogriE72llzUg9HvrS20vQBkJodOVAhpNymJznPIkvDX2QlcHLaNwQgOKBD8kYB1oFVv1knpkfX4VVjx8WN9FoEqcOCLMZLB5AENCrXKGcDa0S9pi_3sY-J46tnexkixadzAtWz98sptGc63Mu8z7E9bSzHBAq-LlDAsCsNxtjetNhyZxuYxEzboadv5DSXE5ZtsuzopSeh-Os-HRxUpSGQmmS2nQRS9O8sd9hpDK45RWrZZ8eRrGNXfgqvb2-oD-l0kxEu_1SN8s34bQgOttgTi7n9R_G5Ep29ydYHtxT6qInaGgN79AdDbdZyLRaq6LhvNxvGI89et5bGn3dBojhF2tLqi5hbOba0XUl90gFoAsXu_IoC6CHlbYOHn6qWpdLU1C8pkb34an4TdqN89zdDSipcDLVOpg1va5M0F1CQZOU001yr0_AB16bJMPvFyTYIywO9_ikQBgl8Jfq-SKJv-1J2O0HU1Gzr90pRIVHLCvCZi6r8_gTfPUlnK3Y5Lv0b0OSnP-i5g84lRPEF9pYXbsbWmqh5HXNYxJigbp7IaetxTW5nNKIc2byq5mss-5UZB_EhJYkgoEWPhMf_TKgcyG8se4OlOyQzBpnXwMro4zjZaFz9UUfKFOSdWOFouSys38FLCYE0viFRMhxXKsRTdDeoY2dm_oWMtU9jJr-ldpxVyTmeSULwS5b4rmkex0E6l9IeV8st-Gkh8dOJP9CtEkE3xtgW1mrtthKwDrrNa9qzF5pRUa-DYpKlnrqKjzUW6TA8qU7653hQbk0rpWwOeOgnm_hTN-FZfnywszdNck4WXcGbSXvWI8sb4OKEnY1SBwOz_x1n6fqW7wFFgzCJHRgjLAAO85ZwfAt1PTy-9fX8rqh7GHsONDKg5V-f3qO-RO0QnkPNSzlt2vpFtwLa-aL3JSCxVxjjM1YMzZfjW1Cq7MQUkONCj0wAT37qRGIOjBV4LW9kHbbFEgqyDfwCRkGJsrsCtvWYmOILACFkLXeiOmEuNbxADYqE---nCmyBDQD371E5PKW1fnIgjLmx3btkLngABlP2fSGryKH1sLm5v0ktf3Cy7dsHOM5X-5t3Zp4qjbe-znHkddxvFKXiJlJo-FMFG12_z0syYpIZ2z_oW06VHFZqYumT0yoRpNdxLrjAqe7psIye7dOjrIVsBxISB3yS1sp7vNL9XI0kUi5Y_ChBGjwGrx2-6V6TUbYqckyam6Z-zH7xEOaQH7k1WiYSR7hYlbZJlX6kiD0sEhXCVN5LENAgMz1AAl96OCwqX0D7w-LiYRIlvgfxRy4KLvZ80RqTxuCvlBvpcBymwHQTwfvZoa3qElLN7XLl-fVsXn2azW_vuSQIz3GPLjS282eIY04Uc9pI_UTSDQ2uBXzGPJiVuUOIFnmAkRakk8ZE0Utl9re0pOWZfNvjzmOZ_6CimgQY_dSCRlCvtkhlj_NEiVqjs0nr5DZpBjEa4bRu5iQHmhvyzvCmvcfS_XSAR86g6GGmZgDuWc77PW2srTYR5BjzteMGGB_dno_02_AtIlqpwdhjE33dUfOtS16uoCs7190cQE_AIeHb2a2G_G5QHmmfv2x4UmvNXGwuj_ixbJaIIOGr8yE7QjXXmPlppKFNEZZj77x0f367S2ME6OCbHMjkzMUaOFifQomD7i1ihgcYkHUWZmlCHYGvtOJbyfTKT7zt75ZOGSoWySHNP0JTQoHlZk46Azc9Utx7qG5SUailu5W_HCd_edAFtiYS_TZNklP7TF9-PSXrgZehwrEICn_9XGXsOkLOJ0MzMZCuh0zxDiO4eBxFrHljyHXYhvJZtsDqVVTMTO0NhRkBV-aVjJU-_L_LXx0oQnakf02UkOGhHRRY5BIdRAToyrsFbfN-OcUCTUgbiQ1cWYFNclKBbAqIokzkssyKYu89mu53czyzGLJu3hG8S9SuWWYXeMQoZr_y0QFk671rxKxdx2e8T0IbgTQt_bHkQPhdX8rkbjZ1dd4gbfEhUfGPvZ2wN7Fz_N8gkVfcfSsj5P85oVU8jwJcWjPKlQ-6sKeQTiVq0icI82CpzqjtxbeXF03Tt4w2HTGLxiTOZc9l_XKdmTuhC9zeKCWd0iayzSEXv5-xxJHpjlVr2sVZoxJPV4BNROZg15oahN4UctJjLof-KQZ-jg4nV6vzj_bE4uX5RTI5c5Fxnl9rgXm_-YyYMg2WB-oDJolkcwiHokvjPfXJqql-plC0mna0-Q0AWwcI1S9PVTvBY5CiPa1M12eo6FQ7d0tOI8Jy-TzIt1yxtI9m4IUVeiZSBKlZwZnC-CP1ME2xoOO4JeFJ7OLT9RF6gq4kLIdpxomSQk5DFSU5dYY2H1x1oVHnNh7u6I12VpLmxQIekmw53M6BAjpldtwdTdVianp050NWgQtUhlN43-fHFYP_5RoLXtj8THUDEmm1SpL8Tb6d8DMf0rOqyvCJ0rtx0MyUtMUVdRoxV1xJoaHG9uEM2B6geCTDdqgQvhy7-12nJmenSzChtsMmMDdzaFD4k_VsI3PCmFDbkcZONhQJd4b7U2chFZNaRX0rU3DvYVVGrQuchSjZaKSbsisKttxVOhXpQ-p0sa2NIMmWm1jtzOL2U8_3nNOgBj5EUqUwXsJXI0juJW0bsLTZZ9OYqTGMjfZTv9QMjfDYsAOkfltz5UtZ5ZJjBIhHsV1dkBwzbnoTEZIGCuHFZ3h-BET-jwoEoDvcNGPp3VepdOTS_3cpUAm4-SiAnbLnjCR9By3kO1VOK6TYoniTGdsbZYbzKNTZ0AGZFbpsQ8jsfiMMpeOow49z9_QE4hOPJ2TQ7o4ji12nrWZ1DkMQkbFIJEUjEUbq0ls5y4tWDocrz5tvKvAHg8odV7CaCnfbdeHDb5eZ5HMOULRzD5YjUH0EWlV4xeihP9wrjK3LAKsTFWs5XJxzcNZhlhc8f4nQyshEebiRkKG8AnyApSSVhK5Iil75N-sty5TMCbItUqUvUQNUAWn0xN1IlSD1dRykmplBuPUPD1uaAR_vgp_DUe3uH28ccr2ff89jnflWbK37Z2M1HI66UFd4RDdCXBmHUcTkSehbymyfNcOMrFCpP3GFnO-T2ymp6OBRnJLZ9SYkoI_n07d3sgsjg_iHDPzlJZ77r3SSzQjal2kJknX4C0BhTxKmdDdJKG50WUhrLkNv08L4EPg7JqTjy5aCy26MNRAe7fzIDawLnPnMiS0LG1Qc6xI0wED4uWHHf1jwerjw_MHamHzV2PIlZ4VitAcaMFSvnkaZtvDB1MqT9xqiVy7Nc7qyyxHjsFqOjhDJXMV_WX4sFyHluSO0AQACA8fKUb2a3ohjNPZAsRjsWGOBbnAWN021cPPvTvKT5-JuKZZ_dJzVsPJcHPdR6jCIz81I4VO6UqQ31f6r9GMa01U1OO7p6zhJsyIJZkAp4bJeTsEEHcPojtKTJRhh88zt7xYlbiL1EkyMZtoRzzhX9C2JAc9H9rwmvtkILXcR3UVjV8dgzML3ccCIqNm99gu-1js9zRoro9P2nx3zZ5qUl69GodqNcVJPI_8v2nXmUcso0ONyOEK_ctbnbUnEFXiNv2ipJobWsMIOuV4nBnwmIQYVNxCnq4GxCzpB00MLw6SO9kvk-RIV1ga8EThRL_-oZhivqCTlHP6znxQHJkao_Te6CyNUT_7lVvhaDRzeGvsy__FiKJd_Dh7uNYh1nYumoOkhblqMFBWRip6S78QXkHa8RPrzXn69bamyHrNv9FVV-ZqlJDe6ROuHQsUWzcKYhmQqXR5Zl1-XwetEmTQv4Tco6_kVnqxC2jNQmNlgJWx-SRAJJZ58DSUSTJfsKeHtXWqlsoBMIVUlaC-DANhvMKC5BNVk_sGbCBPHn5yboZhh",
+            "format": "openai-responses-v1",
+            "id": "rs_0fa12b5ded06de4c016a15a4228d688193bc4e88bc837d4f5e",
+            "index": 0
+          }
+        ]
+      }
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 1110,
+    "completion_tokens": 795,
+    "total_tokens": 1905,
+    "cost": 0.0294,
+    "is_byok": false,
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "cache_write_tokens": 0,
+      "audio_tokens": 0,
+      "video_tokens": 0
+    },
+    "cost_details": {
+      "upstream_inference_cost": 0.0294,
+      "upstream_inference_prompt_cost": 0.00555,
+      "upstream_inference_completions_cost": 0.02385
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 516,
+      "image_tokens": 0,
+      "audio_tokens": 0
+    }
+  }
+}

@@ -1,0 +1,6 @@
+[
+  "Move \"notify customer\" out of the credit-card branch and insert it immediately after the parallel block, before \"send goods\". Result: after both the payment branch and the shipping branch containing \"pack goods\" complete, \"notify customer\" is executed, so every occurrence of \"pack goods\" is eventually followed by \"notify customer\".",
+  "Move \"notify customer\" from the credit-card payment sequence to the shipping sequence immediately after \"pack goods\". The shipping branch becomes: \"provide shipping address\" -> \"pack goods\" -> \"notify customer\". This directly guarantees that \"notify customer\" follows \"pack goods\" in the same branch for all payment types.",
+  "Insert a new \"notify customer\" activity immediately after the parallel block and keep the existing \"notify customer\" in the credit-card branch. This fully satisfies the leads_to requirement because there is always a notification after \"pack goods\", but it may cause duplicate notifications for credit-card payments.",
+  "Insert a new \"notify customer\" activity immediately after \"pack goods\" inside the shipping branch and keep the existing credit-card notification. This satisfies the requirement locally in the shipping branch, but may produce two notifications for credit-card payments; use only if duplicate notifications are acceptable."
+]

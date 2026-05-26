@@ -1,5 +1,17 @@
 [
     {
+        "requirement_id": "R2",
+        "requirement": "condition_eventually_follows (tree, 'not data.evaluation', 'add respondent bank to blacklist')",
+        "assurance": 90,
+        "evidence": [
+            "Activity \"add respondent bank to blacklist\" was found on branch following condition \"not data.evaluation\"",
+            "Found 1 calls that influence condition \"not data.evaluation\". Checking if both are prior to branch",
+            "Activity \"conduct due diligence study\" is before Activity \"add respondent bank to blacklist\"",
+            "Activity \"add respondent bank to blacklist\" does not occur in all exclusive branches",
+            "Found a call \"conduct due diligence study\" that is not prior to the identified branch, so compliance can be violated if said call can cause the condition to evaluate to true"
+        ]
+    },
+    {
         "requirement_id": "R4",
         "requirement": "condition_eventually_follows (tree, 'data.evaluation_extra', 'conduct due diligence study')",
         "assurance": 90,
@@ -7,7 +19,20 @@
             "Branch was found which matches to data.evaluation_extra",
             "Activity \"conduct due diligence study\" was found on branch following condition \"data.evaluation_extra\"",
             "Found 1 calls that influence condition \"data.evaluation_extra\". Checking if both are prior to branch",
+            "Activity \"conduct due diligence study\" is before Activity \"conduct due diligence study\"",
             "Found a call \"conduct due diligence study\" that is not prior to the identified branch, so compliance can be violated if said call can cause the condition to evaluate to true"
+        ]
+    },
+    {
+        "requirement_id": "R5",
+        "requirement": "condition_eventually_follows (tree, 'data.respondent_bank_rating == \"rejected\" ' , 'terminate')",
+        "assurance": 90,
+        "evidence": [
+            "Activity \"terminate\" was found on branch following condition \"data.respondent_bank_rating == \"rejected\" \"",
+            "Found 1 calls that influence condition \"data.respondent_bank_rating == \"rejected\" \". Checking if both are prior to branch",
+            "Activity \"Review Respondent Bank rating\" is before Activity \"handle rejection\"",
+            "Activity \"handle rejection\" does not occur in all exclusive branches",
+            "Found a call \"Review Respondent Bank rating\" that is not prior to the identified branch, so compliance can be violated if said call can cause the condition to evaluate to true"
         ]
     },
     {

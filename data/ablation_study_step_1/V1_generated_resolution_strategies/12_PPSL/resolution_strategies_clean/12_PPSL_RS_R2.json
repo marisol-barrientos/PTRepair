@@ -1,0 +1,8 @@
+{
+  "resolution_strategies": [
+    "Insert a new activity named \"production step\" in the accepted-order sequence, in the first branch of the parallel block, immediately after \"Produce Part 2\" and immediately before \"Test Quality\". This ensures that every occurrence of \"production step\" is eventually followed by \"Test Quality\", while \"Ship\" remains after \"Test Quality\". The context requirement R1 remains satisfied because \"Report Order\" still precedes \"Close Bill\".",
+    "Rename the existing activity \"Produce Part 2\" to \"production step\", leaving it immediately before \"Test Quality\". This satisfies leads_to('production step','Test Quality') without adding a new activity, and \"Ship\" still occurs after \"Test Quality\". This strategy is suitable only if the more specific label \"Produce Part 2\" is not required elsewhere.",
+    "Replace the subsequence \"Produce Part 1; Produce Part 2; Test Quality; Ship\" with \"Produce Part 1; Produce Part 2; production step; Test Quality; Ship\" inside the same sequence branch of the parallel block. This explicitly models completion of production before quality testing and preserves the existing ordering that prevents \"Ship\" from occurring before \"Test Quality\".",
+    "If the violation is caused by the checker interpreting \"Test Quality\" and \"Ship\" as being in different exclusive contexts, restructure the accepted-order branch so that \"production step\", \"Test Quality\", and \"Ship\" are placed in the same linear sequence branch: \"Produce Part 1; Produce Part 2; production step; Test Quality; Ship\". Do not move \"Close Bill\" or \"Report Order\", so R1 remains preserved."
+  ]
+}

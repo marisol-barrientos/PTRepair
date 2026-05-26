@@ -1,0 +1,7 @@
+{
+  "resolution_strategies": [
+    "Insert activity \"clear package status\" with resource \"regulatory authority\" in the held-status branch immediately after \"route package\" and before \"handle package\". The held branch becomes: assess package -> route package -> clear package status -> handle package. This satisfies condition_eventually_follows because the activity occurs when package.status == \"held\", satisfies precedence because \"route package\" occurs before it, and satisfies executed_by by assigning it to the regulatory authority.",
+    "Insert activity \"clear package status\" with resource \"regulatory authority\" in the held-status branch after \"handle package\" and before the exclusive block rejoins at \"update status\". The held branch becomes: assess package -> route package -> handle package -> clear package status. This satisfies the required eventual execution after the held condition and preserves the required precedence because \"route package\" still occurs before \"clear package status\".",
+    "If \"clear package status\" should occur only after all held-package handling is complete, add it as the final activity inside the sequence guarded by condition package.status == \"held\", with resource \"regulatory authority\". Do not place it after the exclusive gateway outside the held branch, because then it would also execute for non-held packages where \"route package\" did not occur, violating the precedence requirement."
+  ]
+}

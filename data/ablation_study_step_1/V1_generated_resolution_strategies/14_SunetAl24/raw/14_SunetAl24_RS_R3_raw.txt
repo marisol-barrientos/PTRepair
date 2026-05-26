@@ -1,0 +1,8 @@
+{
+  "resolution_strategies": [
+    "Minimal local annotation update: add data input/receive annotation data.sim_card_status to the existing activity \"Activate Sim Card\" and add resource annotation \"telephone company\" to the same activity. This directly satisfies both activity_receives('Activate Sim Card','data.sim_card_status') and executed_by('Activate Sim Card','telephone company') without changing the control-flow structure.",
+    "Make the required data explicitly available before activation: annotate \"Send Sim card\" as producing/sending data.sim_card_status, then annotate \"Activate Sim Card\" as receiving/consuming data.sim_card_status, and assign \"Activate Sim Card\" to resource \"telephone company\". This preserves the sequence and clarifies the data dependency between sending and activation.",
+    "Insert a new activity immediately before \"Activate Sim Card\", for example \"Receive Sim card status\", which produces or forwards data.sim_card_status; then annotate \"Activate Sim Card\" as receiving data.sim_card_status and executed by \"telephone company\". The modified fragment becomes: \"Send Sim card\" -> \"Receive Sim card status\" -> \"Activate Sim Card\". This is useful if the status must be obtained from an external system before activation.",
+    "If \"Activate Sim Card\" is currently assigned to another resource in the implementation, replace that resource assignment with \"telephone company\" and add the missing receive annotation data.sim_card_status to \"Activate Sim Card\". This resolves the violation while avoiding duplicate activation activities or unnecessary branching."
+  ]
+}

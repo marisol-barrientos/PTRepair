@@ -1,0 +1,61 @@
+{
+  "id": "gen-1779803139-C7sD9NlcxQLadPiysCju",
+  "object": "chat.completion",
+  "created": 1779803139,
+  "model": "openai/gpt-5.5-20260423",
+  "provider": "OpenAI",
+  "system_fingerprint": null,
+  "service_tier": "default",
+  "choices": [
+    {
+      "index": 0,
+      "logprobs": null,
+      "finish_reason": "stop",
+      "native_finish_reason": "completed",
+      "message": {
+        "role": "assistant",
+        "content": "{\n  \"resolution_strategies\": [\n    \"Insert activity 'notify customer' immediately after 'check credit worthiness' in the sequence under condition loan.amount == \\\"lower equal 1M\\\", before the exclusive split on loan.credit. Keep the existing later 'notify customer' activities unchanged to preserve current approved-loan behavior.\",\n    \"Move the existing 'notify customer' activity from the loan.credit == \\\"good\\\" branch so that it directly follows 'check credit worthiness', before the exclusive split on loan.credit. This satisfies directly_follows but changes the timing of the customer notification in the low-amount approved path.\",\n    \"Insert a new activity such as 'notify customer of credit check result' directly after 'check credit worthiness' and treat it as the required 'notify customer' step, while retaining the existing final 'notify customer' activities after contract sending. This resolves the direct-follow violation with minimal structural change, though it introduces an additional notification.\"\n  ]\n}",
+        "refusal": null,
+        "reasoning": "**Evaluating credit check process**\n\nI'm considering whether to check credit worthiness before notifying the customer in the good credit branch. If I move the check to happen right before the notification, it might lead to inconsistency since the decision depends on the check result. Alternatively, moving the notification up could work, but I'm not sure if that accurately conveys the credit results. I could also think about replacing the nested checks with a more straightforward sequence. It feels like there's a valid approach I haven't quite nailed yet.",
+        "reasoning_details": [
+          {
+            "type": "reasoning.summary",
+            "summary": "**Evaluating credit check process**\n\nI'm considering whether to check credit worthiness before notifying the customer in the good credit branch. If I move the check to happen right before the notification, it might lead to inconsistency since the decision depends on the check result. Alternatively, moving the notification up could work, but I'm not sure if that accurately conveys the credit results. I could also think about replacing the nested checks with a more straightforward sequence. It feels like there's a valid approach I haven't quite nailed yet.",
+            "format": "openai-responses-v1",
+            "index": 0
+          },
+          {
+            "type": "reasoning.encrypted",
+            "data": "gAAAAABqFaQRDwP7PyOiSLZJXRRZzlbbvU3rZgWR0SajbLRPadue5qPI6xLeOL8mJLVeADcapf4BkPZA5AVe3TI7D8MQmtCM9uritk6jJPa_LagnthoTjrZb0_P46EAdtlVcBVRLMSoW4ICx42n8AZS4n9I7sc-aIjbWoC9kVE0q0PUpnw8LCTvc4COUgcrC76jMJwwfjUd-wf5mnCUG1V_1HFJ517Bz6qKY874vr4MyJQ0Fn1_u-gaBB8IhWaH992ofaU-C8tsiHVSXJXtun0dLqgFOjGBYNy1tT6I4FaVH-9U0OJWDzVxVVQq8xhyMA7964hac2Be0KlLDAG9TzFBhII_85NyBxjj8Kp5ltFDo4tErokJdqdpVmBIPl9xhyyNV5LjoDrcWZye2mouXoy57t0QUvNd1PBEUxRynp1KLp813iofk__eegDDdUL38350zNC30WNGiJtOMbq7id0XjMX19QOl23O5yj1i0Gn3L37gDTLSa_wMYVtVQ_xo21o27AxUUSHWSI2B4Xvlg39IuG_Jm8wo9E4ny07vsgQyfzYDTZmQEjCkey_4Xot2jUeBPVVvlBC3bEe1jYl-HqtB43jX4GyGiGak88l2IaqN9hWeAFWntH83eNz0eF9ExXDGu_SvHjX2ne_Vt5ffp05R59zob8bZkVtakXthK4EsJorDyTtAk8vMBi6AZnSfBGPqG6UEYwRctSNfVBZ6c0zzv7PnJVZT4m_5xcxCY0tsdi-mXsNI-ZRxYBfIx6Fzti2zgofAROFfGtWnLG58zcpVbeQaUdYpBj8WvdVBNr1ZhEXlPILxWR6XyZwMhfAAoU7w7LSZnUSEsS9ddr0tlQamhdr_2dF1R8htXXsA7HN23N3VZeCiWDV--XD45Apb2TVY4QkAIF1KrRHrkBbyq5sR9oN2zeTP06g3h5_Fjn_VrfT1cpj9jIhOrs3jDobXIB5UCwUUWvA4RdSfnVsGyN9GGmruprWnSovQDIbsVxiLHPo6y8wZr-NpY4_FwQXX-URc_IfFsIBs7i8O_tfeaQOA7gLKfroZv5MVvhxfSds-6sZY1uWnG9JctFXOqcTnpnmCar8OyXBSxgQqN6pZPxPNoW3XwF-vWjDNXd6XvENXZuc2GCrO-p-Grt2vf0tfSjNuD9CG-ySsBYjud345fYgdeB0oTcxSqWQpRdZvXekNKIXcBXx9mVwLHEus7Gmgmmk4tuGyUvreBUcn5aOIAk__TvZEJENV4vmuC1klQcT_k8G_fpOZDcU6ex2m4OBJ4MHJzdWcgFn2dDDTIkM1cR9ztbEMzdgsE4-IWNU-h1Qpr-LCDyTBTKf-Cpu6Vt14Oge7kLf2wJBhKdqsypu0o2FiKxYEAZ3Na68JRtadpr4sFA2RDeUvRPpm7sthQigARQjptpM1zW50Xqm7I3HG1MipqgU4WKQRTXtx4Jp5IgUTkThilAgEympQtQYZqcxG6G5FYp3L2nd1N8PKCaQQBt8zw_KTBthctElJKsGpZDmBNI2L6ce6lPTtFjQCwTkdCxYQkSl00_SRb82gawJ4MhdWLgzZmFujSXRM7r2O57R2PC-_o9gGuc3gowGknu3C6D4TKYOAoMzEbTSXx1KfT1h3GrdReRVZfqKRGsaE1so8xOHBdHt52ssqGC-15yoY6uYpDU9iwcVb5_5hPO1Im3K5_S8Xcg2dWkkjuDQcXR2YlcATW3izUtsUYq2359MB1rhBcPGaVI6JoHGsjTlVK24tmxYtn_b-2opy9HOR8wfj1s-VkWOq40g2xCwnWEZziZI07ppyesJ6wMZb7qEXMzdyf-ALNRNr1LfGQ9m94c2sPytBQW9iCN7fCebXAGSzZVhpwJDS1ntwdJIaC80ALoWuZt-eeTtlPHbL9OSFE7LWL7CfZu1wIU_Qo6El1e_2-WU986dvm7ilA9cEyl5AY1rUEkcs9AkYdUjQSV4cEf9Q24Xi8v30AM19s5971ZeHojCRC3kzKk-vij3W_ApEH0yqx0IzolDPDtsnxJ70lo-7a9tywSQu2GHgqG_3khTSkm9_hjrVfiudUnbR6IviOyRJ14DYDaJb5BMzbcXkjqTzSpH1L61z8s9FjCYf7bLzdBY7a8dSbM0O3c101jjUMOgqil_wGPx1LZSIEuWsOuxGUTcPfVYZAbxK4ny8Wb5a45oU2JsxRAs6mPSvWZzI8qsmyocggqLZYCzYFzCveaI_0-f-S18xLpaBt9EX_lwp8iKHmaXtOyPDBjKE4YGKmnqAxkuyKicRpix7VkFA0OK_AT_8hraT6dbY_4bqg7Ii8YG98YpHh_sk183Y1SzTmVonRMS5VVrcAq155dAERHKlCehdcNeKPBgk1Br4K9DdM5n2vNRkf7X45IFk8rRUpaVcQc_SPFdIZrGAXFOL70X11BXFq_FM8tWzRh1B3ysEZX9jrMTTger6W8EpFuffYoqJeCJTrig_XCWytAv4oevYNWM5CkOW3gQVaYqHO5daKYFpaB8OElcnoVdgsZk2EphVKpEi5ez1wPU18xuC-91iigMw54zPDnzGWSvnlr6SGIz8D4cU0_eQS_aG97gZQeatJs3MDm6YF7mo7ngynJKjKTmrnyiZGNn63DgCHWmmPk57l-hXEVoGubHKX43TiGwc9yMeJ-QkTLDtr9IqTnQFcTuKQoutM6VsFp_bqUt9OlupjAPiAED80R-ra-Rkl21DBFM205wyyWiTNsEJOlZwIOVYgzdc07xJdygW76GIInTEho8I7J0DitzuO0N_K5Fw66-cA5WbbXafOZHb79jwuz2UW4FDG6f87PMnb5nb-5aztkbzoddth97LDaRieAWgjCB-gVW7YPsyfqB2Mpg7rWhNsOFtFT5VxibUgeJosbhTNr6jqzx4leNcACkpxBSqAogvmt6ZKcaNRIFWdQ8m9MB85OBjqISa2PzX6ldNF3cJVM7enBs5BvO0RrVSmNFu_xg23fWmd0RnkG5mhS-Ndz9xYIH6bXJ0_Z5f9ueppmJBkXvjUh2Kcvv8o-f1x46krxMnXQgJlGQMo3d6gXhI-qA4sB5Ny7ABWSpckWwkB_kGvmp8BZLNOInF3a9t2diTrbG59C2w8YHppCD1jCTpZhcF0YZ3nCxq_swLVl_4QJbLD1o_ZGMSPf1j-EQcIP7QEC-hqnqq8BJgpShjiSpuVAHZM8RhrLLPFY6WB-hoIpLYk6y1NqKvcN2_r4HVIr-Nj4M65q8SqDA7PliUNoXgBNlljOBTyYqtYWasKhrHXTzJGyHSM3k_RWDcrLsEUKmIoIYTnv0goXofsRvlyfGJXfeOGtKpN_qZKY7WSZLrXalbk1z5K8fj7P1a9LhSBe_dBd_DF26Gx0ufNltGTECq5PjNHQsatBXaXGBO5daLlQpbJxKW_pxemK0bLLOVXt32PXInSMiLA-DXMAIOYH2XL-w8x_d4cmvynrAazoR-LnnzMV-7wXz_lcngusoKBhsP8jhAuadNJpn3zTPNQ-QxFRjyr7OypCPA-D2JKZqFP9e7SI2yKBUiZiLXbyfrsaBtXrkODDgJ6jywgC7GQD70EMTeO_J-B70zdkUcTzpv0n4O0ZLspAVFZCWD0MJK4kOcd-H46hlj62hSYQ963W6VHk6mpuD29f0dnD0yhPG4aZpQirP63OE1G37FpYna-3bjtAiLury7XPlOjbGJWUTM1UOjjAlcrTPwQ3X4oEsn7OR8UoelDf7M5I5BWUDAh9wqzNIRgtXXQKqi0B1n-MvtynjOt-iv8xTHweyho37Ra8BYcHK2wTkyoswxqSeda31zB1Acnv0YnYpC5MmHx72YmRTMuVndF3KsCkPJD65n1KrqeXlDlyav1OMOflAejU6wtMJVIVTzabhUDqXHs1deTNJ6UgRlkp6YIBrN2TfYMCqh3aVg49gGjqiT8BwYPP_k3IgyFRsUOcGSFGgRu5lSYsdNXlZlQanzn6r8H3nbPxtnCGwJrVf9SINaLnBuYS7jRhVCpawbDM6bXa2tKXsPBATHEUI0N6d6JK7QBuBbtuvSlqoMEU2hZIXeryTuFEVXmYItrwDEFMnEQBgrxmqjwiDLXSBAPBAqhLk7KfTC-i16wLqhZXPJ-x_k8XgI1yKc5LGwiDI7dI_kTh2Ohbe7A8FjxcJ2_JnuW-kjv3_kZc8biZdhPkBf7KZqkqIpIHf_QWFuTFSo_jfNFTyNTa0EygJm18MvVl3L-a29C6OXriluHgX7EGa3rz4vsUjVcT1-11TBGVnrPNFpjjjSF9BXBLhJNM0Nw3aeIwVerUfz3PdjPC8h732BZvjQdO-b1HlQnQXKawVnh5vhw0JtO6cS5ZWeP2CmJzU7IcwtQJ85u8gXe-WxWz9w7MwQldZYoXU8xkuuDIN7TkSJMqYUizMoVJJTk7oMOOFNfk_P1_ldyDPFh7Qm3X8U618R5cR5uW67Zm1gBFqkUyd-aYGgurSg_arozft0H2upr1bW0rk1VM-bsNnxmaelWzqHQNet8X9yN3vdyLgvClgX9Ywh8bjs9LIJvzjY0FXpdQydokrSoqvzw7nj34jSQkesJGZNzkU59YJbmwJKnizPm2p8DqyBPPM05f6Jv8J3Ckspi5Zzp5v18CK_99thUiSHQe7W-wXZtxwFvBHjHbHbvWLhe8MlhfKcy4_VaVmxFm48-ILPjGrwLe0nB5fahE-xjGwZXd86oFfqnmvJQUCohxliJuGo_Lk8CgMWQROIVRbrtELnqEU_SsLKjX7_1",
+            "format": "openai-responses-v1",
+            "id": "rs_0b0cc9e833b02fe4016a15a4041a348190a7979e322a6739be",
+            "index": 1
+          }
+        ]
+      }
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 1155,
+    "completion_tokens": 718,
+    "total_tokens": 1873,
+    "cost": 0.027315,
+    "is_byok": false,
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "cache_write_tokens": 0,
+      "audio_tokens": 0,
+      "video_tokens": 0
+    },
+    "cost_details": {
+      "upstream_inference_cost": 0.027315,
+      "upstream_inference_prompt_cost": 0.005775,
+      "upstream_inference_completions_cost": 0.02154
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 516,
+      "image_tokens": 0,
+      "audio_tokens": 0
+    }
+  }
+}

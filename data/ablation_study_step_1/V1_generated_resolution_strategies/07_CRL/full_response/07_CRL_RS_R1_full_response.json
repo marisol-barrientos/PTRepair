@@ -1,0 +1,55 @@
+{
+  "id": "gen-1779803423-W2jMmdv25kfZgh7uwJT6",
+  "object": "chat.completion",
+  "created": 1779803423,
+  "model": "openai/gpt-5.5-20260423",
+  "provider": "OpenAI",
+  "system_fingerprint": null,
+  "service_tier": "default",
+  "choices": [
+    {
+      "index": 0,
+      "logprobs": null,
+      "finish_reason": "stop",
+      "native_finish_reason": "completed",
+      "message": {
+        "role": "assistant",
+        "content": "[\n  \"Replace the activity `Check Credit Worthiness (write: credit_worthiness, risk_report)` with a parallel block containing two branches: branch 1 executes `Check Credit Worthiness (write: credit_worthiness, risk_report)`, and branch 2 executes `Send Automated Email`. Keep the parallel block in the same position, after the bank-information-valid branch and before the credit-worthiness decision. This directly satisfies `parallel('send automated email','check credit worthiness')` while preserving the existing precedence of `Evaluate LoanRisk` after both `Check Customer Bank Privilege` and `Check Credit Worthiness`.\",\n  \"Inside the `data.bank_information_valid` branch, after the optional supervisor-assignment exclusive block, insert a parallel block where one branch contains `Check Credit Worthiness (write: credit_worthiness, risk_report)` and the other branch contains `Send Automated Email`, then continue with the existing credit-worthiness exclusive decision and `Evaluate LoanRisk`. This is a localized restructuring of the valid-bank-information path and avoids affecting the suspended-privilege or invalid-bank-information decline paths.\",\n  \"If the automated email should only be sent when credit checking is actually performed, restructure only the valid-bank-information path by replacing `Check Credit Worthiness` with `parallel { Check Credit Worthiness; Send Automated Email }`. Do not add the email activity globally after `Notify Customer`, before `Check Customer Bank Privilege`, or after `Evaluate LoanRisk`, because those placements would not satisfy the required parallel relationship with `Check Credit Worthiness` and could disturb the existing compliance context.\"\n]",
+        "refusal": null,
+        "reasoning": null,
+        "reasoning_details": [
+          {
+            "type": "reasoning.encrypted",
+            "data": "gAAAAABqFaUsLQpn3H-daO-1oXCDisHwsqTTKRNEOHlkjbqBjD-vKvxAvyq5Xzdlrzzxtypl6wyDIf8bZparXP6uC1nvwLJ4xujHxqaqsFkJMrc6pzHyZdWN_k3SxzVqOVkZQ4c4cnJf0L9xUd4Ua4cYsHxvOxoAoxP0rX8c4UKruBmAAsfAQcLdnQxdKtpkgeoOgl2E4eiF-4TtbX-U-KVJWIKXsVJbUlOPfr6CwBmY_IN0k5GDggTMoaH81sI7eg7vbDgCsSrZH0VTBCTsdUIQV7cmhJ79TdHvubrUdoBOaewCMd21PLktarogMiIbTYwIvvXTGEX51D58Q2ZWlAi9Kzh8H4dgylsqa3TKYSMrxYPKCwsxOiO5m965V23glWQzeL_ECbtiSBvSoDA6VVSOO41ew-y3ulVvWNiUrvM4BoY-6hzFt3cJavSox_oT4sxHnp_CdQsYut_01gpCN3-0x7UKnHx3CAcrWG5t_aiPheo6WFvHv4OTcNF09wmCn3VydQQofZEtBJSqWB_X5YBJR72KLvEP8qvFKVdhrsrQoOoeYmmbJbT-InS8Ixaotmz5zkdjKxrPa209NUQkVLrTDOEN-chLu1UEMeRociGD7WDIrTO8B0FeXonTwHon-zMIYJ1deQSYc1GBOrq_WX0D9gCeTtWMVx052PZsl_6EftgrCnYXoWOcbw-xpdqu5azB4X7-RgzeCUNWg8eDLQFZEfkTI8mUn-F9n4QHz_SjeGJOBgmhePWWwaiTZcdsmGEqcMqVqtVSY87ZYGzO7yphRBxILtru2CSBddaSfPEnnJzX7PfFSfpKtbhMZSNX08K7cgSkZerHUqp8WZff6JOaGdvuK5dC4prp2hA6-5ao9ggP747HgL3ocKsLSbnAtAVvk3PfnfvbB6avxAWMgoHJBXLa0hTU3KX409v2ckaa5SmrakheNoUYcTZDkZ07_z6sWc9FgZjvzGdcedCY8_1jesyl2jJRc3d5e-33rSxN6CdBk-B118TJyTe9KoPuz6SCob2RlJW4_8QPCyEZWGUeLE7WplNxu0lmBDNUQVk10rmIPV2X81lALMbJXOS--J41KNNW_ulUelmuecchz1z48cDo10Zq0JNjQpVE_gSnu8VZRl9MjtPRm4zCGRNKGH8JFOEAihpJ4YJcnix1-as2-RcLWIwu9TvCB4YGGH28uqet1soUQGgaA0cHI-psijG6-exlp8BThaPJskcOd4y61w2qjb158qGkleQhoZwd8BNDgawIdvlRbkh-0aPR4_flQ8KEsRrLP1cF7YcD__m9N2wTLTF-8ez1btQs_FE5CHDD2FfAxn8ri2wj7yQhkys0Skth0p9fSrCMyWLpRhArHXyXpLaOdP_KfMtR0XaUAU_WsW1uirdO5AV3XVjjf70wzBafhlXz-CySsS4kmHD1ej0KJXxUTeM2PsrGapr8Io9FxZ94Fw5UPrfMQo8BQxtAMWFuB5CsKf46k0lL6A9e4nwdziK-0-uDvESm84Xad1rGrFTl5W5PCIo1WsGk7lWtuB-ZZxEUlhQAakBFGpS8UY0fJT46s0FZz5lKelSNdXua7epO4YsKRPoeVfg5YTiIvluG2ZjqfSGsQKMR8eMGcgokol28KPIpCrTAGGAQIn5ruieNM9D1kUTWxoCWUbjLYndDU_LBNq5cwpfB7FHmzRSawrw08n4jwEy_HH-3E9etn3Ewk53Cs9NzxCspNBltZ8_82JGVMu2QYr7Xr3nAJA90ITa7ammjwbtMz8Lx5Uc2moOaPnV1qN4L44pLSJ-8EzWXIyZXcBvib60N8tGFJEvJL7o4DPSRKS9G-hg26i5d7wW2wDjhXZLXQMuBHRY4wnu8HAAfim_rVo1sR9NLFTEYwbqDtBgSaFbDjJytJ79u7y4kXpyVfDocOqIUxuDwucVGK2GJrMlrgMuvx1OY0y5NMfa3dcB77jBi4tkQI6aqRzVfzKFeoZibFT-msUUvNoNKBh9loVFi_EW9nK_hD_2YCSltE8M_PMV3HIMiA-ODNONyJsGbcNHJNlibqt_LGWqdpZsdvqf_dSClfdhOBokVjP-h-bWx6gzqYG0sndCOhn59jWAiXIcdEgTKDR43vwWn5b6aq-l5yBi1vysklBqPifAIAbFnFSrQKhiBYbqeUX58rv6mIu0GN_CydN9huarRnHJqaTL-APPp90umj_k1wuPYfwqg_yAQNrX_0JB9aDa4WAl_-evtATQfQTzVRPu7G9KKFbcGCKtiKMOJlQvu8jPR3GeQVl8cxFT9n3vTh6S93aYVekQbSHTKATN1ON9PwLGmCodo-Q2w-wCYRi_Tzn_3Uvlt79AAWXZyNRnHsOtP0U2F58Mzbpm_hoNL_eb20MaOi3RRXgbjUvC-J6fVuu-jzHXxClsUPXmO9ctb5myBx0CYNqLrSEMCLM7Agof81lQ1bc0MA5hRh30li7uZSrTe8eFNQbait9t9ZRqUZ0I4hSE6mygX2rgvYlZgmyit3HwqZ2e6VFN6VkrVWBWa_u9HHG5_ou_d5ZPqb4l7yhFwjqNR_ykF5NzP4VSOTc0HCwEtSt0eUZf26OVasSLKIM5HpDzmw2BDSG2NRpVyjdvMN90RNWKDdVu39JCIST_w0PRxbXR_B_kclhvlhB6LdpNmniqsgcLNuKQDCKqGAY7WImM0QcOfhy-8ApK9Scuq4cRGv45cXY7XC5nmFUaLivLKMKMw6l055d1GA8NbSlS_cerrUFEPPxowspYbfaMUqcFSEGzEs_E3lOpeLKtFEhC-7GcmnQkyNpHXImsVeF7NbS67LgzfLjyR9ECwerhJbANBbGwijUxaS-6JvAeS0XIva80aM-CfQRyHgKQfh5cIyhnqELla31GY6ro-K-XTK7BSSpFsGWsbedVmY7zoetaS6gzgZ2mjUIjv3fFOgVGxjJuL-2jpwL7px9dxtfTr-uDEBmql-ocLJckHsqWuMz6JzM7-XOv9TDuU6hbtjCrOd5opmPkIFNAn6YftDPDGJIpelFpzgvY1uuI7WjPTOUc-nOtq6daine7x_hgz4bVtTaloQXVG7HLrlkSc0JPl0QmvVWd0QiSBgusvJyQdREped_2eyNDUJdLm3zYsF2gTaVzGGPeqNRXWet8wXhEmn9tk0NdS0qWj_gsFV3sFKNzulmGcUVVrW_sNcq24vklVeJJ6KvXpKMFsrnDpW_gAbvyH_VfloN1Y9jKtyJOdJx9t31pLHhyxCjstAYr9ktCboLOxRelx49c2G20lP0xJYA0iNn_n6RAlsgWHQt3gABshVC2pj1F6mzgvoQyCZ6pipKM08-yNOkFWxlHV4mict94purPFddSO3m9QN_NhaSyZaWMaP8edzOwzCB_mKXuBORjLXbuATwTa3cafGXvJztNm5n5pORU4oW_ECmuL3jLXTv_uvwXPdp9rfiVDAEcAEkRq7xPHBwZnXYjae9agJBdy7exfnE2ZC8EaNVE9iPDBo_pl0AVJCRvmR-KVJjc-WT2aL2p2vKmIlYIqRwHxq119m4f0d5KL8OH8041Z0BRWfYsd8B0dWsuSEivi9Dae9O626PM82mNxGr8eEDJORUYHdFwApRQGcs_Mv4-xSDEAgJorazPUoHPOZlfUI9Z_DPTvJuoNP_w-oDnTTNUQMSosjEkf7ZBDH22OS7R9a7tJHoKT087DvXq5VunxOU9jD5rNc9YRkt8CewPhUABR2rje98TosT01UJ2WqXXlUnXGe_jtzgC6ePTFJttJNP5eVG-jQJoX2IbvQaXXmg69zDckFPctsVQKcmooTxfFhE70fqvyy5ccaMlEs-LoAFwnISBl_L2wme05IKItHc5JrJnDjprzK_2nEHp8l46iD5s15pGVDQK9EkNLffuevJyes1QJdllOMR8TnVynGtszCIGlE49tLW_aDETc2L3KSt48qQ0Sk0dZDtxBT-HlfVu4r-Ktconlu5f3XoFm3WGwK3uyErniJIrbO4wt7ZqechuZIqJQWbrou7Q4Xz71VOXQqJZNdyC4ij1uL5wUF7-jX13UC8aQ8vRRhhpJ5nOeCTZvHZiqJ5mDbuNpmEjuoC6Gey_a_BW0y9IFXGAdNCLF99AacvpexC24QyN9477FIVZsfSk9eF68EvnVbluawqTYphmq_9cFfkOFFnWBIHGfvgvYZ6B6A4kNBmHdHib8wfaoO8p1eugCmFMn4eWLgURoeWqYwitfNQtbk21GPOQ-nzt2DmYzxPuo-1PHepZQ785fOjfpZ0jDCkqvpetjMRLhNK05F8lzM_kEfSeBeJJ14199AxjpdQqc8c8F1WptgPh5K0t-4fIf4tcVSRpF3g-LvJlhfZlphv2e8w0Eh6c2ljYY0iDd8wt9wUIMVutqL6oroImf2RiWuEEJUmyTJNiVy73CQYZTF7mab0FoWIgylCUzBa1f8XQq-fY8HM07UyDOaVSuNsqO-bXw3isljmymNnCYD6MZDSSn4fhYQ0HpstCJpEWhcDQY0K08pxlb7_wPECyw2Ni4i0IC116oRaYcTGAuKnQve-wj-ZIlAADrNnv9Oc9ACcqUCM9_PP8jMMxl8V3RM6pGMJU887THiL5uNHfOCbYhCwoXZgbwsbx-Gk-0DpV2a19hgM61g7txBk0jL3fX4w_EcMza4cDmW-uVRnIA2yLdKsLzla39QdMSP3ZWGoMTDzCBhBBDVvtpTG7uq2hqM-HVX7hmkOieeXIHQygupx_0U5-TuuNMaMTn9KDY",
+            "format": "openai-responses-v1",
+            "id": "rs_0b32aec408a49ecd016a15a52074748194b3ad127217e4cab7",
+            "index": 0
+          }
+        ]
+      }
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 1379,
+    "completion_tokens": 846,
+    "total_tokens": 2225,
+    "cost": 0.032275,
+    "is_byok": false,
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "cache_write_tokens": 0,
+      "audio_tokens": 0,
+      "video_tokens": 0
+    },
+    "cost_details": {
+      "upstream_inference_cost": 0.032275,
+      "upstream_inference_prompt_cost": 0.006895,
+      "upstream_inference_completions_cost": 0.02538
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 516,
+      "image_tokens": 0,
+      "audio_tokens": 0
+    }
+  }
+}

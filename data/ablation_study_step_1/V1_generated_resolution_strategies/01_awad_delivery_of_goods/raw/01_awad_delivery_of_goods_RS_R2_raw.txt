@@ -1,0 +1,8 @@
+{
+  "resolution_strategies": [
+    "Move 'pack goods' out of the parallel shipping branch and place it immediately after the parallel block, before 'send goods'. The parallel block then contains the payment choice in one branch and only 'provide shipping address' in the other branch. This ensures that both 'pay by credit card' and 'pay by bank transfer' complete before 'pack goods' is executed.",
+    "Replace the current parallel block with a sequence: first execute the exclusive payment choice, then execute 'provide shipping address', then execute 'pack goods', followed by 'send goods'. This fully satisfies the leads_to requirements because packing always occurs after either payment activity, but it removes the existing parallelism between payment and address collection.",
+    "Keep the parallel block, but move 'pack goods' into the payment branch after the exclusive payment choice, and leave 'provide shipping address' as the other parallel branch. Structurally, the parallel block would contain one branch with the payment alternative followed by 'pack goods', and another branch with 'provide shipping address'. This ensures that 'pack goods' occurs after both possible payment activities while preserving some parallelism.",
+    "Duplicate 'pack goods' inside both payment alternatives: place one 'pack goods' after 'pay by bank transfer' in the bank-transfer branch and one 'pack goods' after 'pay by credit card' in the credit-card branch, then remove the original 'pack goods' from the shipping-address branch. This satisfies the violation locally, although it introduces duplicated packing logic and is therefore less preferable than moving a single 'pack goods' after the parallel block."
+  ]
+}

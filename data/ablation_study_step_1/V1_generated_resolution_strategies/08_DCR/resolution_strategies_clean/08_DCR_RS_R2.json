@@ -1,0 +1,8 @@
+{
+  "resolution_strategies": [
+    "Insert a new activity named \"diagnosis\" immediately after \"verify symptoms\" and before the following exclusive choice inside the loop. This is the minimal localized fix: every execution of \"verify symptoms\" is then followed by \"diagnosis\", while \"consult\" still precedes \"verify symptoms\" and no \"prescribe medicine\" activity is introduced.",
+    "Insert a new activity named \"diagnosis\" as the first activity in the sequence guarded by condition \"data.throat\", before the nested exclusive choice, and insert another new activity named \"diagnosis\" in the sequence guarded by condition \"not (data.throat)\". This ensures that all alternatives after \"verify symptoms\" eventually execute \"diagnosis\" while preserving the existing branching structure.",
+    "Normalize the existing disease-specific diagnosis activities by replacing \"diagnosis: cold\" with \"diagnosis\" and \"diagnosis: strep throat\" with \"diagnosis\", then add a new \"diagnosis\" activity to the currently diagnosis-free paths: the \"not (data.fever)\" branch and the \"not (data.throat)\" branch. This preserves the intent of performing diagnosis in each clinical path, but requires more edits than inserting one common diagnosis activity.",
+    "If the labels \"diagnosis: cold\" and \"diagnosis: strep throat\" are intended to be specializations of the activity \"diagnosis\", update the process model or activity taxonomy so that both are recognized as instances of \"diagnosis\", and add explicit \"diagnosis\" behavior only to the missing paths \"not (data.fever)\" and \"not (data.throat)\". This partially preserves the existing model semantics while making the leads_to requirement enforceable on all paths."
+  ]
+}

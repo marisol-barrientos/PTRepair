@@ -1,0 +1,8 @@
+{
+  "resolution_strategies": [
+    "Rename the existing activity \"activate screen lock\" to \"activate screeen lock\" in its current position inside the parallel block. This is the most localized structural change and satisfies exists('activate screeen lock') without affecting the authentication decision logic, so R1 remains satisfied.",
+    "Replace the existing parallel child activity \"activate screen lock\" with a sequence containing \"activate screen lock\" followed by \"activate screeen lock\". This preserves the original correctly named activity while adding the required activity label; R1 remains unaffected because the change occurs before access authentication and does not introduce any path from not data.authenticated to \"Unlock screen\".",
+    "Replace the existing parallel child activity \"activate screen lock\" with a sequence containing \"activate screeen lock\" followed by \"activate screen lock\". This satisfies the missing existence requirement while keeping the original lock activation behavior, although it may introduce redundant lock-related execution. R1 remains satisfied.",
+    "Add \"activate screeen lock\" as an additional child of the existing parallel block alongside \"wait for user input\", the timeout sequence, and \"activate screen lock\". This minimally adds the required activity without changing the later authentication-exclusive choice; however, it increases parallel complexity and may execute the misspelled activity concurrently with the existing lock activation. R1 remains satisfied."
+  ]
+}

@@ -1,5 +1,13 @@
 [
     {
+        "requirement_id": "R1",
+        "requirement": "max_time_between (tree, 'Start Activity', 'End Activity', 2592000 )",
+        "assurance": 100,
+        "evidence": [
+            "No timeout was found to enforce the max time between requirement"
+        ]
+    },
+    {
         "requirement_id": "R2",
         "requirement": "exists (tree, 'verify user data') and executed_by (tree, 'verify user data', 'telephone company')",
         "assurance": 100,

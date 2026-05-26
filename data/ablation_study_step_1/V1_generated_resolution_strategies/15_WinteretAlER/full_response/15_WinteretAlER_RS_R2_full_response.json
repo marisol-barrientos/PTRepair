@@ -1,0 +1,55 @@
+{
+  "id": "gen-1779804083-XI9yasIS1bWxiB1O5bep",
+  "object": "chat.completion",
+  "created": 1779804083,
+  "model": "openai/gpt-5.5-20260423",
+  "provider": "OpenAI",
+  "system_fingerprint": null,
+  "service_tier": "default",
+  "choices": [
+    {
+      "index": 0,
+      "logprobs": null,
+      "finish_reason": "stop",
+      "native_finish_reason": "completed",
+      "message": {
+        "role": "assistant",
+        "content": "{\n  \"resolution_strategies\": [\n    \"Rename the existing activity \\\"activate screen lock\\\" to \\\"activate screeen lock\\\" in its current position inside the parallel block. This is the most localized structural change and satisfies exists('activate screeen lock') without affecting the authentication decision logic, so R1 remains satisfied.\",\n    \"Replace the existing parallel child activity \\\"activate screen lock\\\" with a sequence containing \\\"activate screen lock\\\" followed by \\\"activate screeen lock\\\". This preserves the original correctly named activity while adding the required activity label; R1 remains unaffected because the change occurs before access authentication and does not introduce any path from not data.authenticated to \\\"Unlock screen\\\".\",\n    \"Replace the existing parallel child activity \\\"activate screen lock\\\" with a sequence containing \\\"activate screeen lock\\\" followed by \\\"activate screen lock\\\". This satisfies the missing existence requirement while keeping the original lock activation behavior, although it may introduce redundant lock-related execution. R1 remains satisfied.\",\n    \"Add \\\"activate screeen lock\\\" as an additional child of the existing parallel block alongside \\\"wait for user input\\\", the timeout sequence, and \\\"activate screen lock\\\". This minimally adds the required activity without changing the later authentication-exclusive choice; however, it increases parallel complexity and may execute the misspelled activity concurrently with the existing lock activation. R1 remains satisfied.\"\n  ]\n}",
+        "refusal": null,
+        "reasoning": null,
+        "reasoning_details": [
+          {
+            "type": "reasoning.encrypted",
+            "data": "gAAAAABqFafAjwX6x2FPYli9OgtW4LRsl9lWWz_2dhfbUifeaK6FjyZI2dFkNqc-ZN2Ph28G4VkEMRHDBTT9RICnj6Y3xpK6qFcKhBZdr3hZRVNY0SfIP44uhqAYzWblWH51i3_hcOAYucGppiDlx9APiuBxuEnFUC8A3lkvgFD5KFKq8y4WZDI74yYFKDspqsM1-CJWKsnH_U2tIq5VJEtF06jvQiXr9vGaHRE8znkl-Ckn7e3mrNoz3vOATVGUZY05uUqzlcAllW6a51ZzvB_oV_I0qtYmAbFRZzn-JJGf7I-My1GRzAnrmJ5RheZfu88BKFculy-6Ir7Xba-f2wf0ui6AHBrYecHp1xtWRPo5c7FVqJoSlJcXYTgj9E93iKOQGemR5sO1g-NMuwCzguLAC0RXrvTahveiRzxORSsn2XQzbgKbwWQXznfnizLd4ECdG_AA2187OR8A4-HvlYczGhp7v-K5kWJdx-myARB6P9l5RKXJa2WwrZ-o_ktBcuLY85FvDLaSVNvmcKma-OhJkk0uo1MGkJlaTJuBrPrxOmVF8Bguj4qjnzKrPNh8J0hJ-GaBBGLYmqu53rAyRiGCNJspOLT1BxIFiGJx2DAOG0cS2Yp31f6NrBebJBEHVAAD8rbvZfNYAw_4pb3LXy8ued8OqSW6YZzJHwTImraBkBTdXL7uDSkH0DXPI6s-Kmd8iya5-T1HBM3ePu4Nkf-Z4aMO9OHR_gZdJdM6fVR7lIQ75kdYhhlGz5Q8bLmb27s__BlP9l_ylzn4b5jAiV0lSbEbkg0FiUusO1eOaO8m3XuF0GPcgYQV3QEODGUBID28oxipQBAjWG0c49Xaf8hV4Y-iE-USxSEOIIeq4pqHaTQdp0ZHq1XaWNvgpgP6LzZgWaYwdJpGcguKyt2qdsQH2Q1LeCAimY4o0EMCZOf2Kkl-5tLPMlwsmq2wqfrJ3FGwST59QfbOB03ikqJk91WNVkRbZVtgIaw6esQEEuXIooFuNnJ8oM_hJyI212btU45bnOXTUrzh4Z7seLbzNhp2sMKrkrliZhxymYOp2Cv04qU-5THymWVM96lftKxwGWQFez7HEZAVUaejmbYmP2MbTpDu4LGIHFJqaMMHI14FNJpysDKxVuZi8oJOJQOCab8XjxcYo4KSYssjoqPhQiwQuvlsUUluiV4cAAjF1u1nVadUYNn2jS80eoPZ-FSMMJXzBodiw_j9ZnZwrhY-U2j_7OZowMUrHVSqQVbQbyar-uFDKfnkhhkcSykjZOaA7L-YT5mlvUe_c23iU56yx1LcVnUG3qW_Yutcd477eKzHFgiVxzsv9BQxz8KHleJQhKv8n4Ef6VmgNFWGib-CQsLFvj-Kgkk7Al5WPDd1O-hTbbQCIchyBQLFvvmuaAO6HY1UWa9OLTTP07TasUabfGWmVZ9raMoYJnbb_L62lF3xokp45pL8eB7Cjq87c3vmSp-D6RfljzbOiB6MaEMNzX_oSPIcZtKu6YQmBK5oGjKkwN-IpxcX1QMX3vImShcc-5xKyQ1yIMtD0MCj7vOhXflRMg3dZgOg6hWuAAjeeoNq1aD-G94-bZwochM3lqWz6PY8HLoiQ3LY5Xd6hjFupmTbNenVphqAOJluEvHsrKb5pDKGuIm7HmUoCDGRENxWvST2bpgx5SF51nqu4vRaLsg1444EVgHIJYuSPL9pLZEZOBlN3XfWXdxGjRHH_KEfPKSmL9J9VgIaCbkL0buCvI4ZmOIl7IpCrrAzMFm364SCfKIJA25IyNfvOyfKtLUo1qU-1KeolyuaodgXgG8sUzU_Na2ys_mav5umusBkCWAxvvwb_CvwgDFpNW70Caz8CeaYSIxCQCEWmZ5NnT9iL4iTwX2rozJpn-a2cs-MGp9b7B-jVPJ_UozucW4EbuSQwX52mmR0X3JFd5lJcHBnw-ex_frriaQFw6idbD7xjnVfNFP7Ls3LNqF6oHT7URcGf0zlYzR_kVX452aMVpathdMUquJ6gZPcaNdwvJ8Xkd8GgmWtGp5y10YQysf8Q5qMFmF0T3vCMnsxYrsvcOmTBBh-AWpj9wE6MbnvIBGC5U1eltj1mC68pc6wolxHAiSEnu93jM7w4pV3Lr6D2bF96TB-GWQB6p0Y-Xyd60KNXTxhJpPSUOlUKfrwCVJdGMqSIrSaxaVyrJ2df4BGgqXAXosaMLjVzzecj7Zv807eXMcD82n1MBe51gbIFCiID2It6wMWVa1sQUXettnPvwhvzn6pkhENHcT7rE6l9ADuLch_skPxJx4WeQABUjvypRFjSWvdqxgegfLxw2s-C1pCtDiJvXXCDxWdb4O46iotJXQeQ7LIuVyLx_1mkp9KEyCDObnvsvkbMUHZqmlIKd4G4bOB5sMKdAadhXJTtBZArRe60850g2R0jBrOqXThg-Kfp4ol5pUWiTjqL6wg2Gdh4IP8rl9V_3EodoCgEgUwDTghbtjGo5MLVctXPGCS5W7vxJdLeXsEOMt62qa_80CWURtJ2C6ZZspsYi7nG92zrxzo7pDTrO0G_83BxafY4I01b04ls81oOLFq9crkY1xTHvvMIcJkSo8R-GvZEBIWsX0sjvVymhE93-X70zFcWu04wjfdqHYWIn2KLJ1V4LX6FZ9-CRQLKHT7z6_Raqq2Le978MjUMde1iIdQLKXsIDyE1vvKYIq3NwHgpj3e3toZ1yDMbokIRz5qrRtyxWBzXGypNkepAU8ZUBnDMOWNR7-3AE0mNHR4gOy9Wcp8RkB2eSKCIrLHYV9c1dLln69VOMwVY82Dh3eSk9m7JZ8TvolGeeoUR__jS62hvI0UAHUZ8PSQXgsvDWJQcdjb8hi4ZR5EQ-gE2rRPgQxCrvly7WVkVDCp24Q47W2q8wA-H283VPJi7kaoD5lHd-IyDddtULtJSp7NXypYC66MrfZnN0PqyvC756Z4Fk9src69TaZ1NfLrSw2PkJxckSu3MEXn8yfJTaRQ5IQVwksLnO2hNs7dCcOE_GcqfCq11_IwpFbM-2sYH9MFYssFNba7JVxLUW-7IqRsjvk146yIdAu5Z9yCEWi4JMNxJxwkaNHyHqklbqArRNEm7qOz2IJsrd2omnwmcYEbfG1-k6pdAaUhhPfA2ps7scTb2r0D-_FJF1mTrCaX36Fro8lTujyRV8wuCnGxeXpiJTXv2dkFzsd5BEas6KRhmPja38chXei2176ij5vxo9WCqlZ1Ll0sst-arutGOE1gYoEvy2Kvr5NdsAH-Ifxp8o-jEecdLh4wMeNQgbP0FV3biEmI8Ir2g3OGhz7i8tdPinE3cIxIotCYUQiADAfhcTekthiu6W9qDgAS0QHxodWCv6QXkcNmffLejsrNBbFpBc4QtgTD3zIx3XfmC_h_xLpSlgqblGUFvqnc8_hbliXmp7fg0ia50N-0A9OXWpkOUAbNgcvs4r2EFJbOKSBdLFweGXZHqxDj8n2jcLGesDJbpkpr53NrvzmQbhC1gNhAWBN05Qco8y4zTuaX4WcQZdGKdokpNHkmsI7wcrHd9T0CJYCHp5Yf6QJP7w7KUfzN8YA4gZrTvN_61WahEHisJ_whJZVaPN57gjLR-N6UOlnW2jO8bjx1xc6JzfSGlOJEMNOksCkL2cvlT-4kgLK1cPv_kO3fCS1u_pktdSbDUdz9ZFSPuaUWftPKdSqlGqZyzHFAUjfJlSBBwuW729Xj-3v6bVVqNHzaUPkyRPF-1WuGyNksni7r-6DS20e7Goiy1_Rg3ZDbt9i66Gqdd69ryufaUM8ObNlqsk5nXdJD8J-rS8Yev-eAkUvOJl7xUcL4ufVRBngUw354Mm9J6EBlEcbq8dCPGRu9KRmmHXWXjxi2n_4GuIIIogVlPMkV-MJjfGwHiTaeGl-tTFv-16ntr6x3Ro_-qq4Cn8qhm70oeuInzhkgbyn2dXGajL7sZPQivUCeoS9-s3hkzaPdwfdCZcKOVzr29eYl51jHV8ZkC5egl29oEYxmX0vSm8U5QYKpwTKjBOhXH2ccOnch0ct1T28Zj4mbLY78BrQdyrG8nnZHY_Jv6sQMJ2dfS4LSgFgWe_fJuoPy0w1giOghPx-bx0WkDznVkGYHxIXXTL1kd_cVbeSQXjcsyAD1kAjiYTyNIdkvukl_muU443OwBImXMK1pTjiYAu9rwhQ9SXNx5TlC5jEVXXxYMNxTSA43xa9AGC9eCfuOl1io-L-fD2fsfj9G4PCHhUNE6oHuVyc9avAG4doyL96HUht0txnpyHqvNXSINoayEliW5ifxWBqrBfKGirfGNbRz04WBQLRNvysm60omhGADAdFW1qaTvRELMJ-RfPPt6ao4XacIxu-TbfoLE_J9gS9Iz8QoFnnhxKDQ3aARdMEMl9-_sq50m_3aeK5EvQDQiEqmTdyXrBMuwosoBZg-MxFspBtMIbqFMdz86w6yChgQQfq5PUSUmH5fJuYZVvorzaasQR6oZ0Duns0TwmXrrdjX7gAYC-AHk1ACf9yCEP0JrE8sb5FMdaZuZVMluTbnZnzt3NxI9MlTUAK9N1n7q_ed8GNO9kK_ViqWuBNu6kSax49h_y4C7hYm0H24u58=",
+            "format": "openai-responses-v1",
+            "id": "rs_0ae66a790b9b0081016a15a7b4291881979d6889225c702f5b",
+            "index": 0
+          }
+        ]
+      }
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 997,
+    "completion_tokens": 798,
+    "total_tokens": 1795,
+    "cost": 0.028925,
+    "is_byok": false,
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "cache_write_tokens": 0,
+      "audio_tokens": 0,
+      "video_tokens": 0
+    },
+    "cost_details": {
+      "upstream_inference_cost": 0.028925,
+      "upstream_inference_prompt_cost": 0.004985,
+      "upstream_inference_completions_cost": 0.02394
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 516,
+      "image_tokens": 0,
+      "audio_tokens": 0
+    }
+  }
+}

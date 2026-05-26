@@ -34,5 +34,23 @@
             "Activity \"officially sign loan contract\" existence was checked but not found",
             "Activity \"officially sign loan contract\" is missing in the process"
         ]
+    },
+    {
+        "requirement_id": "R5",
+        "requirement": "max_time_between (tree, 'officially sign loan contract', 'perform loan settlement', 604800)",
+        "assurance": 100,
+        "evidence": [
+            "Activity \"officially sign loan contract\" existence was checked but not found",
+            "Activity \"officially sign loan contract\" is missing in the process"
+        ]
+    },
+    {
+        "requirement_id": "R6",
+        "requirement": "condition_eventually_follows (tree, 'data.loan_amount > 1000000', 'assign post processing to supervisor')",
+        "assurance": 100,
+        "evidence": [
+            "Activity \"assign post processing to supervisor\" existence was checked but not found",
+            "While branch following condition \"data.loan_amount > 1000000\" was found, the Activity \"assign post processing to supervisor\" was not found on the branch"
+        ]
     }
 ]

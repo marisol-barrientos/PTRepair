@@ -1,0 +1,4 @@
+[
+  "Full compliance, minimal local change: In the high-risk loan branch sequence `delegate to supervisor -> judge high risk loan -> exclusive(...)`, add Resource = \"branch office manager\" to activity `judge high risk loan`, and insert a new activity `take final decision` immediately after `judge high risk loan` and immediately before the following exclusive decision on `loan.status == \"approved\"`.",
+  "Full compliance, structured replacement: Replace the activity node `judge high risk loan` in the high-risk loan branch with a sequence containing `judge high risk loan` annotated with Resource = \"branch office manager\" followed directly by a new activity `take final decision`. Keep the existing following exclusive approval decision unchanged after this new sequence."
+]
