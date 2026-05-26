@@ -1,0 +1,16 @@
+{
+  "model": "openai/gpt-5.5",
+  "scenario_name": "14_SunetAl24",
+  "requirement_id": "R3",
+  "output_prefix": "14_SunetAl24_RS_R3",
+  "execution_time_milliseconds": 27444.83,
+  "execution_time_seconds": 27.44,
+  "resolution_context_requirements": 0,
+  "problems_detected": [],
+  "usage": {
+    "prompt_tokens": 2308,
+    "completion_tokens": 1477,
+    "total_tokens": 3785,
+    "reasoning_tokens": null
+  }
+}

@@ -1,0 +1,141 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_sequentialize_parallel_branches",
+      "change_operations": [
+        {
+          "operation": "sequentialize_parallel",
+          "parameters": {
+            "first_activity_label": "retrieve data",
+            "second_activity_label": "check application"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The top-level parallel branches are transformed into a sequence where the branch containing 'retrieve data', 'assess loan risk', 'check medical history', and 'predict risk' executes before the branch containing 'check application' and the XOR branch with 'ask for updates'. Therefore, 'check medical history' always precedes 'ask for updates' whenever 'ask for updates' occurs."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No additional resolution context requirements are specified. This strategy preserves all existing activities and branch conditions, so it avoids removing or renaming behavior."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one process change operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The strategy removes top-level concurrency between two major process branches. Although the process remains structurally sound, the behavioral change is broad because activities that previously ran in parallel are now ordered sequentially."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The repaired ordering concerns activities located across the upper and middle parts of the process. The structural change is applied at the top-level parallel block, but its compliance effect is mainly on the ordering between the middle loan-risk branch and the update request branch."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_move_check_medical_history_before_ask_for_updates",
+      "change_operations": [
+        {
+          "operation": "move_before",
+          "parameters": {
+            "source_activity_label": "check medical history",
+            "target_activity_label": "ask for updates"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Moving 'check medical history' directly before 'ask for updates' ensures that the required precedence relation is satisfied whenever 'ask for updates' is executed."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "No explicit context requirements are violated. However, the medical-history check is removed from its original position inside the loan-risk assessment branch, which may weaken the original risk-assessment semantics."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one move operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The change is localized to the two activities involved in the violation, but it moves an activity across structured blocks, from a nested parallel risk-checking fragment into an XOR branch. This may reduce the clarity of the original process structure."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The source activity is in the middle loan-risk portion of the process, while the target activity is in the earlier update-handling branch. The effective repair spans both locations."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_move_ask_for_updates_after_check_medical_history",
+      "change_operations": [
+        {
+          "operation": "move_after",
+          "parameters": {
+            "source_activity_label": "ask for updates",
+            "target_activity_label": "check medical history"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "substantial",
+          "reason": "The moved 'ask for updates' activity would occur after 'check medical history', satisfying the ordering between the two activities. However, because 'ask for updates' is originally guarded by the XOR condition 'not (data.conflicts == \"true\")', moving it out of that conditional context may make it execute in cases where it should not, so the repair is behaviorally risky."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "There are no explicit context requirements to preserve, but the original conditional behavior of 'ask for updates' may be lost or weakened."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one move operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "high",
+          "reason": "The strategy moves an activity out of an exclusive branch and into another parallel branch, potentially leaving the XOR structure semantically imbalanced and changing when the update request occurs."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The repair crosses from the earlier XOR branch into the middle risk-assessment branch containing 'check medical history'."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_delete_ask_for_updates",
+      "change_operations": [
+        {
+          "operation": "delete",
+          "parameters": {
+            "target_activity_label": "ask for updates"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "partial",
+          "reason": "Deleting 'ask for updates' removes the activity involved in the violation, so the specific conflicting precedence relation no longer occurs. However, this is only a partial or vacuous repair because the intended compliant ordering is not established; instead, the target activity is removed."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "No explicit context requirements are violated, but removing 'ask for updates' may eliminate necessary business behavior in the non-conflict branch."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one deletion is required."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The process remains structurally simple, but the XOR branch containing 'ask for updates' may become empty or semantically incomplete."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The deleted activity is located in the early application-checking and update-handling part of the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_sequentialize_parallel_branches",
+  "best_resolution_reason": "RS1 is recommended because it fully restores the required precedence relation while preserving all existing activities, branch conditions, and business semantics as much as possible. Although it reduces concurrency by sequentializing the top-level parallel branches, it avoids deleting, renaming, or relocating individual activities across conditional contexts. Given the available change operations, this is the most robust compliance-preserving repair."
+}

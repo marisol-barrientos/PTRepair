@@ -1,0 +1,131 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_replace_generic_non_accepted_with_rejected",
+      "change_operations": [
+        {
+          "operation": "remove_branch_by_condition",
+          "parameters": {
+            "target_condition": "not (data.status == \"accepted\")"
+          }
+        },
+        {
+          "operation": "add_xor_branch",
+          "parameters": {
+            "existing_branch_condition": "data.status == \"accepted\"",
+            "new_branch_condition": "data.status == \"rejected\"",
+            "new_activity_label": "terminate"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The process obtains an explicit XOR branch with condition data.status == \"rejected\" directly followed by terminate, satisfying R1."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The accepted-status branch and all translation and alignment behavior remain unchanged, so R2, R3, R4, and R5 are not affected."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only the existing generic non-accepted branch is removed and replaced by a specific rejected branch."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The XOR structure remains simple and mutually exclusive, but behavior for non-accepted statuses other than rejected is no longer explicitly handled."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The change is applied at the top-level status decision shortly after receive job and process job."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_split_non_accepted_into_rejected_and_other",
+      "change_operations": [
+        {
+          "operation": "remove_branch_by_condition",
+          "parameters": {
+            "target_condition": "not (data.status == \"accepted\")"
+          }
+        },
+        {
+          "operation": "add_xor_branch",
+          "parameters": {
+            "existing_branch_condition": "data.status == \"accepted\"",
+            "new_branch_condition": "data.status == \"rejected\"",
+            "new_activity_label": "terminate"
+          }
+        },
+        {
+          "operation": "add_xor_branch",
+          "parameters": {
+            "existing_branch_condition": "data.status == \"rejected\"",
+            "new_branch_condition": "not ((data.status == \"accepted\") or (data.status == \"rejected\"))",
+            "new_activity_label": "terminate"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The repaired tree contains an explicit branch where data.status == \"rejected\" directly leads to terminate."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The accepted branch is preserved exactly, including manual and automatic translation, alignment, and translation-memory updates. Existing context requirements remain unaffected."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "The strategy requires three localized operations: removing the generic fallback branch and replacing it with two explicit branches."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The resulting XOR remains well-structured and mutually exclusive. It also preserves the previous behavior for statuses that are neither accepted nor rejected."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "All changes are localized to the top-level status decision near the beginning of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_add_rejected_branch_without_removing_fallback",
+      "change_operations": [
+        {
+          "operation": "add_xor_branch",
+          "parameters": {
+            "existing_branch_condition": "not (data.status == \"accepted\")",
+            "new_branch_condition": "data.status == \"rejected\"",
+            "new_activity_label": "terminate"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "substantial",
+          "reason": "An explicit data.status == \"rejected\" branch followed by terminate is introduced. However, the existing not accepted branch still overlaps with the rejected condition."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The accepted branch and the existing translation and alignment behavior are unchanged, so the listed context requirements are preserved."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one branch is added and no existing activities or conditions are modified."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The XOR gains overlapping conditions because data.status == \"rejected\" also satisfies not (data.status == \"accepted\"). Although both branches terminate, the structure becomes less clean."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The change occurs at the top-level status-based XOR immediately after the initial job-processing activities."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS2_split_non_accepted_into_rejected_and_other",
+  "best_resolution_reason": "RS2 is recommended because it fully restores compliance with R1 while preserving the previous behavior of the generic non-accepted path. It avoids overlapping XOR conditions, keeps the accepted branch untouched, and maintains consistency with the existing resolution context requirements."
+}

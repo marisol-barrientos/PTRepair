@@ -1,0 +1,198 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_add_required_outputs_and_align_analyse_resource",
+      "change_operations": [
+        {
+          "operation": "add_write",
+          "parameters": {
+            "target_activity_label": "Create resolution proposal",
+            "added_statement": "resolution_proposal"
+          }
+        },
+        {
+          "operation": "add_write",
+          "parameters": {
+            "target_activity_label": "Generate consultative report",
+            "added_statement": "report_cb"
+          }
+        },
+        {
+          "operation": "add_write",
+          "parameters": {
+            "target_activity_label": "generate legal report",
+            "added_statement": "report_ld"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "Analyse reports",
+            "new_resource": "Tech.MD Position"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The strategy restores all violated parts of R2: the required data objects are produced by the three relevant activities, and Analyse reports is assigned to the same resource as Create resolution proposal. The existing ordering between Create resolution proposal and Analyse reports is preserved."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No additional resolution context requirements were provided. The strategy is localized to the activities directly involved in the violation and does not alter control-flow behavior."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The strategy requires four simple attribute-level changes: three write additions and one resource modification. No structural reorganization is needed."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The process structure, branching, parallelism, and execution order remain unchanged. Only data outputs and one resource assignment are modified."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The changes affect the early-to-middle part of the process: proposal creation, parallel report generation, and report analysis."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_add_required_outputs_and_align_proposal_resource",
+      "change_operations": [
+        {
+          "operation": "add_write",
+          "parameters": {
+            "target_activity_label": "Create resolution proposal",
+            "added_statement": "resolution_proposal"
+          }
+        },
+        {
+          "operation": "add_write",
+          "parameters": {
+            "target_activity_label": "Generate consultative report",
+            "added_statement": "report_cb"
+          }
+        },
+        {
+          "operation": "add_write",
+          "parameters": {
+            "target_activity_label": "generate legal report",
+            "added_statement": "report_ld"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "Create resolution proposal",
+            "new_resource": "Tech. MD Position"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The strategy adds all missing required data objects and makes Create resolution proposal and Analyse reports have the same resource by changing the resource of Create resolution proposal to Tech. MD Position."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No resolution context requirements are listed. The strategy preserves the existing control-flow structure and only changes data production and one resource assignment."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The required repair consists of three write additions and one resource modification, all of which are simple local operations."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "No structural changes are introduced. The sequence, parallel block, XOR block, and termination remain unchanged."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The resource change is applied to the first activity, and the write additions affect the proposal and report-generation portion of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_add_required_outputs_only",
+      "change_operations": [
+        {
+          "operation": "add_write",
+          "parameters": {
+            "target_activity_label": "Create resolution proposal",
+            "added_statement": "resolution_proposal"
+          }
+        },
+        {
+          "operation": "add_write",
+          "parameters": {
+            "target_activity_label": "Generate consultative report",
+            "added_statement": "report_cb"
+          }
+        },
+        {
+          "operation": "add_write",
+          "parameters": {
+            "target_activity_label": "generate legal report",
+            "added_statement": "report_ld"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "partial",
+          "reason": "This strategy resolves the missing data-object outputs but does not resolve the resource mismatch between Create resolution proposal and Analyse reports. Therefore, R2 remains only partially satisfied."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy only adds expected data outputs to the activities that are already responsible for producing the corresponding artifacts. It does not alter resources or control flow."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only three write additions are required, with no resource or structural changes."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The process structure is completely preserved."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The affected activities are located in the initial proposal and report-generation part of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_align_resources_only",
+      "change_operations": [
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "Analyse reports",
+            "new_resource": "Tech.MD Position"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "partial",
+          "reason": "This strategy resolves the resource-equality part of R2 by assigning Analyse reports to the same resource as Create resolution proposal. However, the required data objects resolution_proposal, report_cb, and report_ld are still missing."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No context requirements are provided, and the change is limited to a single resource assignment on an activity directly involved in the violation."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one resource modification is required."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The process structure and data flow are otherwise unchanged."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The only changed activity, Analyse reports, appears after the parallel report-generation block in the middle of the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_add_required_outputs_and_align_analyse_resource",
+  "best_resolution_reason": "RS1 is recommended because it fully restores compliance with R2 while preserving the existing control-flow structure. It directly repairs the missing data outputs and resolves the resource mismatch by changing Analyse reports to the resource already used by Create resolution proposal, which is a localized and low-cost correction."
+}

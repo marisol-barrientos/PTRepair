@@ -1,0 +1,119 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_rename_wait_for_user_input",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "wait for user input",
+            "new_activity_label": "user input"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The violation is caused by a label mismatch: the process contains \"wait for user input\" while the requirement expects an activity labeled exactly \"user input\". Renaming the activity makes the required activity exist and preserves the existing timed-alternative structure with \"automatic screen lock\" after timeout 60."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The change is limited to the initial screen-lock alternative and does not affect authentication conditions or the path to \"Unlock screen\". Requirement R1 remains satisfied."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one activity label is changed. No control-flow, resource, data, or condition changes are required."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The process structure is unchanged. The existing parallel timeout pattern is preserved."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The changed activity is located in the initial parallel block before access is requested."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_insert_user_input_after_existing_wait",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "wait for user input",
+            "new_activity_label": "user input"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "substantial",
+          "reason": "This introduces the missing activity label \"user input\" in the same alternative branch as the existing user-input wait. It is likely to satisfy the existence part and may satisfy the timed-alternative relation depending on whether the checker accepts the inserted activity inside the alternative branch. However, it leaves the original \"wait for user input\" activity in place, which may make the branch semantically redundant."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The change does not affect authentication, rejection, or unlocking behavior. Requirement R1 should remain satisfied."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one localized insertion is needed, but it adds an additional activity rather than correcting the existing one."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process remains structurally valid, but the input branch becomes slightly redundant because it contains both \"wait for user input\" and \"user input\"."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The inserted activity is placed in the initial timed-alternative area before access is requested."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_replace_wait_activity_by_insert_and_delete",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "wait for user input",
+            "new_activity_label": "user input"
+          }
+        },
+        {
+          "operation": "delete",
+          "parameters": {
+            "target_activity_label": "wait for user input"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The missing \"user input\" activity is introduced and the non-matching \"wait for user input\" activity is removed. The resulting branch contains the required activity label in the existing timed-alternative structure with \"automatic screen lock\" after timeout 60."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The operations are confined to the initial screen-lock alternative and do not modify authentication-related conditions. Requirement R1 remains unaffected."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "Two operations are required to achieve the effect of replacing the activity. This is more costly than a direct rename."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The final structure remains clean and equivalent to the intended timed-alternative pattern, but the repair is operationally less direct than renaming."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "Both changes occur in the initial parallel block before the access request and authentication handling."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_rename_wait_for_user_input",
+  "best_resolution_reason": "RS1 is the best strategy because it directly addresses the detected cause of the violation: the required activity label \"user input\" is missing while an equivalent activity labeled \"wait for user input\" already exists in the correct timed-alternative position. It restores full compliance with a single localized rename, preserves the existing process structure, and does not risk violating the satisfied context requirement R1.",
+  "alternative_suggestion": {
+    "reason": "This cannot be represented using the provided process change operations because it would modify the compliance rule interpretation or label-matching configuration rather than the process structured tree.",
+    "conceptual_solution": "Adjust the compliance checker or requirement vocabulary so that \"wait for user input\" is treated as equivalent to \"user input\" through a synonym, alias, or semantic label mapping.",
+    "expected_compliance_impact": "This would likely restore compliance without changing the process model, assuming the intended meaning of \"wait for user input\" is semantically equivalent to the required \"user input\" activity."
+  }
+}

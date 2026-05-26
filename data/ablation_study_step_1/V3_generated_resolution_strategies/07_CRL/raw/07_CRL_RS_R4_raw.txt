@@ -1,0 +1,136 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_rename_and_assign_existing_activities",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Evaluate LoanRisk",
+            "new_activity_label": "evaluate loan risk"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "evaluate loan risk",
+            "new_resource": "Manager"
+          }
+        },
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Sign officially Loan Contract",
+            "new_activity_label": "officially sign loan contract"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The existing loan-risk evaluation activity is renamed to exactly match the required activity label and is assigned to Manager. The existing signing activity already has resource Manager and is renamed to exactly match the required label. Both required executed_by relations are therefore restored."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy preserves the existing ordering: customer bank privilege check still precedes check credit worthiness, and check credit worthiness still precedes evaluate loan risk. No new branch condition involving customer_status == gold and loan_amount < 1000000 is introduced."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only two renames and one resource assignment are needed. No control-flow restructuring or additional activities are introduced."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The process structure remains unchanged. The strategy only corrects labels and the resource assignment of an existing activity."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The main change concerns the risk evaluation activity in the middle of the process, although the signing label correction occurs later in the approval branch."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_insert_required_evaluation_and_rename_signing",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "Check Credit Worthiness",
+            "new_activity_label": "evaluate loan risk"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "evaluate loan risk",
+            "new_resource": "Manager"
+          }
+        },
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Sign officially Loan Contract",
+            "new_activity_label": "officially sign loan contract"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "substantial",
+          "reason": "The required evaluate loan risk activity executed by Manager is added, and the signing activity is renamed while preserving its Manager resource. However, the original Evaluate LoanRisk activity remains in the process and still writes the low_risk value, so the repair may create semantic duplication."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The inserted evaluate loan risk activity is placed after Check Credit Worthiness and remains after the customer bank privilege check, preserving the intended precedence constraints. No new prohibited condition from R7 is introduced."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "The strategy adds a new activity and modifies its resource, in addition to renaming the signing activity. This is more invasive than correcting the existing activity."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The control-flow structure is preserved, but the process may now contain two conceptually similar risk-evaluation activities, which can reduce clarity and create potential data-flow ambiguity."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The inserted evaluation activity is located immediately after credit worthiness checking in the middle of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_resource_fix_without_label_alignment",
+      "change_operations": [
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "Evaluate LoanRisk",
+            "new_resource": "Manager"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "partial",
+          "reason": "The likely intended loan-risk evaluation activity is assigned to Manager, but the activity labels still do not exactly match the required labels evaluate loan risk and officially sign loan contract. The detected violation was based on missing activity names, so this does not fully restore compliance."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The process structure and all ordering relations remain unchanged, and no new conditions are introduced."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one resource assignment is changed."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "No structural changes are made to the process tree."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The only change is applied to the loan-risk evaluation activity in the middle of the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_rename_and_assign_existing_activities",
+  "best_resolution_reason": "RS1 is the best strategy because it fully restores compliance with R4 using minimal and localized changes. It reuses the existing semantically corresponding activities, preserves the established control flow and data flow, avoids duplicate activities, and remains consistent with the resolution context requirements R2 and R7."
+}

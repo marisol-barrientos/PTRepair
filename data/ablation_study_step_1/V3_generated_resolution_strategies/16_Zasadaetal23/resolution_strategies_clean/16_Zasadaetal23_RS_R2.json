@@ -1,0 +1,163 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_rename_existing_brochure_activity",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "provide customer brochurs",
+            "new_activity_label": "send customer_brochures"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The existing brochure-related activity is renamed so that it explicitly represents sending the data object customer_brochures. The activity already has the resource customer_advisor, so the executed_by part of the requirement is preserved."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy only changes the label of the early brochure activity and does not affect customer_data handling, investment advice, custody account handling, or the update customer data branch."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one localized rename operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The process structure, ordering, branching, and resources remain unchanged. The rename also corrects the apparent spelling issue in the original activity label."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The changed activity occurs near the beginning of the process, immediately after the new customer arrives."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_insert_explicit_send_activity_after_existing_brochure_step",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "provide customer brochurs",
+            "new_activity_label": "send customer_brochures"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "send customer_brochures",
+            "new_resource": "customer_advisor"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "A dedicated activity that sends customer_brochures is added and explicitly assigned to customer_advisor, satisfying the missing send existence and execution responsibility requirement."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The insertion is localized before the main compliance-relevant decision logic and does not interfere with the currently satisfied requirements R1, R4, R6, or R7."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Two simple operations are required: one insertion and one resource assignment."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process remains sequential at this point, but the strategy introduces a possibly redundant brochure-related activity because the original provide customer brochurs activity remains."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The new send activity is inserted directly after the existing brochure activity at the beginning of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_replace_existing_brochure_step_with_explicit_send_and_normalize_resource",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "provide customer brochurs",
+            "new_activity_label": "send customer_brochures"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "send customer_brochures",
+            "new_resource": "customer_advisor"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The existing activity is converted into an explicit send customer_brochures activity and its resource assignment is explicitly normalized to customer_advisor."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy does not change control flow, data dependencies, or any activity involved in the satisfied context requirements."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Two localized modifications are required. The second operation may be redundant if the existing resource value customer_advisor is already considered exact."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The control-flow structure is unchanged and no additional activity is introduced."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The affected activity is located immediately after the customer arrival event."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_insert_send_activity_before_risk_disclosure",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "conduct risk disclosure",
+            "new_activity_label": "send customer_brochures"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "send customer_brochures",
+            "new_resource": "customer_advisor"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The process gains an explicit send customer_brochures activity executed by customer_advisor before the risk disclosure step."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The currently satisfied requirements remain structurally unaffected, but inserting the brochure-sending step later than the original brochure-provision point may slightly change the intended customer onboarding behavior."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The repair requires one insertion and one resource assignment."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process remains well-structured, but the additional activity may duplicate the existing brochure-related activity."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The inserted activity is placed after the customer-status exclusive branch and directly before conduct risk disclosure."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_rename_existing_brochure_activity",
+  "best_resolution_reason": "RS1 is the recommended strategy because it is the most minimal and localized repair. It directly addresses the likely modeling problem: the existing activity provide customer brochurs appears to be the intended brochure-sending step but is misspelled and not recognized as sending customer_brochures. The activity already uses customer_advisor, so a single rename restores compliance without changing control flow, resources, data dependencies, or any satisfied resolution context requirement."
+}

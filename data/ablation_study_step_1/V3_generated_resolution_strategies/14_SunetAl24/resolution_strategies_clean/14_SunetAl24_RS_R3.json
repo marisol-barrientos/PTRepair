@@ -1,0 +1,115 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_add_status_and_assign_resource",
+      "change_operations": [
+        {
+          "operation": "add_write",
+          "parameters": {
+            "target_activity_label": "Activate Sim Card",
+            "added_statement": "data.sim_card_status"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "Activate Sim Card",
+            "new_resource": "telephone company"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The strategy directly addresses both missing parts of requirement R3: it adds the required data object data.sim_card_status to the finalization/write behavior of Activate Sim Card and assigns the activity to the telephone company."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No additional resolution context requirements are specified, and the change is limited to the violating activity, so it is unlikely to introduce new compliance conflicts."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only two localized annotation-level changes are required: one data write addition and one resource assignment."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The control-flow structure of the process remains unchanged. No activities, branches, loops, or parallel structures are added or removed."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The modified activity Activate Sim Card appears near the end of the process, after Send Sim card."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_assign_required_resource_only",
+      "change_operations": [
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "Activate Sim Card",
+            "new_resource": "telephone company"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "partial",
+          "reason": "This resolves the executed_by part of requirement R3 but does not ensure that Activate Sim Card receives or finalizes data.sim_card_status."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The change only updates the resource annotation of the violating activity and does not affect any other process behavior."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one metadata-level operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The process structure and execution order are unchanged."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The change is applied to Activate Sim Card, which is located near the end of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_add_required_status_data_only",
+      "change_operations": [
+        {
+          "operation": "add_write",
+          "parameters": {
+            "target_activity_label": "Activate Sim Card",
+            "added_statement": "data.sim_card_status"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "partial",
+          "reason": "This resolves the missing data.sim_card_status finalization evidence for Activate Sim Card, but the activity still lacks the required telephone company resource assignment."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The added data write is local to the violating activity and no resolution context requirements are provided that would be affected."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one data annotation operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The process control-flow structure is not modified."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The changed activity appears late in the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_add_status_and_assign_resource",
+  "best_resolution_reason": "RS1 is the best strategy because it fully restores compliance with requirement R3 using only two localized annotation changes on the violating activity. It preserves the existing process structure, avoids unnecessary complexity, and does not introduce any apparent conflict with the resolution context."
+}

@@ -1,0 +1,129 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_insert_recurring_dms_check_at_start",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "Create resolution proposal",
+            "new_activity_label": "check for new document in DMS"
+          }
+        },
+        {
+          "operation": "embed_post_loop",
+          "parameters": {
+            "start_activity_label": "check for new document in DMS",
+            "end_activity_label": "check for new document in DMS",
+            "condition": "10518984 "
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "substantial",
+          "reason": "The missing activity is added and made recurring by wrapping it in a post-condition loop using the recurrence condition from the requirement. However, the available change operations do not support explicitly configuring an activity to receive the item 'checklist completed and signed by Tax Manager and Financial Controller', so full compliance cannot be guaranteed."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "There are no additional context requirements, and the strategy preserves the existing activities, resources, parallel structure, and exclusive choice."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only two localized operations are required: one insertion and one loop embedding around the newly inserted activity."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process remains well structured. The new loop is localized to a single activity and does not affect the existing parallel or exclusive control-flow constructs."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The DMS check is inserted before the first existing activity, which is appropriate if the checklist is an input prerequisite for creating the resolution proposal."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_insert_recurring_dms_check_after_proposal_creation",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "Create resolution proposal",
+            "new_activity_label": "check for new document in DMS"
+          }
+        },
+        {
+          "operation": "embed_post_loop",
+          "parameters": {
+            "start_activity_label": "check for new document in DMS",
+            "end_activity_label": "check for new document in DMS",
+            "condition": "10518984 "
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "substantial",
+          "reason": "The strategy introduces the required activity and makes it recurring. The receive condition remains unresolved because no supported operation can add or modify received documents or messages for an activity."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The existing process behavior is mostly preserved, with the new DMS check added after proposal creation and before the existing reporting activities."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The repair requires only two operations and does not modify existing activities."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The loop is limited to the newly inserted DMS check and does not disrupt the existing sequence, parallel block, or exclusive block."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The change is placed near the beginning of the process, immediately after the resolution proposal is created."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_insert_dms_check_without_recurrence",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "Create resolution proposal",
+            "new_activity_label": "check for new document in DMS"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "partial",
+          "reason": "The missing activity is added, resolving the existence part of the violation. However, the activity is not made recurring and the required received checklist cannot be represented with the available operations."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The existing process structure and behavior are preserved except for the addition of one preliminary activity."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one insertion operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process remains a simple sequence at the beginning, with no additional branching or looping complexity."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The DMS check is inserted before the current first activity."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_insert_recurring_dms_check_at_start",
+  "best_resolution_reason": "RS1 is the best available strategy because it directly addresses the missing activity and the recurring requirement with minimal, localized changes. It also places the DMS check before proposal creation, which is a sensible location if the required checklist is an input to the process. Full compliance cannot be guaranteed because the supported change operations do not include an operation for adding or configuring an activity receive/input message.",
+  "alternative_suggestion": {
+    "reason": "The provided change operations do not include an operation such as add_receive, modify_receive, or configure_input_message. Therefore, the required condition that the activity receives 'checklist completed and signed by Tax Manager and Financial Controller' cannot be explicitly represented.",
+    "conceptual_solution": "Insert a recurring activity named 'check for new document in DMS' at the start of the process, configure it with recurrence value '10518984 ', and define its input or received document as 'checklist completed and signed by Tax Manager and Financial Controller'.",
+    "expected_compliance_impact": "This conceptual repair would fully satisfy the requirement by ensuring that the activity exists, is recurring, and receives the required checklist."
+  }
+}

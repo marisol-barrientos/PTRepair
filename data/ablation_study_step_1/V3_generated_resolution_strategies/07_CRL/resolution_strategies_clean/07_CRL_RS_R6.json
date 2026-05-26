@@ -1,0 +1,108 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_rename_existing_activity_to_required_label",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Assign post processing to supervisor",
+            "new_activity_label": "assign post processing to supervisor"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The activity already exists on the branch guarded by condition \"data.loan_amount > 1000000\", but its label differs by capitalization from the required activity label. Renaming it to exactly \"assign post processing to supervisor\" satisfies the condition_eventually_follows requirement."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The control-flow structure and ordering of existing activities are unchanged. Requirements R2 and R7 are not affected because the position of credit-worthiness checking, loan-risk evaluation, and customer bank privilege checking remains the same."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one localized label change is required. No activities, branches, resources, or data writes are added or removed."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The process structure is preserved exactly. The strategy only corrects the activity label so that it matches the compliance requirement."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The changed activity is located inside the loan-information validation and high-loan-amount branch, which occurs in the middle of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_insert_required_activity_after_existing_assignment",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "Assign post processing to supervisor",
+            "new_activity_label": "assign post processing to supervisor"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The required activity label is inserted directly after the existing high-loan post-processing assignment activity. Since this insertion occurs inside the branch with condition \"data.loan_amount > 1000000\", the required condition_eventually_follows relation is satisfied."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The insertion is confined to the high-loan-amount branch and does not alter the order among customer bank privilege checking, credit-worthiness checking, and loan-risk evaluation. R2 and R7 remain preserved."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The strategy requires a single insertion operation. However, it introduces an additional activity rather than correcting the existing one, so it is slightly more costly than a rename."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The control-flow structure remains valid, but the process now contains two very similar consecutive activities, which may introduce redundancy or ambiguity."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The inserted activity is placed within the high-loan-amount branch before credit-worthiness checking, which is in the middle part of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_insert_required_activity_before_credit_worthiness_check",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "Check Credit Worthiness",
+            "new_activity_label": "assign post processing to supervisor"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The required activity is inserted before \"Check Credit Worthiness\", which occurs after the loan-amount XOR branch. Therefore, on the path where \"data.loan_amount > 1000000\" holds, the required activity eventually follows the condition."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "R2 is likely preserved because \"Evaluate LoanRisk\" still follows both customer bank privilege checking and credit-worthiness checking. R7 is not directly affected. However, the inserted activity may also execute for loans not greater than 1000000, which changes behavior outside the violating branch."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one insertion operation is needed, but the change is less precise than directly renaming or inserting inside the high-loan branch."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The process structure remains syntactically valid, but the activity is inserted at a shared point after the loan-amount decision, potentially causing unnecessary execution for lower-value loans."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The inserted activity is located before credit-worthiness checking in the central loan assessment part of the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_rename_existing_activity_to_required_label",
+  "best_resolution_reason": "RS1 is the best strategy because the required behavior already appears to be present, but the activity label does not exactly match the compliance rule. A single rename operation fully restores compliance with minimal cost, no structural impact, and no meaningful risk of violating the existing resolution context requirements R2 and R7."
+}

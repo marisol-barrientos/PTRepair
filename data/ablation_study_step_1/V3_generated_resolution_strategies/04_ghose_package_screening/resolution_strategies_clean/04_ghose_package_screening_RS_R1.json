@@ -1,0 +1,129 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_insert_clear_after_route",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "route package",
+            "new_activity_label": "clear package status"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "clear package status",
+            "new_resource": "regulatory authority"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The missing activity \"clear package status\" is added inside the branch guarded by condition package.status == \"held\". It occurs after \"route package\", satisfying the detected precedence interpretation that \"route package\" must occur before \"clear package status\". Its resource is set to \"regulatory authority\", satisfying the execution requirement."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No additional resolution context requirements are provided, and the change is localized to the violating held-package branch without affecting the non-held branch."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The strategy requires only two simple operations: inserting the missing activity and assigning the required resource."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The existing sequence and XOR structure are preserved. Only one activity is added in the relevant branch, with no additional branching or loop complexity."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is applied within the conditional handling branch, after package routing and before the later process continuation."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_insert_clear_before_handle",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "handle package",
+            "new_activity_label": "clear package status"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "clear package status",
+            "new_resource": "regulatory authority"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Because \"handle package\" currently follows \"route package\" in the held branch, inserting \"clear package status\" before \"handle package\" places it after \"route package\" and inside the branch for package.status == \"held\". The resource assignment satisfies the requirement that it is executed by the regulatory authority."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The repair remains confined to the held-package branch and does not modify other currently compliant behavior."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The strategy uses one insertion and one resource modification."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process structure remains a simple sequence inside the existing XOR branch. No new control-flow constructs are introduced."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change occurs within the middle conditional branch, between routing and handling."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_rename_handle_to_clear",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "handle package",
+            "new_activity_label": "clear package status"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "clear package status",
+            "new_resource": "regulatory authority"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The renamed activity is located in the held branch and already occurs after \"route package\". After assigning it to the regulatory authority, all detected compliance constraints are satisfied."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "Although it resolves the detected violation, it removes the explicit \"handle package\" activity from the process, which may affect intended business behavior even though no explicit context requirement prevents it."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only a rename and a resource modification are needed."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "No control-flow structure is changed and no additional activities are introduced."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change affects an activity inside the held-package branch."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_insert_clear_after_route",
+  "best_resolution_reason": "RS1 is recommended because it fully restores compliance with minimal and localized change while preserving the existing activities and process semantics. It adds the required missing regulatory clearance step immediately after \"route package\", satisfying the detected precedence and eventual-follow requirements without removing or repurposing existing work."
+}

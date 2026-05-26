@@ -1,0 +1,141 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_copy_send_to_existing_customer_branch",
+      "change_operations": [
+        {
+          "operation": "copy_after",
+          "parameters": {
+            "source_activity_label": "send legitimation & custody account documents",
+            "target_activity_label": "update customer data"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The activity that sends the custody_account_contract is copied into the branch for existing customers. As a result, the sending activity occurs in all branches of the exclusive structure, resolving the detected reason for the R3 violation while preserving the existing compliant behavior in the new-customer branch."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy does not alter the order or resource assignment of conduct risk disclosure, conduct investment advice, conclude custody account, conduct customer identification & legitimation, or update customer data. Therefore, R1, R4, R6, and R7 remain satisfied."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one localized copy operation is required. No existing activity is deleted or reordered."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The exclusive branch structure is preserved. The only structural impact is the addition of a duplicate send activity in the existing-customer branch."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The change is made inside the first exclusive structure, before conduct risk disclosure and the later advisory and contract activities."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_move_send_after_customer_status_exclusive",
+      "change_operations": [
+        {
+          "operation": "move_before",
+          "parameters": {
+            "source_activity_label": "send legitimation & custody account documents",
+            "target_activity_label": "conduct risk disclosure"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Moving the sending activity to the point after the exclusive customer-status branch ensures that every execution path passes through the activity before continuing to conduct risk disclosure. For the new-customer path, the send activity still occurs after conclude custody account."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy does not modify conduct investment advice, update customer data, conduct risk disclosure, or the identification and custody-account conclusion order. The existing context requirements are expected to remain satisfied."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one move operation is needed and no additional activity is introduced."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process remains structurally simple because the activity is moved outside the exclusive branch instead of being duplicated. However, the semantic timing of sending the documents changes for the new-customer branch."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The change is made immediately after the first exclusive structure and before the risk disclosure phase."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_add_common_send_before_risk_disclosure",
+      "change_operations": [
+        {
+          "operation": "copy_before",
+          "parameters": {
+            "source_activity_label": "send legitimation & custody account documents",
+            "target_activity_label": "conduct risk disclosure"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "A copy of the send activity is inserted after the customer-status exclusive structure and before conduct risk disclosure. This guarantees that custody_account_contract is sent on all paths after the exclusive structure. The original send activity in the new-customer branch remains unchanged."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No existing activity ordering relevant to R1, R4, R6, or R7 is changed. The update customer data activity remains in the existing-customer branch, and conduct investment advice remains assigned to the securities customer advisor."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The strategy requires a single copy operation. It is slightly more costly than a move because it introduces an additional activity instance."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The strategy preserves existing behavior but creates a possible duplicate send activity on the new-customer path, because that path already contains the original send activity."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The additional send activity is inserted before conduct risk disclosure, immediately after the initial customer-status handling."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_remove_existing_customer_branch",
+      "change_operations": [
+        {
+          "operation": "remove_branch",
+          "parameters": {
+            "target_activity_label": "update customer data"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "substantial",
+          "reason": "Removing the branch that lacks the send activity eliminates the specific branch-level cause of the R3 violation. However, this is a destructive solution because it removes the valid existing-customer path rather than repairing it."
+        },
+        "resolution_context_consistency": {
+          "value": "low",
+          "reason": "This strategy violates R7, which requires that the condition for a non-new customer eventually leads to update customer data. Since the branch containing update customer data is removed, the resolution context is not preserved."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "Although only one operation is required, it removes an entire process branch and therefore has a significant behavioral cost."
+        },
+        "structural_quality_impact": {
+          "value": "high",
+          "reason": "The process loses the existing-customer handling path, reducing behavioral completeness and making the process less appropriate for its intended customer-status distinction."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The removed branch is part of the first exclusive structure near the beginning of the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_copy_send_to_existing_customer_branch",
+  "best_resolution_reason": "RS1 is the best option because it directly addresses the missing send activity in the exclusive branch where the violation was detected, while preserving the existing new-customer behavior and all resolution context requirements. It is localized, low-cost, structurally simple, and avoids the semantic side effects of moving the original send activity or deleting an existing branch."
+}

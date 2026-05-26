@@ -1,0 +1,16 @@
+{
+  "model": "openai/gpt-5.5",
+  "scenario_name": "03_elgammal_loan_approval",
+  "requirement_id": "R2",
+  "output_prefix": "03_elgammal_loan_approval_RS_R2",
+  "execution_time_milliseconds": 53458.09,
+  "execution_time_seconds": 53.46,
+  "resolution_context_requirements": 0,
+  "problems_detected": [],
+  "usage": {
+    "prompt_tokens": 2439,
+    "completion_tokens": 3091,
+    "total_tokens": 5530,
+    "reasoning_tokens": null
+  }
+}

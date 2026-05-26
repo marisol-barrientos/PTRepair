@@ -1,0 +1,156 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_insert_generic_diagnosis_after_verify_symptoms",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "verify symptoms",
+            "new_activity_label": "diagnosis"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The missing activity label \"diagnosis\" is introduced immediately after \"verify symptoms\". Therefore, whenever \"verify symptoms\" is executed, it is directly followed by \"diagnosis\", satisfying the leads_to requirement."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The existing order between \"consult\" and \"verify symptoms\" is preserved, so R1 remains satisfied. No \"prescribe medicine\" activity is introduced or moved, so R3 is not negatively affected."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one localized insertion is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process structure remains simple and structured. The new activity is inserted at the point directly related to the violation, before the diagnostic branching logic."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The change is placed immediately after symptom verification, near the beginning of the loop body and close to the violation source."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_rename_existing_diagnosis_activities",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "diagnosis: cold",
+            "new_activity_label": "diagnosis"
+          }
+        },
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "diagnosis: strep throat",
+            "new_activity_label": "diagnosis"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "partial",
+          "reason": "This introduces activities with the exact label \"diagnosis\" in the existing diagnostic branches. However, some paths after \"verify symptoms\", such as the branch where data.throat is false or where no diagnosis is reached, may still not lead to a \"diagnosis\" activity."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy does not move \"consult\" or \"verify symptoms\" and does not introduce \"prescribe medicine\", so the context requirements are preserved."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only two renaming operations are required and both are localized to the existing diagnosis activities."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The control-flow structure is unchanged, but diagnostic specificity is lost because \"diagnosis: cold\" and \"diagnosis: strep throat\" are both renamed to the generic label \"diagnosis\"."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The changes occur inside the conditional diagnosis branches following symptom verification."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_insert_diagnosis_before_existing_treatments",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "treatment: paracetamol",
+            "new_activity_label": "diagnosis"
+          }
+        },
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "treatment: amoxicilin",
+            "new_activity_label": "diagnosis"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "partial",
+          "reason": "The treatment paths will now contain an exact \"diagnosis\" activity after \"verify symptoms\". However, paths that do not reach treatment, such as the no-throat branch or the no-cough and no-fever branch, may still violate the leads_to requirement."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy preserves the order of \"consult\" before \"verify symptoms\" and does not affect or introduce \"prescribe medicine\"."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The repair requires two simple insertions in existing branches."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The inserted diagnosis activities are placed directly before treatments, which is structurally and semantically coherent. The existing branching structure is not altered."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The changes are made inside the diagnostic and treatment decision branches."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_insert_diagnosis_before_callback",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "Wait for Patient Callback or Timeout",
+            "new_activity_label": "diagnosis"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "substantial",
+          "reason": "All paths inside the data.throat branch will reach the inserted \"diagnosis\" activity before waiting for callback or timeout. However, the branch where data.throat is false still terminates without reaching \"diagnosis\", so full compliance is not guaranteed."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy does not change the order of \"consult\" and \"verify symptoms\" and does not introduce or move \"prescribe medicine\"."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one insertion is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The inserted activity is placed at the end of the throat-related branch and does not alter the existing exclusive branching structure."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The change is placed near the end of the data.throat branch, immediately before the callback or timeout activity."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_insert_generic_diagnosis_after_verify_symptoms",
+  "best_resolution_reason": "RS1 is the recommended strategy because it fully restores compliance with the leads_to requirement using a single localized change. It preserves the existing context requirements, avoids deleting or restructuring branches, and minimally impacts the process structure."
+}

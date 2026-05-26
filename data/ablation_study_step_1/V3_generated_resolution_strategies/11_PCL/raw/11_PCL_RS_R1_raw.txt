@@ -1,0 +1,146 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_move_identity_check_after_customer_type_routing",
+      "change_operations": [
+        {
+          "operation": "move_before",
+          "parameters": {
+            "source_activity_label": "Identity Check",
+            "target_activity_label": "Approve Account Opening"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Moving Identity Check to the common sequence after the customer-state XOR ensures that every execution path leaving the routing decision, including the path where data.state == \"new\", eventually performs Identity Check before account approval."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The existing Initiate Account activity is preserved, so requirement R2 remains satisfied. No activity relevant to account initiation is deleted or bypassed."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one activity is moved. No new branches, loops, or data changes are introduced."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The structure remains simple and sequential after the XOR. The change removes the activity from a branch-specific position and places it in a shared position, avoiding duplication."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The modification is located around the customer-type routing block, after the initial request arrival and before account approval."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_insert_common_identity_check_before_approval",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "Approve Account Opening",
+            "new_activity_label": "Identity Check"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "A common Identity Check is inserted before Approve Account Opening, so any execution in which data.state == \"new\" will encounter an Identity Check after the routing condition before account approval."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The Initiate Account activity remains unchanged and reachable, so R2 is preserved."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The strategy requires only one insertion operation."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The process remains structurally sound, but the original branch-local Identity Check remains in the new-customer branch, causing duplicate Identity Check executions for new customers."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The new activity is inserted immediately after the customer-type routing block and before the account-opening decision activities."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_remove_branch_internal_state_write",
+      "change_operations": [
+        {
+          "operation": "remove_write",
+          "parameters": {
+            "target_activity_label": "Enter New Customer Information",
+            "removed_variable_name": "state"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The violation evidence indicates that Enter New Customer Information influences the condition data.state == \"new\" but does not occur in all exclusive branches. Removing its write to state makes the branch condition depend only on state values established before the XOR, so the new-customer branch with Identity Check satisfies the eventual-follow requirement."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "R2 remains satisfied because Initiate Account is unchanged. However, removing a state write from Enter New Customer Information may affect data semantics if that write was used for other business purposes."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one data-write operation is removed from one activity."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The control-flow structure is not changed. No branches, loops, or activity orderings are modified."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The modification is inside the first customer-classification branch near the beginning of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_delete_branch_internal_state_changing_activity",
+      "change_operations": [
+        {
+          "operation": "delete",
+          "parameters": {
+            "target_activity_label": "Enter New Customer Information"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "substantial",
+          "reason": "Deleting Enter New Customer Information removes the activity identified as influencing the condition from inside only one XOR branch. The remaining new-customer path still contains Identity Check. However, this is only a substantial repair because it removes potentially necessary customer-information capture."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "Initiate Account remains present, so R2 is not directly violated. Nevertheless, removing customer-information entry may compromise the correctness of later account-opening activities."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The strategy uses a single delete operation."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The control-flow structure remains valid, but the new-customer branch becomes less semantically complete because a core data-entry activity is removed."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The deletion occurs in the initial new-customer handling branch."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_move_identity_check_after_customer_type_routing",
+  "best_resolution_reason": "RS1 is recommended because it fully restores the requirement with a single localized move, avoids duplicate Identity Check executions, preserves the existing Initiate Account activity required by R2, and maintains a clean structured process by placing the compliance-critical check on the common path after customer-type routing.",
+  "alternative_suggestion": {
+    "reason": "Some possible repairs require semantic modeling changes that are not directly expressible with the provided process change operations.",
+    "conceptual_solution": "Clarify the data semantics so that data.state used in the XOR condition is a stable routing attribute written only before the XOR, while any later customer-information updates write to a different variable such as customer_profile_status or customer_data_completeness.",
+    "expected_compliance_impact": "This would prevent branch-internal activities from influencing the already-evaluated condition and should fully restore compliance while preserving the original control-flow structure."
+  }
+}

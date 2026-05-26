@@ -1,0 +1,204 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_full_alias_activity_after_credit_check",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Check Customer Bank Privilege",
+            "new_activity_label": "customer bank privilege check"
+          }
+        },
+        {
+          "operation": "add_write",
+          "parameters": {
+            "target_activity_label": "customer bank privilege check",
+            "added_statement": "post_processing_resource = Supervisor"
+          }
+        },
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Check Credit Worthiness",
+            "new_activity_label": "check credit worthiness"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "check credit worthiness",
+            "new_resource": "data.post_processing_resource"
+          }
+        },
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "check credit worthiness",
+            "new_activity_label": "credit worthiness check"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "credit worthiness check",
+            "new_resource": "data.post_processing_resource"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The missing activity label customer bank privilege check is introduced by renaming the existing privilege-check activity. The actual credit-worthiness activity is renamed to check credit worthiness and assigned to data.post_processing_resource. A directly following activity named credit worthiness check is inserted so that the separate reference used by executed_by_return can be resolved. Writing post_processing_resource = Supervisor before the credit-worthiness check ensures that the credit-worthiness resource differs from the Credit Broker executing the privilege check."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The original ordering is preserved: the bank privilege check still occurs before the credit-worthiness check, and both still occur before loan-risk evaluation. No branch conditions are modified, so R7 remains unaffected."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "The strategy requires several local changes, including two renames, one data write, one resource change, one inserted activity, and one resource assignment for the inserted activity."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The process remains well structured and sequential in the affected fragment, but the added credit worthiness check activity is structurally redundant and mainly serves to satisfy the inconsistent naming used by the compliance rule."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "Most changes are located in the bank-information validation path around the privilege and credit-worthiness checks, which occur after request intake but before loan-risk evaluation and contract handling."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_substantial_minimal_no_duplicate_credit_activity",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Check Customer Bank Privilege",
+            "new_activity_label": "customer bank privilege check"
+          }
+        },
+        {
+          "operation": "add_write",
+          "parameters": {
+            "target_activity_label": "customer bank privilege check",
+            "added_statement": "post_processing_resource = Supervisor"
+          }
+        },
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Check Credit Worthiness",
+            "new_activity_label": "check credit worthiness"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "check credit worthiness",
+            "new_resource": "data.post_processing_resource"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "substantial",
+          "reason": "This strategy resolves the missing customer bank privilege check label and assigns check credit worthiness to data.post_processing_resource with a clear separation from the Credit Broker. However, it does not create an activity named credit worthiness check, so the executed_by_return reference using that alternative label may remain unresolved if labels are interpreted strictly."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy preserves the original control-flow position of the privilege check, credit-worthiness check, and loan-risk evaluation. It does not alter branch conditions and therefore should not affect R7."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only four localized changes are required, and no new control-flow structures or extra activities are introduced."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process structure is essentially unchanged. The only semantic addition is the explicit assignment of the post-processing resource before it is used."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The changes are concentrated in the privilege-check and credit-check fragment before loan-risk evaluation."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_full_actual_activity_as_credit_worthiness_check",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Check Customer Bank Privilege",
+            "new_activity_label": "customer bank privilege check"
+          }
+        },
+        {
+          "operation": "add_write",
+          "parameters": {
+            "target_activity_label": "customer bank privilege check",
+            "added_statement": "post_processing_resource = Supervisor"
+          }
+        },
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Check Credit Worthiness",
+            "new_activity_label": "credit worthiness check"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "credit worthiness check",
+            "new_resource": "data.post_processing_resource"
+          }
+        },
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "credit worthiness check",
+            "new_activity_label": "check credit worthiness"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "check credit worthiness",
+            "new_resource": "data.post_processing_resource"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Both labels required by R3 are present. The original credit-worthiness activity is renamed to credit worthiness check, so the executed_by_return comparison refers to the activity that writes the credit-worthiness result. A preceding check credit worthiness activity is inserted and assigned to data.post_processing_resource to satisfy the executed_by condition."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The bank privilege check still leads to an activity named check credit worthiness, preserving the main ordering expected by R2. However, the inserted check credit worthiness activity is not the one that writes credit_worthiness and risk_report, so the semantic interpretation of R2 may become less clear."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "The strategy requires six operations, including an added activity. The changes remain localized but are more invasive than a pure rename and resource update."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The resulting process remains structured, but the inserted check credit worthiness activity may be perceived as a duplicate or preparatory no-op before the actual credit worthiness check."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "All changes are made in the bank-validation and credit-assessment part of the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_full_alias_activity_after_credit_check",
+  "best_resolution_reason": "RS1 is recommended because it fully resolves the detected R3 violation while best preserving the existing semantics of the process and the resolution context. The original credit-worthiness assessment remains the activity named check credit worthiness, which supports R2, and the additional credit worthiness check activity is inserted locally only to satisfy the separate executed_by_return reference in R3. Although it has a moderate cost and adds a redundant activity, it avoids changing branch logic and preserves the compliant behavior of R2 and R7.",
+  "alternative_suggestion": {
+    "reason": "The violation appears to be partly caused by inconsistent naming in the compliance rule: customer bank privilege check versus Check Customer Bank Privilege, check credit worthiness versus credit worthiness check. Correcting compliance-rule aliases or label normalization cannot be represented using the provided process change operations, because those operations only modify the process tree and not the rule vocabulary or matching logic.",
+    "conceptual_solution": "Normalize the compliance checker so that Check Customer Bank Privilege is treated as customer bank privilege check and Check Credit Worthiness is treated consistently as both check credit worthiness and credit worthiness check, or revise R3 to use one canonical label for the credit-worthiness activity. Then only the resource assignment and separation-of-duty repair would be needed in the process.",
+    "expected_compliance_impact": "This would remove the need for a redundant alias activity and would allow a cleaner full-compliance repair with only resource and post_processing_resource assignment changes."
+  }
+}

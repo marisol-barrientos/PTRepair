@@ -1,0 +1,121 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_copy_blacklist_inside_failed_due_diligence_branch",
+      "change_operations": [
+        {
+          "operation": "copy_after",
+          "parameters": {
+            "source_activity_label": "add respondent bank to blacklist",
+            "target_activity_label": "Lookup Partner Banks"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The activity \"add respondent bank to blacklist\" is copied into the branch that is taken when the due diligence evaluation is negative. Therefore, when the due diligence study causes the condition equivalent to \"not data.evaluation\" to hold, blacklisting follows within the same local branch instead of relying only on the later exclusive branch."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The existing activities \"obtain respondent bank annual report\" and \"analyze respondent bank annual report\" remain unchanged, preserving R1. The direct relation between condition \"data.risk\" and \"terminate\" is also untouched, preserving R3."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one localized copy operation is required. No existing control-flow structure needs to be moved or removed."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process gains one additional occurrence of an already existing activity. This introduces minor duplication, but the change is localized to the branch where the violation originates."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is applied inside the due diligence part of the process, before the annual report and account opening stages."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_move_blacklist_to_common_conditional_position",
+      "change_operations": [
+        {
+          "operation": "move_before",
+          "parameters": {
+            "source_activity_label": "add respondent bank to blacklist",
+            "target_activity_label": "obtain respondent bank annual report"
+          }
+        },
+        {
+          "operation": "embed_activity_in_xor",
+          "parameters": {
+            "target_activity_label": "add respondent bank to blacklist",
+            "condition": "not data.evaluation",
+            "mode": "skip"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The blacklisting activity is moved to a common continuation point after the initial record and due diligence handling. By embedding it in an XOR guarded by \"not data.evaluation\", all continuing paths reaching that point perform blacklisting whenever the negative evaluation condition holds."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The annual report activities remain present, preserving R1. The risk rejection path where \"data.risk\" directly leads to \"terminate\" is not modified, preserving R3."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "Two operations are required: moving the existing activity and then wrapping it in a conditional XOR. This is more invasive than simply adding a local copy."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The strategy avoids duplicate blacklisting activities, but it introduces a new XOR structure in the main sequence and changes the original location of the blacklisting activity."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The repair is placed between the initial respondent bank checks and the annual report processing stage."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_add_unconditional_common_blacklisting_before_annual_report",
+      "change_operations": [
+        {
+          "operation": "copy_before",
+          "parameters": {
+            "source_activity_label": "add respondent bank to blacklist",
+            "target_activity_label": "obtain respondent bank annual report"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "substantial",
+          "reason": "Adding a common blacklisting activity before the annual report stage ensures that paths continuing beyond the initial evaluation section eventually execute blacklisting after a negative evaluation. However, because the copied activity is unconditional, it may also blacklist cases where the negative evaluation condition does not hold."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "R1 and R3 remain structurally satisfied, since the annual report activities and the direct risk termination path are not removed or reordered. However, the unconditional blacklist may alter otherwise compliant behavior for positively evaluated banks."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one copy operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The structure remains simple and no new gateway is introduced, but the strategy duplicates an existing activity and weakens the precision of the control flow."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is inserted just before the annual report stage, after the initial record and due diligence section."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_copy_blacklist_inside_failed_due_diligence_branch",
+  "best_resolution_reason": "RS1 is the recommended strategy because it is the most localized and least invasive repair. It directly addresses the violating behavior by ensuring that a negative due diligence evaluation is followed by blacklisting in the same branch. It preserves the existing annual report and risk termination requirements, avoids moving existing behavior, and introduces only limited duplication.",
+  "alternative_suggestion": {
+    "reason": "The provided operations do not include an operation for modifying the synchronization behavior of a parallel block, such as changing wait or cancellation semantics.",
+    "conceptual_solution": "If supported by the process modeling environment, the parallel block containing the due diligence study could be configured to wait for the due diligence branch to complete before the post-parallel evaluation and blacklisting decision is reached.",
+    "expected_compliance_impact": "This would reduce the risk that the process reaches the blacklisting decision before the due diligence result is available, thereby improving compliance with the requirement that a negative evaluation is eventually followed by blacklisting."
+  }
+}

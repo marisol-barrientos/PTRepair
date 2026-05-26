@@ -1,0 +1,148 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_insert_notification_in_bank_transfer_branch",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "pay by bank transfer",
+            "new_activity_label": "notify customer"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The missing notification is added to the bank transfer branch. After 'go to checkout', both exclusive payment branches now contain 'notify customer', so every execution path after checkout leads to a customer notification."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No explicit resolution context requirements are provided. The strategy preserves the existing credit-card behavior and only adds the missing notification to the non-compliant branch."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one localized insert operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The existing process structure is preserved. The only impact is that the same activity label appears in both exclusive branches, which is acceptable but slightly increases duplication."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is applied inside the payment-handling part of the parallel block, which is in the middle of the process after checkout and before sending goods."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_move_notification_to_common_path_before_send_goods",
+      "change_operations": [
+        {
+          "operation": "move_before",
+          "parameters": {
+            "source_activity_label": "notify customer",
+            "target_activity_label": "send goods"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Moving 'notify customer' before 'send goods' places it after the parallel block on the common path. Therefore, all executions following 'go to checkout' must pass through 'notify customer'."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "There are no explicit context requirements that would be violated. The activity remains before 'send goods', but its timing changes because it no longer occurs specifically inside the credit-card payment branch."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one move operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "This removes branch-specific duplication risk and creates a single common notification point. However, it changes the original branch-local placement of the notification."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The notification is moved to the common path immediately before 'send goods', which is late in the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_add_common_notification_before_send_goods",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "send goods",
+            "new_activity_label": "notify customer"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "A new common 'notify customer' activity is inserted before 'send goods'. Since every execution after checkout reaches this point, the leads-to requirement is satisfied for all branches."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No explicit context requirements are affected. The existing credit-card branch notification is preserved."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one insert operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The process becomes compliant, but credit-card cases may now execute 'notify customer' twice: once in the credit-card branch and once before 'send goods'. This introduces possible redundancy."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The inserted activity is placed immediately before 'send goods', near the end of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_replace_branch_specific_notification_with_common_notification",
+      "change_operations": [
+        {
+          "operation": "delete",
+          "parameters": {
+            "target_activity_label": "notify customer"
+          }
+        },
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "send goods",
+            "new_activity_label": "notify customer"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The original branch-specific notification is removed and a single common notification is inserted before 'send goods'. All paths after checkout therefore include 'notify customer'."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "There are no explicit context requirements. The strategy avoids duplicate notifications while ensuring all cases are notified."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Two simple operations are required: one deletion and one insertion."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The result is structurally clean because notification becomes a single common activity. However, the original timing of the credit-card notification is changed."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The final notification point is placed on the common path before 'send goods', which is late in the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_insert_notification_in_bank_transfer_branch",
+  "best_resolution_reason": "RS1 is recommended because it fully restores compliance with the smallest and most localized change. It preserves the existing credit-card branch behavior and only repairs the branch where 'notify customer' was missing. Although it duplicates the notification activity label across exclusive branches, this is a minor structural impact compared with moving the notification to a different common point or introducing redundant notifications."
+}

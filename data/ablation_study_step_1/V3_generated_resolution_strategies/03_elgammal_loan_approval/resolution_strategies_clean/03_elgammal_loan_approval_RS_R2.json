@@ -1,0 +1,115 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_insert_notification_immediately_after_check",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "check credit worthiness",
+            "new_activity_label": "notify customer"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The inserted 'notify customer' activity is placed directly after 'check credit worthiness', satisfying the directly-follows requirement."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No additional resolution context requirements were specified. The change is localized and does not remove or reorder existing compliant behavior."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one insertion operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process structure remains unchanged except for one additional activity in the existing sequence. However, it may introduce an additional customer notification before the later existing notification."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is applied inside the nested loan assessment part of the process, after the initial request handling and before contract handling."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_insert_branch_specific_notifications_after_credit_check",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "evaluate loan risk",
+            "new_activity_label": "notify customer"
+          }
+        },
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "decline due to bad credit worthiness",
+            "new_activity_label": "notify customer"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Both possible outcomes immediately following 'check credit worthiness' start with 'notify customer', so the notification directly follows the credit-worthiness check across the credit decision branches."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No resolution context requirements are provided, and the strategy preserves all existing activities and branch logic."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "Two insertion operations are required, one for each credit-worthiness outcome branch."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The XOR branch structure is preserved, but duplicated notification activities are introduced in both branches, increasing model redundancy."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The changes are localized around the credit-worthiness decision in the middle of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_insert_notification_only_on_good_credit_path",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "evaluate loan risk",
+            "new_activity_label": "notify customer"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "substantial",
+          "reason": "This creates a path where 'notify customer' directly follows 'check credit worthiness' on the good-credit branch. However, the bad-credit branch still proceeds directly to 'decline due to bad credit worthiness', so compliance may not be complete if the requirement is interpreted as applying to all outcomes."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The existing process behavior is mostly preserved, and no specified context requirement is affected."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one localized insertion operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process structure remains stable and only one activity is added to an existing branch."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is applied within the credit assessment branch, which is in the middle part of the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_insert_notification_immediately_after_check",
+  "best_resolution_reason": "RS1 is recommended because it fully satisfies the directly-follows requirement with a single localized operation and without restructuring the process. Although it may introduce an additional customer notification, it is the lowest-cost full-compliance repair and avoids ambiguity caused by the existing duplicate 'notify customer' activities."
+}

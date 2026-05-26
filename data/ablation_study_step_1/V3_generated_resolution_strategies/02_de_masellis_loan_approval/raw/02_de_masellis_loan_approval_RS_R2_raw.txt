@@ -1,0 +1,112 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_sequentialize_risk_before_updates",
+      "change_operations": [
+        {
+          "operation": "sequentialize_parallel",
+          "parameters": {
+            "first_activity_label": "predict risk",
+            "second_activity_label": "ask for updates"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The branch containing \"predict risk\" is made sequentially prior to the branch containing \"ask for updates\", so the required precedence relation becomes enforceable."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "There are no additional resolution context requirements, and this strategy does not introduce conflicting conditions or remove required behavior."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one change operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The repair preserves all activities and the structured nature of the process, but it reduces concurrency by sequentializing two previously parallel branches."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change affects the top-level parallel relation between the application/update branch and the risk assessment branch, which spans a central part of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_move_predict_before_updates",
+      "change_operations": [
+        {
+          "operation": "move_before",
+          "parameters": {
+            "source_activity_label": "predict risk",
+            "target_activity_label": "ask for updates"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Moving \"predict risk\" directly before \"ask for updates\" makes the precedence relation explicit on the path where \"ask for updates\" is executed."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "No explicit context requirements are violated, but the original semantic placement of \"predict risk\" after risk assessment activities is disrupted."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one move operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "high",
+          "reason": "Although the precedence violation is repaired, the risk prediction activity is removed from its original risk assessment sequence and placed inside the update-related control-flow area, which may weaken process coherence."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The target activity \"ask for updates\" is located in the application-checking branch near the beginning of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_remove_updates_branch",
+      "change_operations": [
+        {
+          "operation": "remove_branch",
+          "parameters": {
+            "target_activity_label": "ask for updates"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The activity \"ask for updates\" is removed with its XOR branch, so the violated precedence relation no longer has a target occurrence that can be unordered with \"predict risk\"."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "No explicit context requirement is violated, but the behavior for the condition not(data.conflicts == \"true\") is eliminated."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "The operation is simple, but it removes a complete conditional branch and therefore has a meaningful behavioral cost."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The process remains structured, but the XOR decision becomes less meaningful because one alternative branch is removed."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The removed branch is located shortly after \"check application\" in the application-checking part of the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_sequentialize_risk_before_updates",
+  "best_resolution_reason": "RS1 is the best strategy because it fully restores the required precedence relation while preserving all existing activities and conditions. Its main drawback is the loss of parallelism between the two top-level branches, but this is preferable to moving \"predict risk\" away from its risk-assessment context or removing the \"ask for updates\" behavior entirely.",
+  "alternative_suggestion": {
+    "reason": "The available operations do not support adding a fine-grained synchronization dependency or join condition between only \"predict risk\" and \"ask for updates\" while preserving the rest of the top-level parallelism.",
+    "conceptual_solution": "Introduce a synchronization point so that only the execution of \"ask for updates\" waits until \"predict risk\" has completed, without forcing the entire application-checking branch and risk-assessment branch to become sequential.",
+    "expected_compliance_impact": "This would fully satisfy the precedence requirement while preserving more concurrency than full branch sequentialization."
+  }
+}

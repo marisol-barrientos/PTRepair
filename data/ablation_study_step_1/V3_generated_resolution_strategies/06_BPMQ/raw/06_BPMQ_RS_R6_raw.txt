@@ -1,0 +1,142 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1",
+      "change_operations": [
+        {
+          "operation": "copy_before",
+          "parameters": {
+            "source_activity_label": "check respondent bank certificate",
+            "target_activity_label": "open bank account"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "A copied certificate check is inserted immediately before every execution of 'open bank account'. Therefore, all traces that reach account opening necessarily execute 'check respondent bank certificate' beforehand."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The existing annual report activities remain unchanged, preserving R1. The risk branch condition directly followed by terminate is also untouched, preserving R3."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one localized operation is required. No existing activity or branch condition is removed or reordered."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process structure remains largely unchanged. The only drawback is that traces through the non-record branch may execute the certificate check twice."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The change is made directly before the late-stage activity 'open bank account'."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2",
+      "change_operations": [
+        {
+          "operation": "move_after",
+          "parameters": {
+            "source_activity_label": "check respondent bank certificate",
+            "target_activity_label": "Identify Respondent Bank"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Moving the certificate check immediately after 'Identify Respondent Bank' places it before the exclusive branch on record existence. Thus, every trace that can later reach 'open bank account' has already executed the certificate check."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The annual report activities remain present, preserving R1. The branch 'data.risk' followed by 'terminate' is not modified, preserving R3."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one operation is required, but it relocates an activity from a nested parallel structure to the common sequence."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The solution avoids duplicate checks, but it changes the original parallel behavior by making the certificate check unconditional and earlier in the process."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The activity is moved to an early common point after respondent bank identification."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "obtain respondent bank annual report",
+            "new_activity_label": "check respondent bank certificate"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The inserted certificate check is placed on the common path before the later account-opening decision. Therefore, every trace that reaches 'open bank account' has previously passed through a certificate check."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "Both annual report activities still exist, preserving R1. The risk termination branch is not modified, preserving R3."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "A single insertion is sufficient and no existing control-flow construct is removed or reordered."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The overall structure remains intact. However, the activity label is duplicated, and some traces may perform a redundant certificate check."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The insertion occurs after the initial record-handling logic and before the annual report analysis section."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4",
+      "change_operations": [
+        {
+          "operation": "modify_condition",
+          "parameters": {
+            "target_activity_label": "open bank account",
+            "new_condition": "(!data.record) and (data.eval and data.rating)"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "By requiring '!data.record' for the account-opening branch, 'open bank account' can only occur on traces that pass through the branch containing 'check respondent bank certificate'."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The required annual report activities are not removed, and the risk branch followed by terminate remains unchanged."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one branch condition is modified."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The process structure is not changed. Only the enabling condition of the account-opening branch is modified."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The change is made at the final account-opening decision point."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1",
+  "best_resolution_reason": "RS1 is recommended because it fully restores the precedence requirement with a single localized change directly at the violating activity. It preserves the existing process behavior as much as possible, does not disturb the annual report or risk-termination requirements, and avoids restructuring the earlier parallel and exclusive blocks. Its main drawback is possible duplicate certificate checking on some traces, but this is less disruptive than moving activities or restricting account-opening eligibility."
+}

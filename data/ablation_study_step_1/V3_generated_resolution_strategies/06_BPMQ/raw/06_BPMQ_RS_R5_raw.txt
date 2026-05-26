@@ -1,0 +1,112 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_sequentialize_annual_report_parallel",
+      "change_operations": [
+        {
+          "operation": "sequentialize_parallel",
+          "parameters": {
+            "first_activity_label": "analyze respondent bank annual report",
+            "second_activity_label": "Review Respondent Bank rating"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The rejection-rating decision is no longer evaluated inside a parallel fragment. The activity writing respondent_bank_rating, the rejected-condition branch, and the following terminate are placed in a clear sequential control-flow order, so whenever the condition data.respondent_bank_rating == \"rejected\" is taken, terminate is eventually reached."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The required activities 'obtain respondent bank annual report' and 'analyze respondent bank annual report' remain present, preserving R1. The earlier risk branch with condition data.risk directly followed by terminate is not modified, preserving R3."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one localized control-flow restructuring operation is required, affecting the parallel block after the annual report is obtained."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process becomes slightly less concurrent but more deterministic. No additional branches, loops, or duplicate activities are introduced."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The modification is located in the annual-report and respondent-bank-rating part of the process, after the initial request handling, risk assessment, and due-diligence logic."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_delete_intermediate_rejection_activity",
+      "change_operations": [
+        {
+          "operation": "delete",
+          "parameters": {
+            "target_activity_label": "handle rejection"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Removing the intermediate 'handle rejection' activity leaves the rejected branch leading directly to terminate. This eliminates the flagged situation where an intermediate activity occurs only on one exclusive branch before termination."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The activities required by R1 remain unchanged, and the risk-related termination required by R3 is not affected."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one activity is removed, with no restructuring of surrounding branches or parallel blocks."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The structure is simplified, but the process loses the explicit rejection-handling activity, which may be undesirable from a business perspective."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The change is located in the respondent-bank-rating decision block near the end of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_rename_rejection_handling_to_termination",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "handle rejection",
+            "new_activity_label": "terminate"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "substantial",
+          "reason": "The rejected branch would encounter a terminate activity immediately after the rejected condition. However, this strategy relies on interpreting the renamed activity as a true termination point and may create duplicate termination labels."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "R1 and R3 are not directly changed, but introducing another activity with the label 'terminate' may make later compliance checks or change operations ambiguous."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only a single activity label is changed."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The control-flow structure remains unchanged, but the semantic distinction between rejection handling and process termination is lost, and duplicate terminate labels may reduce model clarity."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The change is applied in the respondent-bank-rating rejection branch near the end of the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_sequentialize_annual_report_parallel",
+  "best_resolution_reason": "RS1 is recommended because it restores the rejected-rating-to-terminate compliance relation while preserving the explicit rejection-handling activity and avoiding ambiguity from duplicate termination labels. It also preserves the existing resolution context requirements R1 and R3 and only makes a localized, structurally clean change by replacing the parallel annual-report analysis/rating fragment with sequential execution.",
+  "alternative_suggestion": {
+    "reason": "The supported operations do not allow adding an explicit typed end event, annotating termination semantics, or directly changing the formal interpretation of the condition_eventually_follows rule.",
+    "conceptual_solution": "If the modeling environment supports it, explicitly mark the terminate activity in the rejected branch as an error/end termination event that cancels the enclosing process instance, and ensure the compliance checker treats that event as the required terminal outcome of the rejected condition.",
+    "expected_compliance_impact": "This would likely fully restore compliance while preserving the current business behavior and avoiding unnecessary restructuring."
+  }
+}

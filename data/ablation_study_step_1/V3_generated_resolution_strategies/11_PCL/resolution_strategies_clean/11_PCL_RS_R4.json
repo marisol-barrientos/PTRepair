@@ -1,0 +1,147 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_add_accept_empty_to_non_special_branch",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "Accept Initial Deposit",
+            "new_activity_label": "Accept Empty Initial Balance"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The activity \"Accept Empty Initial Balance\" would occur in both branches of the exclusive choice controlled by data.special_allowance. This directly addresses the detected issue that the activity does not occur in all exclusive branches after the condition."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The existing activity \"Initiate Account\" is preserved and remains reachable, so requirement R2 remains satisfied."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one localized insertion is required in the balance-handling part of the process."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The structured tree remains well-formed and the change is limited to the existing special-allowance XOR block. However, the same activity label will now appear in both branches, and the non-special branch will also perform an empty-balance acceptance after accepting an initial deposit."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The change is located in the account-funding portion of the process, after account opening and policy application but before account initiation."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_insert_common_accept_empty_before_initiation",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "Initiate Account",
+            "new_activity_label": "Accept Empty Initial Balance"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "By inserting \"Accept Empty Initial Balance\" after the special-allowance XOR block and before \"Initiate Account\", every execution path following evaluation of data.special_allowance eventually reaches the required activity."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "\"Initiate Account\" is not deleted, renamed, or made unreachable, so R2 remains satisfied."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The strategy requires a single insertion operation."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The overall sequence remains structurally simple, but special-allowance cases may execute \"Accept Empty Initial Balance\" twice: once inside the special branch and once before initiation."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The change is applied immediately before account initiation, near the detected violation."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_move_accept_empty_to_common_path",
+      "change_operations": [
+        {
+          "operation": "move_before",
+          "parameters": {
+            "source_activity_label": "Accept Empty Initial Balance",
+            "target_activity_label": "Initiate Account"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "\"Accept Empty Initial Balance\" is moved from the special-allowance branch to the common path before \"Initiate Account\". Therefore, after the special-allowance condition is evaluated, the activity is eventually executed on every branch."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "\"Initiate Account\" remains present and reachable, preserving R2."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one move operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The process remains structured, but the data.special_allowance branch may become empty. This is structurally tolerable because the model already contains an empty XOR branch elsewhere, but it weakens the semantic meaning of the special-allowance branch."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The change affects the balance-handling and account-initiation segment of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_rename_initial_deposit_to_accept_empty",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Accept Initial Deposit",
+            "new_activity_label": "Accept Empty Initial Balance"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "After the rename, both branches of the special-allowance XOR contain an activity labeled \"Accept Empty Initial Balance\", satisfying the detected condition-eventuality requirement."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "\"Initiate Account\" is unaffected and remains present."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one rename operation is needed."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The tree structure is unchanged. However, the business meaning of the non-special branch is significantly altered because the explicit initial-deposit acceptance step is removed."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The change is located in the funding decision block immediately before account initiation."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_add_accept_empty_to_non_special_branch",
+  "best_resolution_reason": "RS1 is recommended because it directly addresses the reported cause of the violation: \"Accept Empty Initial Balance\" is missing from one branch of the special-allowance exclusive choice. It requires only one localized operation, preserves the existing \"Initiate Account\" activity required by R2, and avoids moving activities across structural boundaries. Although it introduces the empty-balance acceptance into the non-special branch, it is less structurally disruptive than moving the activity out of the XOR and less semantically destructive than renaming \"Accept Initial Deposit\".",
+  "alternative_suggestion": {
+    "reason": "The provided operations only modify the process tree. They do not allow changing the compliance rule semantics or the compliance checker interpretation.",
+    "conceptual_solution": "If the intended meaning of R4 is strictly that whenever data.special_allowance is true, \"Accept Empty Initial Balance\" must eventually occur, then the current XOR structure may already satisfy the rule because the branch guarded by data.special_allowance contains that activity. A conceptual alternative is to refine the compliance checker so that it recognizes the implication created by the XOR branch condition instead of requiring the target activity to occur in all exclusive branches.",
+    "expected_compliance_impact": "This would likely restore full compliance without changing the process model, provided the XOR conditions are mutually exclusive and data.special_allowance cannot change between branch evaluation and execution of the branch activity."
+  }
+}
