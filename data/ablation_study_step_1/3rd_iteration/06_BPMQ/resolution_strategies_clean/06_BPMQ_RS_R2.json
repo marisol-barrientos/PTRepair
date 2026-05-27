@@ -1,0 +1,123 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_insert_blacklist_after_failed_due_diligence_lookup",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "Lookup Partner Banks",
+            "new_activity_label": "add respondent bank to blacklist"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The violating path is the branch where the failed due-diligence condition can hold but only 'Lookup Partner Banks' executes before leaving the branch. Inserting 'add respondent bank to blacklist' immediately after 'Lookup Partner Banks' ensures that whenever the condition 'not data.evaluation' or its equivalent failed-evaluation branch is taken, the blacklist activity eventually occurs."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy does not affect 'obtain respondent bank annual report' or 'analyze respondent bank annual report', so R1 remains satisfied. It also does not modify the risk branch where 'data.risk' directly leads to 'terminate', so R3 remains satisfied."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one localized insertion is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The change preserves the existing structured tree and does not introduce new control-flow constructs. It adds a duplicate occurrence of an existing activity, but the addition is localized to the failed due-diligence branch."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The modification is made in the initial respondent-bank evaluation part of the process, before the annual report activities."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_add_guarded_blacklist_after_due_diligence",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "conduct due diligence study",
+            "new_activity_label": "conditional blacklist after failed due diligence"
+          }
+        },
+        {
+          "operation": "embed_activity_in_xor",
+          "parameters": {
+            "target_activity_label": "conditional blacklist after failed due diligence",
+            "condition": "not data.evaluation",
+            "mode": "skip"
+          }
+        },
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "conditional blacklist after failed due diligence",
+            "new_activity_label": "add respondent bank to blacklist"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The activity that can influence the condition, 'conduct due diligence study', is followed by a guarded blacklist activity that executes when 'not data.evaluation' holds. This ensures that if the due-diligence result makes the failed-evaluation condition true, the blacklist activity eventually occurs."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy is confined to the due-diligence loop and does not affect the annual-report activities required by R1. It also leaves the 'data.risk' branch and its direct 'terminate' activity unchanged, preserving R3."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "The repair requires three operations: inserting a temporary activity, embedding it in a conditional XOR, and renaming it to the required blacklist activity label."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The added XOR guard improves semantic precision by avoiding unconditional blacklisting, but it introduces additional nesting inside the due-diligence loop."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The modification is made in the early due-diligence section of the process before the annual-report analysis."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_insert_global_blacklist_before_annual_report",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "obtain respondent bank annual report",
+            "new_activity_label": "add respondent bank to blacklist"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "substantial",
+          "reason": "Placing a blacklist activity before the annual-report phase ensures that any earlier occurrence of the failed-evaluation condition is eventually followed by blacklisting. However, because the inserted activity is unconditional, it may also execute in cases where the failed-evaluation condition does not hold."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The required annual-report activities remain present, preserving R1. The risk branch with direct termination remains unchanged, preserving R3."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one insertion is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process structure remains sequential and no additional branching or looping is introduced. The main drawback is behavioral rather than structural, because blacklisting becomes unconditional at that point."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The insertion is made between the initial respondent-bank evaluation section and the later annual-report analysis section."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_insert_blacklist_after_failed_due_diligence_lookup",
+  "best_resolution_reason": "RS1 is the best strategy because it restores compliance with a single localized change on the specific failed-evaluation path. It preserves the existing process structure, does not interfere with the annual-report or risk-termination context requirements, and avoids the additional nesting introduced by RS2 or the overbroad unconditional blacklisting behavior of RS3."
+}

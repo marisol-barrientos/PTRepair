@@ -1,0 +1,95 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_insert_consent_before_personal_data",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "Request personal data",
+            "new_activity_label": "obtain data processing consent"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "obtain data processing consent",
+            "new_resource": "data controller"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The missing activity \"obtain data processing consent\" is inserted before \"Request personal data\", satisfying the precedence requirement. The inserted activity is then assigned to the resource \"data controller\", satisfying the executed_by requirement."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "There are no additional resolution context requirements, and the change does not alter existing activities or control-flow behavior except for adding the required consent step before personal data is requested."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The strategy requires only two localized operations: inserting the missing activity and assigning the required resource."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process remains a simple sequence at the beginning. No additional branching, looping, or parallel structure is introduced."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The modification is made at the beginning of the process, directly before \"Request personal data\"."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_repurpose_existing_permission_activity",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Ask for permission",
+            "new_activity_label": "obtain data processing consent"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "obtain data processing consent",
+            "new_resource": "data controller"
+          }
+        },
+        {
+          "operation": "move_before",
+          "parameters": {
+            "source_activity_label": "obtain data processing consent",
+            "target_activity_label": "Request personal data"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The existing activity \"Ask for permission\" is converted into \"obtain data processing consent\", assigned to the required resource, and moved before \"Request personal data\". This satisfies both the precedence and executed_by requirements."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "No explicit context requirements are violated, but the strategy changes the meaning and location of an existing activity that was originally placed after \"Store Data\" inside a parallel branch. This may affect intended behavior even though it restores the detected compliance requirement."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "The strategy requires three operations and relocates an activity from a nested parallel branch to the start of the process."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "Moving an activity out of a parallel branch changes the structure and behavior of that branch. The resulting structure remains valid, but the impact is greater than simply inserting a new activity."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The final required consent activity is placed before \"Request personal data\", which is at the beginning of the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_insert_consent_before_personal_data",
+  "best_resolution_reason": "RS1 is recommended because it fully restores compliance with minimal and localized changes. It inserts the missing consent activity exactly where required and assigns it to the correct resource without moving, deleting, or repurposing existing activities. This preserves the current process behavior better than reusing and relocating the existing \"Ask for permission\" activity."
+}

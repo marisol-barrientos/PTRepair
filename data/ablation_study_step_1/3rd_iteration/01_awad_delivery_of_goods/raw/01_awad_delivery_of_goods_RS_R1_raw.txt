@@ -1,0 +1,142 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_copy_notification_to_bank_transfer_branch",
+      "change_operations": [
+        {
+          "operation": "copy_after",
+          "parameters": {
+            "source_activity_label": "notify customer",
+            "target_activity_label": "pay by bank transfer"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The missing occurrence of \"notify customer\" is added to the bank-transfer branch. Therefore, after \"go to checkout\", every exclusive payment branch eventually reaches a \"notify customer\" activity."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "There are no additional resolution context requirements, and the existing credit-card behavior is preserved."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one localized copy operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process structure remains unchanged except for adding the same notification activity to the other XOR branch. This creates duplicated notification logic but keeps the branching structure clear."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is made inside the payment-choice section, which occurs after checkout and before goods are sent."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_insert_notification_after_bank_transfer_payment",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "pay by bank transfer",
+            "new_activity_label": "notify customer"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "A \"notify customer\" activity is inserted in the bank-transfer branch, so both payment alternatives contain a notification after \"go to checkout\"."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No existing context requirements are violated, and the credit-card branch remains unchanged."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The strategy requires a single insertion operation."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The change is simple and localized. However, it duplicates an activity label already present in the credit-card branch."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The inserted activity is placed in the payment subprocess, after bank-transfer payment."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_move_notification_after_payment_choice",
+      "change_operations": [
+        {
+          "operation": "move_before",
+          "parameters": {
+            "source_activity_label": "notify customer",
+            "target_activity_label": "send goods"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Moving \"notify customer\" to the common path before \"send goods\" ensures that all executions after \"go to checkout\" eventually execute \"notify customer\", regardless of the selected payment branch."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "There are no additional context requirements. The notification remains after checkout and before goods are sent."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one move operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "This avoids duplicate notification activities, but it changes the timing of notification in the credit-card path by moving it outside the payment branch and after synchronization with the shipping-address and packing branch."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The activity is moved from the payment branch to the shared flow immediately before goods are sent."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_insert_common_notification_before_sending_goods",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "send goods",
+            "new_activity_label": "notify customer"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "A common \"notify customer\" activity is inserted after the parallel block and before \"send goods\", so all executions following \"go to checkout\" eventually include a notification."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No explicit context requirements are affected."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The repair uses one insertion operation."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The strategy satisfies the requirement but causes the credit-card path to notify the customer twice: once inside the credit-card branch and once before sending goods."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The new notification is inserted near the end of the process, immediately before \"send goods\"."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_copy_notification_to_bank_transfer_branch",
+  "best_resolution_reason": "RS1 is the preferred strategy because it directly repairs the missing notification in the non-compliant bank-transfer branch while preserving the existing credit-card behavior. It requires only one localized operation, achieves full compliance, and does not alter the overall control-flow structure."
+}

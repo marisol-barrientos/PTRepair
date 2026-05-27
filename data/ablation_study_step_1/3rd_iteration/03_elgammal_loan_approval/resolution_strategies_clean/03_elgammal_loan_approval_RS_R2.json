@@ -1,0 +1,108 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_insert_notify_after_credit_check",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "check credit worthiness",
+            "new_activity_label": "notify customer"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The inserted activity makes \"notify customer\" directly follow \"check credit worthiness\", satisfying the directly_follows requirement."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "There are no additional resolution context requirements, and the existing compliant behavior is preserved because no existing activity is removed or reordered."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one localized insertion is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The sequence structure remains intact. The only drawback is that approved cases may now contain an additional customer notification later in the process, potentially creating duplicate notifications."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is applied inside the loan evaluation branch, after the initial request handling and before contract settlement."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_copy_existing_notification_after_credit_check",
+      "change_operations": [
+        {
+          "operation": "copy_after",
+          "parameters": {
+            "source_activity_label": "notify customer",
+            "target_activity_label": "check credit worthiness"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Copying an existing \"notify customer\" activity immediately after \"check credit worthiness\" ensures that the required direct-follow relation holds."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The existing behavior is preserved, but the process already contains multiple activities labeled \"notify customer\". The operation may therefore be ambiguous unless the copied source occurrence can be selected consistently by the implementation."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one copy operation is required, but it depends on reusing an existing notification activity."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The control-flow structure is not otherwise changed. However, as with insertion, the resulting process may notify the customer more than once in successful approval paths."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The copied activity is placed in the middle of the process, directly after the credit-worthiness check."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_move_notification_after_credit_check",
+      "change_operations": [
+        {
+          "operation": "move_after",
+          "parameters": {
+            "source_activity_label": "notify customer",
+            "target_activity_label": "check credit worthiness"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Moving a \"notify customer\" activity directly after \"check credit worthiness\" satisfies the directly_follows constraint."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "This avoids adding an additional notification, but it removes the moved notification from its original approval branch. Because there are multiple activities labeled \"notify customer\", the operation is also ambiguous without occurrence-level selection."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one move operation is needed."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The repair changes the timing of an existing customer notification. It may notify the customer immediately after the credit check, before later loan-risk evaluation, contract initialization, signing, and sending are completed."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The target location is inside the credit evaluation portion of the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_insert_notify_after_credit_check",
+  "best_resolution_reason": "RS1 is the recommended strategy because it fully restores compliance with a single, localized, unambiguous operation. It preserves all existing process behavior and does not depend on selecting between duplicate \"notify customer\" occurrences. Its only notable drawback is the possibility of duplicate customer notifications in approval paths, but this is less disruptive than moving or removing existing notification behavior."
+}

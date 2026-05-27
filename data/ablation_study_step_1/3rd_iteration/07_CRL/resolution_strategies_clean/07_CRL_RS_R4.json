@@ -1,0 +1,143 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_rename_existing_activities_and_assign_manager",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Evaluate LoanRisk",
+            "new_activity_label": "evaluate loan risk"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "evaluate loan risk",
+            "new_resource": "Manager"
+          }
+        },
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Sign officially Loan Contract",
+            "new_activity_label": "officially sign loan contract"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The missing activity labels required by R4 are restored by renaming the semantically corresponding existing activities. The activity 'evaluate loan risk' is explicitly assigned to the Manager resource, and 'officially sign loan contract' preserves its existing Manager assignment."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy preserves the existing control-flow position of the loan-risk evaluation after customer bank privilege checking and credit worthiness checking, so R2 remains satisfied. It also does not change the conditional structure related to gold customers and loan amount, so R7 is not affected."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only two renames and one resource assignment are required. No control-flow restructuring, branching, or deletion is introduced."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The process structure remains unchanged. The repair only aligns activity labels and resource assignment with the compliance requirement."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The main modification is located in the middle of the process, around credit assessment and risk evaluation. The contract-signing rename occurs later but does not affect the control-flow structure."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_insert_required_evaluate_activity_and_rename_signing",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "Evaluate LoanRisk",
+            "new_activity_label": "evaluate loan risk"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "evaluate loan risk",
+            "new_resource": "Manager"
+          }
+        },
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Sign officially Loan Contract",
+            "new_activity_label": "officially sign loan contract"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The required activity 'evaluate loan risk' is explicitly inserted and assigned to Manager. The existing signing activity is renamed to the required label and keeps its Manager resource assignment."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The inserted 'evaluate loan risk' activity is placed after customer bank privilege checking and after credit worthiness checking, preserving the precedence constraints in R2. The strategy does not alter the condition relevant to R7."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "This strategy adds a new activity instead of reusing the existing semantically equivalent 'Evaluate LoanRisk' activity, increasing the number of process steps."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The process remains structurally valid, but it introduces a potentially redundant risk-evaluation step immediately before the existing 'Evaluate LoanRisk' activity."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The inserted evaluation activity is located in the middle credit and risk-assessment part of the process. The signing rename is late in the process but structurally neutral."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_rename_existing_activities_without_resource_change",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Evaluate LoanRisk",
+            "new_activity_label": "evaluate loan risk"
+          }
+        },
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Sign officially Loan Contract",
+            "new_activity_label": "officially sign loan contract"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "partial",
+          "reason": "This strategy resolves the label-mismatch evidence by creating activities with the required names. However, 'evaluate loan risk' still has no explicit Manager resource assignment, so the executed_by requirement may remain violated."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The existing process order and conditions are preserved. The loan-risk evaluation remains after the bank privilege check and credit worthiness check, and no new condition is introduced that would affect R7."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only two activity labels are changed."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "No structural change is made to the process tree."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The most compliance-relevant change is in the middle of the process at risk evaluation. The second rename is late in the contract-signing segment."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_rename_existing_activities_and_assign_manager",
+  "best_resolution_reason": "RS1 is the best strategy because it fully restores R4 with minimal and localized changes. It reuses the existing semantically equivalent activities instead of inserting duplicates, explicitly assigns the required Manager resource to the risk-evaluation activity, preserves the existing Manager assignment for contract signing, and does not disturb the already satisfied context requirements R2 and R7."
+}

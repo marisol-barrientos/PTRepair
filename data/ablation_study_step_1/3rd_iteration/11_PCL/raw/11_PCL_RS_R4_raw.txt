@@ -1,0 +1,113 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_add_accept_empty_to_non_special_branch",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "Accept Initial Deposit",
+            "new_activity_label": "Accept Empty Initial Balance"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The activity \"Accept Empty Initial Balance\" would occur in both branches of the exclusive choice controlled by data.special_allowance. Therefore, after data.special_allowance becomes true, the required activity is present on the relevant following control-flow paths."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The existing activity \"Initiate Account\" is not modified or removed, so the context requirement R2 remains satisfied."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one localized insertion is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process structure is not changed; only one additional activity is added inside an existing branch. However, it may introduce a semantic side effect because non-special-allowance cases would also execute \"Accept Empty Initial Balance\" after accepting an initial deposit."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The change is located in the account initialization part of the process, after account approval and opening but before \"Initiate Account\"."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_add_accept_empty_after_balance_choice",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "Initiate Account",
+            "new_activity_label": "Accept Empty Initial Balance"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Placing \"Accept Empty Initial Balance\" after the exclusive balance-handling block ensures that the activity eventually occurs on all paths after data.special_allowance may have become true."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The activity \"Initiate Account\" remains present and is still reached after the inserted activity, so R2 is preserved."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one insertion is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The structured tree remains simple and sequential after the exclusive block. The main drawback is behavioral: \"Accept Empty Initial Balance\" would execute for all cases, including cases without special allowance, and may duplicate the existing activity for special-allowance cases."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The modification is made immediately before \"Initiate Account\", near the end of the account setup flow."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_rename_initial_deposit_branch_activity",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Accept Initial Deposit",
+            "new_activity_label": "Accept Empty Initial Balance"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Both branches of the exclusive balance-handling block would then contain an activity labeled \"Accept Empty Initial Balance\", satisfying the eventual-follow requirement for data.special_allowance."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The activity \"Initiate Account\" is not affected, so R2 remains satisfied."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one rename operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The control-flow structure is unchanged, but the business meaning of the non-special-allowance branch is weakened because the explicit acceptance of an initial deposit is removed."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The renamed activity is located in the balance-handling phase shortly before account initiation."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_add_accept_empty_to_non_special_branch",
+  "best_resolution_reason": "RS1 is the most localized repair. It modifies only the branch where the required activity is missing, preserves the existing special-allowance behavior, keeps \"Initiate Account\" intact, and avoids changing the surrounding structured tree. Although it may introduce a semantic side effect for non-special-allowance cases, it is less disruptive than making the activity unconditional after the XOR or renaming the initial-deposit activity.",
+  "alternative_suggestion": {
+    "reason": "Under standard XOR semantics, the existing process may already satisfy the requirement because the branch guarded by data.special_allowance contains \"Accept Empty Initial Balance\". The available change operations cannot express a verification-level repair such as improving the condition analysis without changing the process model.",
+    "conceptual_solution": "Refine the compliance checker or annotate the XOR gateway to explicitly state that when data.special_allowance is true, only the branch containing \"Accept Empty Initial Balance\" is feasible.",
+    "expected_compliance_impact": "This would likely restore compliance without changing the process behavior, if the violation is caused by conservative analysis rather than an actual executable path that skips the required activity."
+  }
+}

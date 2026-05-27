@@ -1,0 +1,147 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_copy_certificate_check_before_open",
+      "change_operations": [
+        {
+          "operation": "copy_before",
+          "parameters": {
+            "source_activity_label": "check respondent bank certificate",
+            "target_activity_label": "open bank account"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Every execution of \"open bank account\" is preceded directly by a copied execution of \"check respondent bank certificate\", so the precedence requirement is satisfied on all traces, including the path where data.record is true."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy does not affect \"obtain respondent bank annual report\" or \"analyze respondent bank annual report\", and it does not modify the data.risk branch where terminate must directly follow."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one localized copy operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The existing control-flow structure is preserved. The only downside is that the certificate check may be duplicated for traces that already executed it earlier."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The change is made immediately before \"open bank account\", near the end of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_move_certificate_check_to_common_prefix",
+      "change_operations": [
+        {
+          "operation": "move_after",
+          "parameters": {
+            "source_activity_label": "check respondent bank certificate",
+            "target_activity_label": "Identify Respondent Bank"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Moving \"check respondent bank certificate\" after \"Identify Respondent Bank\" places it before the exclusive split that currently allows some traces to skip the check. Therefore, any later execution of \"open bank account\" is preceded by the certificate check."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy does not remove or rename the annual-report activities required by R1 and does not alter the data.risk branch required by R3."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "Only one operation is required, but it relocates an activity from inside a parallel branch to a common sequential prefix, changing the behavior of multiple traces."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The repair avoids duplicate certificate checks, but it changes the original parallel structure and may make the certificate check execute even for cases that later terminate or are rejected."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The activity is moved to the beginning of the process, directly after respondent-bank identification."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_skip_open_when_certificate_check_was_not_guaranteed",
+      "change_operations": [
+        {
+          "operation": "embed_activity_in_xor",
+          "parameters": {
+            "target_activity_label": "open bank account",
+            "condition": "!data.record",
+            "mode": "skip"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The embedded XOR allows \"open bank account\" only when !data.record holds. In that path, the earlier branch containing \"check respondent bank certificate\" is executed, so the precedence relation is satisfied. Traces with data.record skip the opening activity instead of violating the requirement."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The annual-report activities and the data.risk-to-terminate behavior remain unchanged."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one operation is required, but it introduces an additional conditional structure around the account-opening activity."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The strategy preserves the existing outer flow but adds nested XOR logic and suppresses account opening for existing-record cases, which may be functionally restrictive."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The change is applied locally around \"open bank account\" near the end of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_delete_open_bank_account",
+      "change_operations": [
+        {
+          "operation": "delete",
+          "parameters": {
+            "target_activity_label": "open bank account"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "If \"open bank account\" no longer exists, the precedence requirement is vacuously satisfied because the constrained activity can no longer occur."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy does not affect R1 or R3 directly."
+        },
+        "change_cost": {
+          "value": "very_high",
+          "reason": "Although technically simple, deleting the account-opening activity removes a core business function of the process."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The control-flow structure remains mostly intact, but the positive branch of the final decision loses its main business activity."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The deletion occurs in the final decision part of the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_copy_certificate_check_before_open",
+  "best_resolution_reason": "RS1 is the best option because it fully restores the precedence requirement with a single localized change immediately before the violating activity. It preserves the existing process structure, avoids modifying the risk-related termination behavior required by R3, and keeps the annual-report activities required by R1. Although it may duplicate the certificate check on some traces, this is less disruptive than moving the original check to a common prefix or suppressing account opening for existing-record cases.",
+  "alternative_suggestion": {
+    "reason": "The provided operations do not allow inserting an activity directly into the currently empty XOR branch with condition not (!data.record), because there is no activity inside that branch to target with insert_before or insert_after.",
+    "conceptual_solution": "Add \"check respondent bank certificate\" specifically inside the existing-record branch, i.e. the branch with condition not (!data.record), before the process continues to \"obtain respondent bank annual report\". This would ensure that only the currently non-compliant path receives the missing certificate check, without duplicating the check on paths where it already exists.",
+    "expected_compliance_impact": "This would fully satisfy the precedence requirement while minimizing behavioral side effects and avoiding unnecessary duplicate checks."
+  }
+}

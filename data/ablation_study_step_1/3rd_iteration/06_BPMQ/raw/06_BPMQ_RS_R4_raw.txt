@@ -1,0 +1,163 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_remove_self_write_of_evaluation_extra",
+      "change_operations": [
+        {
+          "operation": "remove_write",
+          "parameters": {
+            "target_activity_label": "conduct due diligence study",
+            "removed_variable_name": "evaluation_extra"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The detected violation is caused by activity \"conduct due diligence study\" writing the same variable, data.evaluation_extra, that controls the loop condition in which the activity is located. Removing this write prevents the activity from influencing a future evaluation of the condition after the condition has already been reached. If data.evaluation_extra is true before the loop condition is evaluated, the activity still eventually executes."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy does not affect \"obtain respondent bank annual report\" or \"analyze respondent bank annual report\", so R1 remains satisfied. It also does not modify the risk branch where data.risk directly leads to terminate, so R3 remains satisfied."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one localized data-write operation is removed from the violating activity."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The control-flow structure is unchanged. However, the loop condition may no longer be updated by the due diligence activity itself, which may reduce the model's ability to represent repeated extra evaluation unless data.evaluation_extra is set elsewhere before the loop."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The change is located in the initial respondent-bank evaluation branch before the annual-report analysis part of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_convert_due_diligence_to_post_condition_loop",
+      "change_operations": [
+        {
+          "operation": "remove_loop",
+          "parameters": {
+            "target_activity_label": "conduct due diligence study"
+          }
+        },
+        {
+          "operation": "embed_post_loop",
+          "parameters": {
+            "start_activity_label": "conduct due diligence study",
+            "end_activity_label": "conduct due diligence study",
+            "condition": "data.evaluation_extra"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Changing the surrounding loop from a pre-condition loop to a post-condition loop ensures that \"conduct due diligence study\" executes before data.evaluation_extra is checked for repetition. If the activity sets data.evaluation_extra to true, the condition is evaluated after the activity and the activity can execute again, satisfying the eventual-following requirement."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The change is local to the due diligence loop and does not affect the existence of the annual-report activities required by R1. It also does not alter the data.risk branch that directly leads to terminate, preserving R3."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "The strategy requires two structural operations: removing the existing loop and wrapping the activity in a post-condition loop."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The repair preserves the idea of repeated due diligence but changes loop semantics: the due diligence activity will execute at least once when that part of the process is reached. This is structurally coherent but may broaden behavior compared with the original pre-test loop."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The modified loop is located in the early respondent-bank evaluation branch before the annual-report and account-opening stages."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_determine_evaluation_extra_before_loop",
+      "change_operations": [
+        {
+          "operation": "add_write",
+          "parameters": {
+            "target_activity_label": "Assess Respondent Bank risk",
+            "added_statement": "evaluation_extra = requires_additional_due_diligence"
+          }
+        },
+        {
+          "operation": "remove_write",
+          "parameters": {
+            "target_activity_label": "conduct due diligence study",
+            "removed_variable_name": "evaluation_extra"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The value of data.evaluation_extra is established before the loop condition is reached, and the later self-write by \"conduct due diligence study\" is removed. Therefore, whenever data.evaluation_extra holds at the loop condition, the due diligence activity can eventually follow without being the source of a non-prior condition update."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The existing annual-report activities remain unchanged, preserving R1. The direct data.risk-to-terminate branch remains untouched, preserving R3."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The strategy uses two localized data-flow changes and does not restructure the process tree."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process structure is unchanged and the decision about additional due diligence is moved to the prior risk-assessment step, which is a plausible nearby decision point. The main impact is a redistribution of data responsibility between activities."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "Both changes occur in the early respondent-bank evaluation section before annual-report handling."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_rename_internal_loop_control_variable",
+      "change_operations": [
+        {
+          "operation": "modify_write",
+          "parameters": {
+            "target_activity_label": "conduct due diligence study",
+            "new_statement": "evaluation, due_diligence_repeat_required"
+          }
+        },
+        {
+          "operation": "modify_loop_condition",
+          "parameters": {
+            "target_activity_label": "conduct due diligence study",
+            "new_condition": "data.due_diligence_repeat_required"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "partial",
+          "reason": "This removes the problematic self-influence on data.evaluation_extra by replacing the internal loop-control variable. However, the original compliance condition specifically refers to data.evaluation_extra. Since the loop would no longer be guarded by data.evaluation_extra, this strategy mitigates the detected self-dependency but may not fully demonstrate that \"conduct due diligence study\" eventually follows whenever data.evaluation_extra becomes true elsewhere."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy is local to the due diligence loop and does not affect the annual-report activities or the data.risk branch."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one write statement and the surrounding loop condition are changed."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The control-flow structure is preserved. The impact is limited to clarifying that the loop repetition flag is separate from the compliance-relevant data.evaluation_extra condition."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The change is located in the early due diligence branch of the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_remove_self_write_of_evaluation_extra",
+  "best_resolution_reason": "RS1 is the recommended strategy because it directly addresses the detected cause of the violation with the smallest and most localized change. It preserves the existing process structure and does not affect the already satisfied context requirements R1 and R3. If the removed write was required for loop repetition semantics, RS2 is the best structural alternative because it preserves repetition by converting the loop into a post-condition loop."
+}

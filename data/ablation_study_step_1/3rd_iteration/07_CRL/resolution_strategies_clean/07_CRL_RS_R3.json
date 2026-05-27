@@ -1,0 +1,121 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_full_label_resource_and_segregation_repair",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Check Customer Bank Privilege",
+            "new_activity_label": "customer bank privilege check"
+          }
+        },
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Check Credit Worthiness",
+            "new_activity_label": "check credit worthiness"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "check credit worthiness",
+            "new_resource": "data.post_processing_resource"
+          }
+        },
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "check credit worthiness",
+            "new_activity_label": "credit worthiness check"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "credit worthiness check",
+            "new_resource": "Supervisor"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The required activity label customer bank privilege check is created by renaming the existing bank privilege activity, while preserving its Credit Broker assignment. The existing credit-worthiness activity is aligned to the required label check credit worthiness and assigned to data.post_processing_resource. A separate credit worthiness check activity is inserted and assigned to Supervisor, making its executor different from the customer bank privilege check executor."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The customer bank privilege check still precedes the credit-worthiness checks and the loan-risk evaluation. The existing control-flow conditions are not changed, so the satisfied precedence and leads-to context requirements are preserved. No condition is added that would cause evaluate loan risk to follow the forbidden gold-customer condition."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "The strategy requires five localized operations: two label alignments, two resource-related adjustments, and one inserted activity. It is more costly than a pure annotation repair but still limited to the affected compliance region."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The process remains well-structured and sequential in the affected fragment, but it introduces an additional credit-worthiness-related activity, which may add some redundancy unless interpreted as an explicit segregation-of-duties verification step."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "Although the customer bank privilege check is near the beginning of the process, the main repair is located in the middle loan-assessment fragment between bank-information validation and loan-risk evaluation."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_minimal_label_and_resource_repair",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Check Customer Bank Privilege",
+            "new_activity_label": "customer bank privilege check"
+          }
+        },
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Check Credit Worthiness",
+            "new_activity_label": "check credit worthiness"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "check credit worthiness",
+            "new_resource": "data.post_processing_resource"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "substantial",
+          "reason": "This repairs the missing customer bank privilege check label and assigns check credit worthiness to data.post_processing_resource. However, it does not create a separate activity named credit worthiness check, so the executor-inequality part of the detected requirement may remain unresolved if the compliance checker treats credit worthiness check as a distinct required activity."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The existing order of the process is preserved: the bank privilege check remains before the credit-worthiness check, and the credit-worthiness check remains before evaluate loan risk. No branch condition is modified, so the context requirement involving the gold-customer condition is unaffected."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only two renames and one resource annotation change are required. No new activity or control-flow structure is introduced."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The process structure is unchanged. The repair only aligns labels and the resource assignment of an existing activity."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The repair affects the early-to-middle compliance region around bank privilege checking and credit-worthiness checking, with the most important resource change occurring in the middle assessment fragment."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_full_label_resource_and_segregation_repair",
+  "best_resolution_reason": "RS1 is recommended because it is the only proposed strategy that fully addresses all detected evidence: the missing customer bank privilege check label, the required data.post_processing_resource assignment for check credit worthiness, and the missing distinct credit worthiness check activity needed for the executor-inequality condition. Although it introduces one additional activity, the change is localized and preserves the currently satisfied resolution context requirements.",
+  "alternative_suggestion": {
+    "reason": "Part of the violation appears to be caused by inconsistent naming between the process model and the compliance rule, especially customer bank privilege check versus Check Customer Bank Privilege and check credit worthiness versus credit worthiness check. Such semantic label normalization cannot be represented directly using the provided process change operations except by renaming or adding activities.",
+    "conceptual_solution": "Introduce or update a compliance-rule ontology or label-alias mapping so that semantically equivalent labels are recognized as the same activity where appropriate. The rule should also clarify whether check credit worthiness and credit worthiness check are intended to be one activity or two separate segregation-of-duties activities.",
+    "expected_compliance_impact": "This would reduce false-positive existence violations and may allow the minimal resource-only repair to be sufficient if the two credit-worthiness labels are intended to refer to the same activity. The resource assignment issue would still need to be repaired in the process model."
+  }
+}

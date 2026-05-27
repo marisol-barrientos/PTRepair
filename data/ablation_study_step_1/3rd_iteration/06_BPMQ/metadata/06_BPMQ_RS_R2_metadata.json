@@ -1,0 +1,16 @@
+{
+  "model": "openai/gpt-5.5",
+  "scenario_name": "06_BPMQ",
+  "requirement_id": "R2",
+  "output_prefix": "06_BPMQ_RS_R2",
+  "execution_time_milliseconds": 102797.91,
+  "execution_time_seconds": 102.8,
+  "resolution_context_requirements": 2,
+  "problems_detected": [],
+  "usage": {
+    "prompt_tokens": 3180,
+    "completion_tokens": 4898,
+    "total_tokens": 8078,
+    "reasoning_tokens": null
+  }
+}

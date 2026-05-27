@@ -1,0 +1,55 @@
+{
+  "id": "gen-1779852454-KlSwRaDQanRJllO8B42E",
+  "object": "chat.completion",
+  "created": 1779852454,
+  "model": "openai/gpt-5.5-20260423",
+  "provider": "OpenAI",
+  "system_fingerprint": null,
+  "service_tier": "default",
+  "choices": [
+    {
+      "index": 0,
+      "logprobs": null,
+      "finish_reason": "stop",
+      "native_finish_reason": "completed",
+      "message": {
+        "role": "assistant",
+        "content": "{\n  \"resolution_strategies\": [\n    {\n      \"resolution_strategy_id\": \"RS1_insert_archive_order_before_terminate\",\n      \"change_operations\": [\n        {\n          \"operation\": \"insert_before\",\n          \"parameters\": {\n            \"target_activity_label\": \"terminate\",\n            \"new_activity_label\": \"archive order\"\n          }\n        }\n      ],\n      \"evaluation\": {\n        \"compliance_degree\": {\n          \"value\": \"full\",\n          \"reason\": \"The missing activity \\\"archive order\\\" is added, and because it is inserted immediately before \\\"terminate\\\", the directly_follows requirement that \\\"terminate\\\" directly follows \\\"archive order\\\" is satisfied.\"\n        },\n        \"resolution_context_consistency\": {\n          \"value\": \"high\",\n          \"reason\": \"No additional resolution context requirements are specified, and the change does not interfere with existing payment, packing, or shipping behavior.\"\n        },\n        \"change_cost\": {\n          \"value\": \"very_low\",\n          \"reason\": \"Only one localized insertion is required.\"\n        },\n        \"structural_quality_impact\": {\n          \"value\": \"low\",\n          \"reason\": \"The process remains a simple sequence at the end; no new branching, looping, or synchronization complexity is introduced.\"\n        },\n        \"change_location\": {\n          \"value\": \"late\",\n          \"reason\": \"The change is applied immediately before process termination, after goods have been sent.\"\n        }\n      }\n    },\n    {\n      \"resolution_strategy_id\": \"RS2_insert_archive_order_after_send_goods\",\n      \"change_operations\": [\n        {\n          \"operation\": \"insert_after\",\n          \"parameters\": {\n            \"target_activity_label\": \"send goods\",\n            \"new_activity_label\": \"archive order\"\n          }\n        }\n      ],\n      \"evaluation\": {\n        \"compliance_degree\": {\n          \"value\": \"full\",\n          \"reason\": \"Since \\\"send goods\\\" currently directly precedes \\\"terminate\\\", inserting \\\"archive order\\\" after \\\"send goods\\\" places it directly before \\\"terminate\\\". This satisfies both existence and direct-follow constraints.\"\n        },\n        \"resolution_context_consistency\": {\n          \"value\": \"high\",\n          \"reason\": \"The existing process behavior is preserved, and archiving is added only after fulfillment is complete.\"\n        },\n        \"change_cost\": {\n          \"value\": \"very_low\",\n          \"reason\": \"Only one process change operation is needed.\"\n        },\n        \"structural_quality_impact\": {\n          \"value\": \"low\",\n          \"reason\": \"The end of the process remains sequential and easy to understand.\"\n        },\n        \"change_location\": {\n          \"value\": \"late\",\n          \"reason\": \"The operation is placed near the end of the process, directly after \\\"send goods\\\" and before termination.\"\n        }\n      }\n    },\n    {\n      \"resolution_strategy_id\": \"RS3_rename_send_goods_to_archive_order\",\n      \"change_operations\": [\n        {\n          \"operation\": \"rename\",\n          \"parameters\": {\n            \"target_activity_label\": \"send goods\",\n            \"new_activity_label\": \"archive order\"\n          }\n        }\n      ],\n      \"evaluation\": {\n        \"compliance_degree\": {\n          \"value\": \"full\",\n          \"reason\": \"After renaming, the process contains \\\"archive order\\\" directly before \\\"terminate\\\", satisfying the detected compliance requirement.\"\n        },\n        \"resolution_context_consistency\": {\n          \"value\": \"medium\",\n          \"reason\": \"No explicit context requirement is violated, but the original shipping activity is removed semantically, which may undermine the intended business behavior.\"\n        },\n        \"change_cost\": {\n          \"value\": \"very_low\",\n          \"reason\": \"Only one rename operation is required.\"\n        },\n        \"structural_quality_impact\": {\n          \"value\": \"none\",\n          \"reason\": \"The control-flow structure is unchanged.\"\n        },\n        \"change_location\": {\n          \"value\": \"late\",\n          \"reason\": \"The renamed activity is located at the end of the process immediately before termination.\"\n        }\n      }\n    }\n  ],\n  \"best_resolution_strategy_id\": \"RS1_insert_archive_order_before_terminate\",\n  \"best_resolution_reason\": \"RS1 is the best strategy because it fully restores compliance with a single localized change, preserves the existing business behavior including sending goods, and places archiving exactly where required: directly before process termination.\"\n}",
+        "refusal": null,
+        "reasoning": null,
+        "reasoning_details": [
+          {
+            "type": "reasoning.encrypted",
+            "data": "gAAAAABqFmSx6pKVDUc6G4dB7Ybiz6RclTX3e1Tqh4UGd55nCoXXqtOEbNi2vyiPSJuWItx6ENV4rufSOgWu6cl9FPUBFC5lauhKGWnzEJ4GtqDq3LfUcsHSeKYnMwray_1vQKAVbAXjbBh7EYG5ja7eFAjHshMbshTjOVPH-of6kIoErv3FrWoAiYCxwUrIclzOpOB4_DuNeqDZc4yltGn4Ct2Fx5yMinb1VLMlooB4Lzm6dWlugyAOcWNsJ2Zo01OIJCqaFav6pBZa0oIVTFpXpxnPLI0UjZcQhTp_jaj_1c0_2YkuD-fW9okkCSAZzksBUdDQ8w99kzKulVtWTbXXv6U-r6nqulFi5yNrvxequRxpkCIiYh0K7-HaWfY38y2iPBERfuNPMLWCgWnMEc-MHdxINxzPfGerFUHZ5SVWtIKZd4PY3HPD9CeOCDsy1DH_C6D4p_lNCoJIwLIYW-Dy-Z4cigD1tLg6RKOKWc7ZXDnClXB-LI5DH3T8Jaw0mqLd89nR04uSBtkE9m6RCNb_skEWxX6dL81BDvQIzE3Ru_1bnH6p4_cmQI-Y4lAt2nq89uDd2AbqJxCZ_mg-f_zxIEl9twdz6zId_5XytKTngbQVT-JdxQI6eVl4cgycvCRvESkwxUpHkQ2bFrhsKWWBa5H6qYpP8rS4f-wET3Yh35lV7LxeCrDSapIl8pbJ6DxaEFwGCYhCF87JT7jU8BF9eRqF1bFSwvylYTQ0cuDrmnXz_kGW8FG6e4jxQ62YSQJIDVmzb8T98kZi7ykqV-UndH7s25-NDGU36cX6dpOslzYn_q9dwx_X1tFSiLZ4SzS-gEVaP5bpwXjgxyTG2uWnvVC4lnVyw51_AI_K7g5PD2moeRkskzVya6rrUcxl0_VSeT7bKKb8pfI_ND5izpmlN_1ZiI24JXfUfWmkXb4dnkSDjokjaQ8fo7RaSNuBLBJK0J-QxpwCyR-IHRgQVS_7CaY2vfdWza2lOPlw0otE5lLJIv2ilXAjvj_FWffxWV5htnJnrM9r6KyKL7K5buFbR7b3tyCCWgzVODqB2BsqGRmsVIMliYYp7Mw-E01i4GktZ3XrjAZf84FyXM1fCZPuzIWUumg5xEOYRgjnBTGyfa-g2Anmu1JZZMZLTjmvDxKo-40_LtNupp41h7tqoB1YbwlF4Cj5mF_dRGuthkNOBhP7VVkcGEZf7w3436DUTlKvuSA1a4Q94jeH6FMCfq3vdPCqD8aPuMMxRHu-RWSnwVpE7RRqU5YS4rPLr6O3-j9mqSjg_QgDf2w1A2MM3xjdVUa7Gy49mb_gkNpdO6GD8SkrEal_SohnAnz67w0wN1JXfKX1UwMJgp4esbXinhLIUms4bLKS2CbKdIDwFYMk7gccOzgw1H411wKewAkYwRWHpXOsUOWNN6tGquM8vpF5TRsEnsRg7QZwqQl5a5RvJ-q39rZyR2I9QsP5uCyzsJNs7Uls--SuVmDBUldxyCiw5JUeENo8qyzJlCo6bGREyTSOKE5qQ-EVZmMwUGgFHQOwzgtUq4GY6p6Vw-JDB575wrgtZNISFmlg-eC4Dh3mbbnfNFic-HVqCnxJWU8Qfi5KOLdAYWmJ2Jg33vT_O72dB86qUMaCDebkeaMAAoGdBPyofY4voSUL97EX3Ymv5wkQrC8B1opSTiNRq45iGy5HD05IivpLVctfyLxzVMxi7iCtf5KGtnOIKw1ljLtBJFibx3HT7qyCPOOteS4s2rmOFscKOAFjrR9KovxT4e9N34o8OGPwyZs73sYxXELZzyrLdmJJFrwV61SQb0qCLvPeYz61raN0k8klrYi_qQPZC1HPFuInkVbeWGYgfeEYoelOIMEo46jE5oqaJxaPxLcjH8jtmWZFZGCTi-t_TJcp2UPaIozoOr3VbdojT4ibtUHeJEgeGVKLNWT-DgEe6P8bjnGllJI-TTLOTHDSwyNR_iZV3_wZ5JyO9cuZO-haTKHrDBj9yJ3cs465BReGpNKtsV0602D_FXmZemH3rA7EjiW1-Gv5po3B1nrtIltjp2iBZn8lqlLLyXCQh7GScQ43KXHIsdS7XsBlp709XwJqg-DDWkzQ04Bv9_u7LxYU3icbGF_QuklSHQE9ZJ7X369ZwH-qQ4afmG-5VpiagSBCOPmmwNwWYeaQwxLNYgbsfwr8HOrjF9wuwU4d4bWy3mRThSE2nz3xe37qt1UEBQcto-FTkTZQef23X2B-uR0Ep62UM2i8Y3VV9HpUpQiWAipyOM_3DUhFfd9L6FgrojJsqCvTeLMKPPbr_SKigE0IEJX2AJUEpBUy4LQMdOZsgh6vRLdVGBcGPRVAE2BKk1Ufefpy-aCEKs7K7xcmV0mToZh154IRlGRcDzJwI0zraQlNvJXFL0Nc9JRYHkukIryFh58-E2ESCrltsX2yUGjjtVurMyndI9IGoliUWgofft80kFooVw5dra6nNja1VR6CGM9A-wLXnRIB0hEDu4DFdLM3S5pLQxlJdglCCBJuXIekI5HmCyj3vcL_cnY8ZhZ6xISp_gMmBrjX1ob55O0xY3FSQJMBeo05l7Y8hg-2oiV_TKvNUEKcBo-iNWZSNQj4x1ok7QRJolaET3YU0ha__torMX6jobxkRTpoPtqx1A40cc5iGUU13cMZWnzhrzgiZQPjmgYe_YftaXDlCZHUNhulTiKz5VVTtT00uRahmAOUboSZkbB9XQXKlAf4cVfBidelWMQnTeZgBJIiERckC6acNif_eEk4bIGN-KXNiQMyYeb96xCKYPU7jqw-uwH-cYtaOp6OBlFv8vf7OVtw9HzrofkMbxX6PugpYh0_B3-sLnU-8gT4kX8Z0yDQDUszAOjgB5lbNgeqnLqJo3WBQ-Yd3SOtMd52Mgcyh-S9tO5V-JPQZ7ccFJHgmlU0suFBY2Y7YJ-VwAZ9TJC7653akonmr8ottAlMM9GsDWZ9KpbBpFpDB4hixk6Bf8gPu1jj29Ypv1XvtcQCQm7RZCvIIO9-l7G5rV6IbjCUKjK_pGyWEQsfTEs0fJqxmA-1Q--gNlsxfQ0f2vtvqlkBXG-0lx5Oe9HmxjVKgDHIDnGjLC_XeC8Bplv3DmslTEf7kZVG99c3_CFMfqMKC_wiNpp2LcbnM_v5D4oTXhFUhduq9hSExzLtLR-WuJux_F4s7nnAWqE2Rd6HO7RIgQV5afWMZ9L3JkYRT3t3s0KLX7kuVQG-4RqQyfVUUgDxAWA9A-C7PC_z1J3ImOih-WaaartexwKGiRvrX1sOaDHhENZYmGp1eZ_d1Jw5Sjme_5Kt_Dvb7_To7AmTDYNE6gAd0UCS82Au7Gxbgr6x4_ahuq4Hh4W8pqaTUIBj1Y3YY1JScYbIiI8cJ0sfPpl2w8nIFO3P12C8X4B4rmOjeh1KebjIsKRqbq6f15pk7pE9_OkZ2CS6k3f1to_I8tWa3t3GqhjCJHB0-ja55oJo30bkIEYUIJCVlA_YcDGMpJVzi0ymdRPVS_RuR1JqRZ042Q0CBeDBJqBY7aR_LuVmozCZA1gh6GlW_kKUy9PMs7cuErkk2xt-Dbf_U357q9Jt18ruYXmTZoqfvS2P-n_Y9DrxDxRAaRSfi3SOldnxt9H7BU2pjQx33q9BcX-FMMxnm3-qd1_aFA7mHZPqfJJWP_raB3LeQWBNV6a_JKjwQu4eJybObZpkIz5M_g3rVj09c3uYQhBoxF9oB46tELx00P7JzkPUPUEUSq_l1Y5Ez45wWNKfrsyy8RcWvoA1s91VvKXSyWau9rf8aDe6o09LznYiLTzyodGkP2ITY-Nq3PFk1QYsb1xj8enIMjFGG381ivpFQeW1R_CUA1SXqdu_7EXx7j6fK_yQh68_vfbYBGVSqi2VvGR7-e7Ov9cdhtLEpcCEgUMmE9bYdLHqsqd1pFhcChq9av8FgqLzfHlR6hmB0ZDx5gjXhiTXN26S5AkQwNBrS8Sew7PRaEothnf90-lm0KJp1VeUIDAEdM9YwFHk7Uu4gAXyd-RrjDcUq3m3iTgUwzhlP8oCfjRhoT9LKq9CiFUzFvsATEiPAhCCoXfTtcqwOFDrIHr5wOoH0EU4HBGh87IkX_nTb4Pm0rd_mGIJ4eWEaK--uxYWof30JTiFtofy_tZ8B0hbNLhGB7RUonbUZA-1AGPV8HWTUBLWCU7r7tl_-iyB__wik5ZWM5mfRgsOajRyOt7nFTpKN0k9yrjNKpD7ZfQ-RtZrdDYIT4nU16HtjZ7S2qnCHD1z4DkVHWaUiAT35RQQ8qvGE2KvnQZTf_4y1lSShp0Va-kAyAEP2ZfPFBmEO3yPJlbwtEOLYFsK7DFRQ3IPhYoHpNy32yJWWOFR5vFA3_IJoFZVcf1sIv4u3dBGLO8lXClFEc18CsviHxX8AwPwLgp0vTILPGmC2OyXIWMRTRac0Y0ztoaSejKrQn3YSMy2s3jqQozAcT78NSyXafbnboX3ZwBb2h33MSt3NwfCb2lM1HP_XH6BZ-xlsxhKV3-vUyBeYf1aoD6itP1Bh_XIsjtYWY_2l4UBHNfEYeE8rynRiVeuoiIpm8tCCuP8SezBD7MgIld68SQvDOfk93C0Jl0wyLwJwpaU3GvuSJoNywSKdi-VC61gd0NSf5kIohAh5nyU5yYh577J6USzvcP7Y9feJCA=",
+            "format": "openai-responses-v1",
+            "id": "rs_09c059469ed38b56016a1664a6e9708197b610af571225f73f",
+            "index": 0
+          }
+        ]
+      }
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 2821,
+    "completion_tokens": 1419,
+    "total_tokens": 4240,
+    "cost": 0.046307,
+    "is_byok": false,
+    "prompt_tokens_details": {
+      "cached_tokens": 2304,
+      "cache_write_tokens": 0,
+      "audio_tokens": 0,
+      "video_tokens": 0
+    },
+    "cost_details": {
+      "upstream_inference_cost": 0.046307,
+      "upstream_inference_prompt_cost": 0.003737,
+      "upstream_inference_completions_cost": 0.04257
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 516,
+      "image_tokens": 0,
+      "audio_tokens": 0
+    }
+  }
+}

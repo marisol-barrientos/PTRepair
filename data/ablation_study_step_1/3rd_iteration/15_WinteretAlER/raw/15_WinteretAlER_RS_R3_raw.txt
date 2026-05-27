@@ -1,0 +1,119 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_rename_wait_for_user_input",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "wait for user input",
+            "new_activity_label": "user input"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The violation evidence indicates that the required activity label \"user input\" is missing, while a semantically equivalent activity \"wait for user input\" already exists in the timed parallel structure with the 60-second timeout and \"automatic screen lock\". Renaming it resolves the missing activity and allows the timed alternative relationship to be recognized without changing the process behavior."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The change is confined to the initial screen-lock/user-input handling and does not affect the later authentication XOR. It does not create a path where \"Unlock screen\" follows the condition \"not data.authenticated\", so requirement R1 remains satisfied."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one rename operation is required. No control-flow restructuring or data-flow modification is introduced."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The process structure remains unchanged. Only the activity label is aligned with the compliance requirement."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The modified activity is located in the initial parallel block before \"Access requested\" and the authentication sequence."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_insert_user_input_before_existing_wait",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "wait for user input",
+            "new_activity_label": "user input"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "substantial",
+          "reason": "This introduces the required activity label \"user input\" into the branch that already represents the user-input alternative to the timeout-driven \"automatic screen lock\". However, because the original \"wait for user input\" activity remains, the model may contain redundant user-input behavior, so this is less clean than renaming."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The inserted activity is in the initial parallel screen-lock handling and does not modify the authentication decision structure. It should not affect the existing guarantee that \"Unlock screen\" does not follow \"not data.authenticated\"."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one insertion is required, but it adds an extra activity rather than simply correcting the existing label."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The control-flow structure remains valid, but the branch now contains two closely related user-input activities, which may be semantically redundant."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The change is applied in the initial parallel section before the access request and authentication logic."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_replace_wait_activity_with_user_input",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "wait for user input",
+            "new_activity_label": "user input"
+          }
+        },
+        {
+          "operation": "delete",
+          "parameters": {
+            "target_activity_label": "wait for user input"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The original activity is replaced by an activity with the exact required label \"user input\" while preserving its position in the timed alternative structure. This resolves the missing activity and supports recognition of the 60-second timed alternative relationship."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The replacement occurs before the authentication decision and does not affect the XOR branches for authenticated versus unauthenticated access. Requirement R1 remains preserved."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Two simple localized operations are required. The cost is higher than a direct rename but still limited."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The final structure is essentially the same as the original structure, with one activity label replaced. During the change sequence there is a temporary additional activity, but the resulting model remains clean."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "Both operations are applied in the initial parallel user-input and timeout section."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_rename_wait_for_user_input",
+  "best_resolution_reason": "RS1 is the best strategy because it directly addresses the detected cause of the violation: the compliance checker expects the exact activity label \"user input\", while the process already contains the semantically matching activity \"wait for user input\" in the correct timed context. A rename is minimal, localized, preserves the existing process behavior and structure, and does not threaten the already satisfied authentication-related context requirement R1.",
+  "alternative_suggestion": {
+    "reason": "If the compliance checker requires an explicit timer-bound alternative construct rather than recognizing the existing parallel timeout pattern, the provided operations do not directly support creating a formal boundary-timer or event-subprocess construct.",
+    "conceptual_solution": "Model \"user input\" as the primary activity with a 60-second timeout boundary event that triggers \"automatic screen lock\" as the timeout alternative.",
+    "expected_compliance_impact": "This would make the timed alternative relationship explicit and should fully satisfy the timed_alternative requirement in tools that require formal timeout-alternative semantics."
+  }
+}

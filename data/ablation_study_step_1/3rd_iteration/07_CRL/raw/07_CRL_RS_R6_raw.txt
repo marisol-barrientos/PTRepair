@@ -1,0 +1,114 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_rename_existing_activity_to_required_label",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Assign post processing to supervisor",
+            "new_activity_label": "assign post processing to supervisor"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The required activity already exists in the branch guarded by condition data.loan_amount > 1000000, but its label differs by capitalization. Renaming it to the exact required label makes the activity detectable on the correct conditional branch."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The change does not alter control flow, data dependencies, resources, or the ordering of activities relevant to R2 or R7. Existing compliant behavior is preserved."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one localized rename operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The process structure remains unchanged. No additional branches, loops, or activities are introduced."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The modified activity is located in the loan assessment part of the process, after initial request handling and before final approval or rejection."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_insert_required_activity_after_existing_assignment",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "Assign post processing to supervisor",
+            "new_activity_label": "assign post processing to supervisor"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The inserted activity appears directly after the existing assignment activity inside the branch guarded by data.loan_amount > 1000000, so the required activity eventually follows the condition."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The strategy preserves the ordering constraints relevant to R2 and does not affect the condition in R7. However, it introduces a duplicate assignment-like activity, which may create semantic redundancy."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one insertion is required, but it adds a new activity rather than correcting the existing one."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The control-flow structure remains unchanged, but the process contains two nearly identical activities in sequence."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The inserted activity is placed in the loan assessment branch for high loan amounts."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_replace_existing_assignment_by_required_activity",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "Assign post processing to supervisor",
+            "new_activity_label": "assign post processing to supervisor"
+          }
+        },
+        {
+          "operation": "delete",
+          "parameters": {
+            "target_activity_label": "Assign post processing to supervisor"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "After the insertion and deletion, the branch guarded by data.loan_amount > 1000000 contains the required activity label."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The control-flow ordering remains compatible with R2 and R7, but deleting the original activity may remove its write behavior unless the inserted activity is assumed to preserve the same semantics."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "Two operations are required, and the strategy is more invasive than a direct rename."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The final structure remains simple and non-duplicated, but the intermediate repair is less direct than renaming."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "Both changes occur in the high-loan-amount branch within the loan assessment part of the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_rename_existing_activity_to_required_label",
+  "best_resolution_reason": "RS1 is the best strategy because it fully restores compliance with a single minimal and localized operation. It preserves the existing control flow, data behavior, resources, and currently satisfied context requirements, while avoiding unnecessary duplication or structural changes."
+}

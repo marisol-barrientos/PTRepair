@@ -1,0 +1,149 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_insert_production_step_before_test_quality",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "Test Quality",
+            "new_activity_label": "production step"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The missing activity \"production step\" is introduced directly before \"Test Quality\" in the same accepted-order execution path. Therefore, whenever \"production step\" occurs, \"Test Quality\" necessarily occurs afterwards. The existing ordering of \"Test Quality\" before \"Ship\" is preserved."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The change is localized inside the production branch and does not affect \"Report Order\" or \"Close Bill\". The existing context requirement precedence('Close Bill', 'Report Order') remains satisfied."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one activity is inserted. No existing activities are deleted, renamed, or reordered."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The sequence remains structurally simple. The added activity increases the length of the production sequence slightly but does not introduce additional branching or looping."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is applied inside the accepted-order branch, between production activities and shipment, which is in the middle part of the process before billing closure."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_rename_existing_production_activity",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Produce Part 2",
+            "new_activity_label": "production step"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "\"Produce Part 2\" is renamed to the required activity label \"production step\". Since this activity occurs before \"Test Quality\" in the same sequence, the leads_to('production step', 'Test Quality') requirement is satisfied. The existing ordering of \"Test Quality\" before \"Ship\" is preserved."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The change does not affect the ordering between \"Report Order\" and \"Close Bill\" and remains confined to the production branch."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one label is changed and no process structure is modified."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The process tree structure is unchanged. No new control-flow constructs or activities are introduced."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The modified activity is located in the production sequence of the accepted-order branch."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_insert_production_step_and_reassert_test_before_ship",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "Test Quality",
+            "new_activity_label": "production step"
+          }
+        },
+        {
+          "operation": "move_before",
+          "parameters": {
+            "source_activity_label": "Test Quality",
+            "target_activity_label": "Ship"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The first operation introduces \"production step\" before \"Test Quality\", ensuring that every occurrence of \"production step\" leads to a later \"Test Quality\". The second operation explicitly places \"Test Quality\" before \"Ship\", reinforcing the required precedence relation. In the displayed tree this second operation is effectively confirmatory because \"Test Quality\" is already before \"Ship\"."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "Both changes are localized to the accepted-order branch and do not alter the relationship between \"Report Order\" and \"Close Bill\"."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "The strategy uses two operations. One operation inserts a new activity and the other repositions or confirms the position of an existing activity."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process remains a simple sequence inside the existing parallel branch. No new branching, looping, or synchronization structures are added."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The changes occur in the production and quality-control part of the accepted-order branch, before shipment and before process closure."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_rename_produce_part_1_to_production_step",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Produce Part 1",
+            "new_activity_label": "production step"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "\"Produce Part 1\" is renamed to \"production step\". Since it is followed by \"Produce Part 2\", then \"Test Quality\", every occurrence of \"production step\" eventually leads to \"Test Quality\". The existing \"Test Quality\" before \"Ship\" order remains unchanged."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The change does not modify control flow and does not affect \"Report Order\" or \"Close Bill\"."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only a single rename operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The process structure is unchanged."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The renamed activity is located in the production branch of the accepted-order path."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_insert_production_step_before_test_quality",
+  "best_resolution_reason": "RS1 is recommended because it directly repairs the missing \"production step\" without altering the meaning or labels of existing production activities. It keeps the change localized, preserves the existing \"Test Quality\" before \"Ship\" ordering, and maintains the context requirement precedence('Close Bill', 'Report Order'). Although renaming an existing activity has lower cost, insertion is safer because it avoids losing the more specific existing activity labels \"Produce Part 1\" and \"Produce Part 2\"."
+}

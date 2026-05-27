@@ -1,0 +1,108 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_insert_archive_order_before_terminate",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "terminate",
+            "new_activity_label": "archive order"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The missing activity \"archive order\" is added, and because it is inserted immediately before \"terminate\", the directly_follows requirement that \"terminate\" directly follows \"archive order\" is satisfied."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No additional resolution context requirements are specified, and the change does not interfere with existing payment, packing, or shipping behavior."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one localized insertion is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process remains a simple sequence at the end; no new branching, looping, or synchronization complexity is introduced."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The change is applied immediately before process termination, after goods have been sent."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_insert_archive_order_after_send_goods",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "send goods",
+            "new_activity_label": "archive order"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Since \"send goods\" currently directly precedes \"terminate\", inserting \"archive order\" after \"send goods\" places it directly before \"terminate\". This satisfies both existence and direct-follow constraints."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The existing process behavior is preserved, and archiving is added only after fulfillment is complete."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one process change operation is needed."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The end of the process remains sequential and easy to understand."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The operation is placed near the end of the process, directly after \"send goods\" and before termination."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_rename_send_goods_to_archive_order",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "send goods",
+            "new_activity_label": "archive order"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "After renaming, the process contains \"archive order\" directly before \"terminate\", satisfying the detected compliance requirement."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "No explicit context requirement is violated, but the original shipping activity is removed semantically, which may undermine the intended business behavior."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one rename operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The control-flow structure is unchanged."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The renamed activity is located at the end of the process immediately before termination."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_insert_archive_order_before_terminate",
+  "best_resolution_reason": "RS1 is the best strategy because it fully restores compliance with a single localized change, preserves the existing business behavior including sending goods, and places archiving exactly where required: directly before process termination."
+}

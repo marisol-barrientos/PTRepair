@@ -1,0 +1,115 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_move_pack_goods_after_parallel_join",
+      "change_operations": [
+        {
+          "operation": "move_before",
+          "parameters": {
+            "source_activity_label": "pack goods",
+            "target_activity_label": "send goods"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Moving \"pack goods\" to immediately before \"send goods\" places it after the parallel block has completed. Therefore, both \"pay by credit card\" and \"pay by bank transfer\" necessarily occur before \"pack goods\" in their respective payment paths, satisfying both leads_to requirements."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No additional resolution context requirements are specified, and the change preserves the existing payment alternatives and shipping address collection behavior."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "The strategy requires only one localized move operation."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The overall structure remains simple. The existing parallelism between payment handling and providing the shipping address is mostly preserved, while packing is delayed until after both branches complete."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The modification affects the position of \"pack goods\" near the end of the process, immediately before \"send goods\"."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_sequentialize_payment_before_shipping_and_packing",
+      "change_operations": [
+        {
+          "operation": "sequentialize_parallel",
+          "parameters": {
+            "first_activity_label": "pay by credit card",
+            "second_activity_label": "pack goods"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Sequentializing the parallel branches so that the payment branch executes before the branch containing \"pack goods\" ensures that both payment alternatives complete before \"pack goods\" can occur."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "There are no explicit resolution context requirements. The payment alternatives remain intact, and \"pack goods\" remains after \"provide shipping address\"."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one operation is required, but it changes the control-flow relation between two larger branches rather than only moving a single activity."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The strategy removes the existing parallelism between payment handling and shipping-address/packing activities, which may reduce process efficiency, but it keeps the process structurally consistent."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change affects the central parallel block containing the payment and shipping activities."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_duplicate_packing_inside_payment_alternatives",
+      "change_operations": [
+        {
+          "operation": "move_after",
+          "parameters": {
+            "source_activity_label": "pack goods",
+            "target_activity_label": "pay by bank transfer"
+          }
+        },
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "pay by credit card",
+            "new_activity_label": "pack goods"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Each payment alternative is followed by a \"pack goods\" activity. Therefore, after either \"pay by bank transfer\" or \"pay by credit card\", \"pack goods\" eventually occurs."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "No explicit resolution context requirements are violated. However, packing is moved into the payment branch and may no longer be guaranteed to occur after \"provide shipping address\", because the shipping-address branch still executes in parallel."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "Two operations are required, and the repair duplicates the packing activity across payment alternatives."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The process becomes more complex because \"pack goods\" appears in both payment alternatives. It also weakens the original coupling between shipping-address provision and packing."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The changes occur inside the central payment and shipping parallel block."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_move_pack_goods_after_parallel_join",
+  "best_resolution_reason": "RS1 is the preferred strategy because it fully restores compliance with both leads_to requirements using a single activity move. It preserves most of the original parallel structure, avoids duplicating activities, keeps \"pack goods\" before \"send goods\", and naturally places packing after both payment completion and shipping-address provision."
+}

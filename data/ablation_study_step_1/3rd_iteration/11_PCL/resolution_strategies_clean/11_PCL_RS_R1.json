@@ -1,0 +1,108 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_move_identity_check_after_state_branching",
+      "change_operations": [
+        {
+          "operation": "move_before",
+          "parameters": {
+            "source_activity_label": "Identity Check",
+            "target_activity_label": "Approve Account Opening"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Moving Identity Check to the common sequence immediately after the state-based exclusive branch ensures that whenever data.state == \"new\" holds, Identity Check will eventually be executed on the subsequent common path."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The satisfied context requirement exists('initiate account') is preserved because Initiate Account is not changed or removed."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one activity move is required. No additional activities, branches, or conditions are introduced."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process remains structurally simple. The main impact is that Identity Check becomes mandatory for all cases, including existing customers and fallback cases, which may be more restrictive than necessary but does not introduce structural inconsistency."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The change is applied around the first exclusive branching structure, before account approval and account opening."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_copy_identity_check_to_common_path",
+      "change_operations": [
+        {
+          "operation": "copy_before",
+          "parameters": {
+            "source_activity_label": "Identity Check",
+            "target_activity_label": "Approve Account Opening"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Adding a copy of Identity Check before Approve Account Opening creates a guaranteed common-path Identity Check after the state-based branch. Thus, if data.state == \"new\" becomes true, Identity Check will eventually occur even if the analyzer cannot guarantee the original branch-local check."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "Initiate Account remains present and unchanged, so the existing context requirement is preserved."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one copy operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The original Identity Check remains in the new-customer branch, while an additional common Identity Check is introduced. This preserves existing behavior but may create redundant checks for new customers."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The added common-path check is placed directly after the initial customer-state branching and before account approval."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_insert_identity_check_immediately_after_state_creation",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "Customer Request Arrives",
+            "new_activity_label": "Identity Check"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "substantial",
+          "reason": "Customer Request Arrives writes data.state. Inserting Identity Check immediately afterwards directly addresses the identified risk that data.state == \"new\" may become true before the branch. The original Identity Check in the new-customer branch also remains. However, this may not fully resolve all interpretations if later activities can also change data.state outside the analyzed fragment."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The operation does not affect Initiate Account, so the context requirement remains satisfied."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The strategy requires a single insertion."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The process remains structurally valid, but it introduces an additional Identity Check before customer type routing, which may be redundant or premature for existing customers."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The new check is inserted immediately after the first activity in the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_move_identity_check_after_state_branching",
+  "best_resolution_reason": "RS1 is recommended because it achieves full compliance with a single localized operation and avoids duplicating Identity Check. It preserves the existing Initiate Account activity and keeps the process structurally simple, while guaranteeing that Identity Check eventually occurs after the state-based branch whenever data.state == \"new\" holds."
+}

@@ -1,0 +1,143 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_minimal_insert_final_decision_and_assign_resource",
+      "change_operations": [
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "judge high risk loan",
+            "new_resource": "branch office manager"
+          }
+        },
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "judge high risk loan",
+            "new_activity_label": "take final decision"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The activity \"judge high risk loan\" is assigned to the required resource \"branch office manager\", and the missing activity \"take final decision\" is inserted directly after it, satisfying both parts of the violated requirement."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "There are no additional resolution context requirements, and the change is localized to the high-risk loan branch without modifying existing control-flow decisions or removing existing behavior."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only two simple operations are required: one resource annotation change and one activity insertion."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process structure remains unchanged except for adding one sequential activity. No additional gateways, branches, or loops are introduced."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is applied inside the high-risk loan handling branch, which occurs after initial request handling and before contract receipt and settlement."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_insert_final_decision_with_status_write",
+      "change_operations": [
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "judge high risk loan",
+            "new_resource": "branch office manager"
+          }
+        },
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "judge high risk loan",
+            "new_activity_label": "take final decision"
+          }
+        },
+        {
+          "operation": "add_write",
+          "parameters": {
+            "target_activity_label": "take final decision",
+            "added_statement": "loan.status = final_decision"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The required resource assignment is added to \"judge high risk loan\", and \"take final decision\" is inserted directly after it. The added write statement also makes the new decision activity semantically aligned with the following approval-based branch."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The strategy is mostly consistent because it localizes the repair, but adding a write to loan.status may affect the subsequent branch behavior if existing data semantics were already defined elsewhere."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "The strategy requires three operations and introduces an additional data write, making it slightly more costly than the minimal repair."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The control-flow structure remains simple and sequential at the repair point. The only additional complexity is a data write attached to the new activity."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The modifications are located in the high-risk loan path before the approval outcome branch and before loan contract handling."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_relabel_existing_judgment_as_final_decision_and_insert_judgment_before",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "judge high risk loan",
+            "new_activity_label": "take final decision"
+          }
+        },
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "take final decision",
+            "new_activity_label": "judge high risk loan"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "judge high risk loan",
+            "new_resource": "branch office manager"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "After renaming the existing activity to \"take final decision\" and inserting a new \"judge high risk loan\" activity immediately before it, the required directly-follows relation is established. The new \"judge high risk loan\" activity is also assigned to the required resource."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The strategy remains localized, but it changes the label and implied meaning of the original \"judge high risk loan\" activity, which may affect traceability or documentation."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "Three operations are required, including a rename and a new insertion. This is more intrusive than simply inserting the missing activity after the existing one."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The resulting structure is still a simple sequence in the same branch. No additional branching or looping complexity is introduced."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The changes occur within the nested high-risk loan branch, which is in the middle of the overall process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_minimal_insert_final_decision_and_assign_resource",
+  "best_resolution_reason": "RS1 is the recommended strategy because it fully restores compliance with the fewest and most localized changes. It directly assigns \"judge high risk loan\" to the required resource and inserts the missing \"take final decision\" activity immediately after it, without altering existing labels, data behavior, or control-flow structures."
+}

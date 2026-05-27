@@ -1,0 +1,139 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_conditional_warning_before_initial_deposit",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "Accept Initial Deposit",
+            "new_activity_label": "send warning"
+          }
+        },
+        {
+          "operation": "embed_activity_in_xor",
+          "parameters": {
+            "target_activity_label": "send warning",
+            "condition": "data.balance < 0 and not data.special_allowance",
+            "mode": "skip"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The inserted activity 'send warning' is embedded in a conditional XOR branch with the exact condition 'data.balance < 0 and not data.special_allowance'. When this condition holds, 'send warning' executes directly after the condition is evaluated."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The existing activity 'Initiate Account' is preserved, so requirement R2 remains satisfied. Existing behavior for accepting an initial deposit is also retained after the warning."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only two localized operations are required: inserting the warning activity and wrapping it in a conditional skip structure."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The strategy introduces a small nested XOR structure but does not disturb the existing main sequence or existing branch conditions."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The change is made in the account initiation part of the process, immediately before 'Accept Initial Deposit', which occurs after account approval and opening."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_add_explicit_negative_balance_branch",
+      "change_operations": [
+        {
+          "operation": "add_xor_branch",
+          "parameters": {
+            "existing_branch_condition": "not (data.special_allowance)",
+            "new_branch_condition": "data.balance < 0 and not data.special_allowance",
+            "new_activity_label": "send warning"
+          }
+        },
+        {
+          "operation": "modify_condition",
+          "parameters": {
+            "target_activity_label": "Accept Initial Deposit",
+            "new_condition": "not (data.special_allowance) and not (data.balance < 0)"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "A new XOR branch is added with the required condition and the activity 'send warning' as the first activity in that branch. The existing deposit branch condition is refined to avoid overlap."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The activity 'Initiate Account' remains in the process, so R2 is still satisfied. The modification does not remove any required activity."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The strategy requires two operations and reuses the existing XOR structure."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The XOR remains flat and mutually exclusive after refining the original 'not special allowance' branch. However, the negative-balance path no longer executes 'Accept Initial Deposit', which may be a behavioral change."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The change is applied to the existing balance/deposit decision point after 'Apply Account Policy'."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_capture_balance_and_conditionally_warn",
+      "change_operations": [
+        {
+          "operation": "add_write",
+          "parameters": {
+            "target_activity_label": "Customer Request Arrives",
+            "added_statement": "balance"
+          }
+        },
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "Accept Initial Deposit",
+            "new_activity_label": "send warning"
+          }
+        },
+        {
+          "operation": "embed_activity_in_xor",
+          "parameters": {
+            "target_activity_label": "send warning",
+            "condition": "data.balance < 0 and not data.special_allowance",
+            "mode": "skip"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The required condition is explicitly introduced before 'send warning', and the data object 'balance' is added to the process input so the condition can be evaluated."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The activity 'Initiate Account' remains unchanged, so R2 is preserved. Existing account-opening behavior is also retained."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "This strategy requires three operations and modifies both data handling at the start of the process and control flow near the deposit step."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process structure remains mostly unchanged except for a small conditional skip branch. The added data write improves the availability of the balance condition."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "Although the warning logic is added late in the process, this strategy also modifies the initial request activity to capture the balance value."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_conditional_warning_before_initial_deposit",
+  "best_resolution_reason": "RS1 is recommended because it fully restores compliance with the condition_directly_follows requirement while preserving the existing account-opening and initial-deposit behavior. It is localized, has low change cost, keeps 'Initiate Account' intact for R2, and avoids changing existing branch conditions."
+}

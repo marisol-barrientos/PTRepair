@@ -1,0 +1,86 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_modify_resource_only",
+      "change_operations": [
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "Activate Sim Card",
+            "new_resource": "telephone company"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "partial",
+          "reason": "This resolves the executed_by requirement for 'Activate Sim Card' by assigning it to the required resource, 'telephone company'. However, it does not resolve the activity_receives requirement because the available operations do not include adding a missing read or receive data object to an activity."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "There are no additional resolution context requirements, and the change is limited to the resource annotation of the violating activity."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one localized annotation change is required."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The process control-flow structure is unchanged."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The modified activity, 'Activate Sim Card', occurs near the end of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_insert_status_check_before_activation_and_modify_resource",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "Activate Sim Card",
+            "new_activity_label": "Receive SIM card status"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "Activate Sim Card",
+            "new_resource": "telephone company"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "partial",
+          "reason": "The resource violation is resolved. The inserted activity can make the process behaviorally more likely to obtain the SIM card status before activation, but it does not formally satisfy activity_receives('Activate Sim Card','data.sim_card_status') because the required data object is still not attached as a receive/read object of 'Activate Sim Card'."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No stated resolution context requirements are affected. The inserted activity is placed immediately before the violating activity, preserving the rest of the process behavior."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The strategy requires one control-flow insertion and one resource annotation update."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process remains a simple sequence at the end. The added activity introduces a small additional step but no new branching, looping, or parallelism."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "Both changes are applied immediately before or at 'Activate Sim Card', which is near the end of the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_modify_resource_only",
+  "best_resolution_reason": "RS1 is the preferred supported repair because it fully resolves the resource-related part of the violation with the smallest possible localized change and no structural impact. The remaining data-receive violation cannot be fully repaired using the available operations because there is no operation for adding a missing read or receive data object to an activity.",
+  "alternative_suggestion": {
+    "reason": "The provided change operations include modify_read, which can rename or replace an existing read variable, but they do not include an operation to add a new read or receive data object to an activity. Since the evidence states that 'data.sim_card_status' is not found for 'Activate Sim Card', and no existing read variable is provided, a valid full repair cannot be expressed with the supported operations.",
+    "conceptual_solution": "Add a receive/read annotation to activity 'Activate Sim Card' so that it consumes 'data.sim_card_status', and assign the activity resource to 'telephone company'. Conceptually, this would make 'Activate Sim Card' explicitly receive the SIM card status before execution and be performed by the required organization.",
+    "expected_compliance_impact": "This would fully restore compliance with both activity_receives('Activate Sim Card','data.sim_card_status') and executed_by('Activate Sim Card','telephone company')."
+  }
+}

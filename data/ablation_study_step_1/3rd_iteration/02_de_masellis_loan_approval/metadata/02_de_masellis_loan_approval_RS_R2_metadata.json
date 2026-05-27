@@ -1,0 +1,16 @@
+{
+  "model": "openai/gpt-5.5",
+  "scenario_name": "02_de_masellis_loan_approval",
+  "requirement_id": "R2",
+  "output_prefix": "02_de_masellis_loan_approval_RS_R2",
+  "execution_time_milliseconds": 70762.14,
+  "execution_time_seconds": 70.76,
+  "resolution_context_requirements": 0,
+  "problems_detected": [],
+  "usage": {
+    "prompt_tokens": 2801,
+    "completion_tokens": 3817,
+    "total_tokens": 6618,
+    "reasoning_tokens": null
+  }
+}

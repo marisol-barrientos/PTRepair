@@ -1,0 +1,149 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1",
+      "change_operations": [
+        {
+          "operation": "copy_before",
+          "parameters": {
+            "source_activity_label": "ask for updates",
+            "target_activity_label": "check medical history"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "A copied instance of \"ask for updates\" is inserted immediately before \"check medical history\", ensuring that every execution of \"check medical history\" is preceded by an \"ask for updates\" activity."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "There are no explicit resolution context requirements, and the original behavior is largely preserved because the existing conditional \"ask for updates\" activity remains unchanged."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one localized copy operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The strategy preserves the existing parallel and conditional structure. The main drawback is that \"ask for updates\" may now occur twice in executions where the original conditional branch is also taken."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is applied directly before \"check medical history\", which is located in the risk-assessment part of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2",
+      "change_operations": [
+        {
+          "operation": "move_after",
+          "parameters": {
+            "source_activity_label": "check medical history",
+            "target_activity_label": "ask for updates"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "\"check medical history\" is moved to occur after \"ask for updates\", so the precedence requirement is satisfied whenever \"check medical history\" occurs."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No explicit resolution context requirements are present. However, the behavior of the risk-assessment branch is changed because \"check medical history\" is removed from its original parallel position with \"check career\"."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one move operation is required, but it relocates an activity across structured regions."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The activity \"check medical history\" is separated from the other risk-checking activities and becomes dependent on the branch containing \"ask for updates\". This may reduce process cohesion."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change affects both the update branch and the risk-assessment section, which are in the middle of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3",
+      "change_operations": [
+        {
+          "operation": "sequentialize_parallel",
+          "parameters": {
+            "first_activity_label": "check application",
+            "second_activity_label": "retrieve data"
+          }
+        },
+        {
+          "operation": "embed_activity_in_xor",
+          "parameters": {
+            "target_activity_label": "check medical history",
+            "condition": "not (data.conflicts == \"true\")",
+            "mode": "skip"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The branch containing \"check application\" and the conditional update decision is made to execute before the branch containing \"check medical history\". Additionally, \"check medical history\" is skipped when the condition for \"ask for updates\" is not satisfied. Therefore, \"check medical history\" only occurs in executions where \"ask for updates\" occurred before."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "There are no explicit resolution context requirements. The strategy avoids adding duplicate activities, but it changes the original concurrency between the two main branches."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "Two operations are required, including one structural transformation from parallel to sequential execution."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The repair is logically consistent but reduces parallelism and introduces an additional conditional wrapper around \"check medical history\"."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The repair affects the main parallel split and the risk-assessment section containing \"check medical history\"."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4",
+      "change_operations": [
+        {
+          "operation": "delete",
+          "parameters": {
+            "target_activity_label": "check medical history"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The precedence requirement is satisfied vacuously because \"check medical history\" no longer occurs."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No explicit resolution context requirements are violated. However, removing the activity may conflict with implicit business expectations not represented in the given context."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one delete operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The process becomes simpler, but the risk-assessment parallel block may become less meaningful because one of its checks is removed."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The deleted activity is located in the middle risk-assessment part of the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1",
+  "best_resolution_reason": "RS1 is recommended because it fully restores compliance with the precedence requirement using a single localized operation. It preserves the existing process structure and avoids disrupting the original parallel branches. Although it may introduce a duplicate execution of \"ask for updates\" in some traces, this is less disruptive than moving or deleting \"check medical history\" or removing the existing parallelism."
+}

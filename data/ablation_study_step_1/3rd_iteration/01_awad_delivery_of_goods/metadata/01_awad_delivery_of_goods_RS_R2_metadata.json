@@ -1,0 +1,16 @@
+{
+  "model": "openai/gpt-5.5",
+  "scenario_name": "01_awad_delivery_of_goods",
+  "requirement_id": "R2",
+  "output_prefix": "01_awad_delivery_of_goods_RS_R2",
+  "execution_time_milliseconds": 51400.33,
+  "execution_time_seconds": 51.4,
+  "resolution_context_requirements": 0,
+  "problems_detected": [],
+  "usage": {
+    "prompt_tokens": 2832,
+    "completion_tokens": 2656,
+    "total_tokens": 5488,
+    "reasoning_tokens": null
+  }
+}
