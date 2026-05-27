@@ -1,0 +1,146 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_remove_recheck_branch_and_generalize_remaining_branch",
+      "change_operations": [
+        {
+          "operation": "remove_branch",
+          "parameters": {
+            "target_activity_label": "ask to recheck"
+          }
+        },
+        {
+          "operation": "modify_condition",
+          "parameters": {
+            "target_activity_label": "ask for updates",
+            "new_condition": "true"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The branch containing the prohibited activity \"ask to recheck\" is removed, so the activity no longer exists in the process. The remaining XOR branch is made unconditional to avoid leaving the XOR without an executable branch when data.conflicts is true."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No additional resolution context requirements are provided. The strategy avoids introducing an unreachable or blocking XOR path by generalizing the remaining branch condition."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The strategy requires two localized changes within the same XOR block: removing one branch and adjusting the condition of the remaining branch."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The prohibited activity is removed cleanly, and the XOR remains structurally executable. However, the XOR becomes semantically unnecessary because it has only one effective branch."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The change occurs in the first parallel branch near the beginning of the process, immediately after \"check application\"."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_rename_recheck_to_update_request",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "ask to recheck",
+            "new_activity_label": "ask for updates"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The activity label \"ask to recheck\" is removed from the process by renaming it, satisfying the absence requirement at the activity-label level."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No resolution context requirements are provided, and the XOR branching behavior is preserved. The conflict branch still performs a follow-up request activity rather than being removed entirely."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one activity label is changed, making this the least invasive strategy."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process structure is unchanged. However, the process will contain two branches with the same activity label \"ask for updates\", which may reduce model clarity."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The renamed activity is located in the first parallel branch near the beginning of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_delete_prohibited_activity",
+      "change_operations": [
+        {
+          "operation": "delete",
+          "parameters": {
+            "target_activity_label": "ask to recheck"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Deleting \"ask to recheck\" removes the prohibited activity from the process, satisfying the absence requirement."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "No explicit context requirement is violated, but deleting the only activity in the data.conflicts == true branch may leave an empty branch, depending on the process-tree semantics."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one activity is deleted."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The change is simple but may create an empty XOR branch, which can reduce structural clarity or introduce execution ambiguity."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The deleted activity is located in the first parallel branch near the beginning of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_remove_conflict_branch_only",
+      "change_operations": [
+        {
+          "operation": "remove_branch_by_condition",
+          "parameters": {
+            "target_condition": "data.conflicts == \"true\""
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Removing the XOR branch with condition data.conflicts == \"true\" removes the prohibited activity \"ask to recheck\" from the process."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "No explicit context requirement is violated, but the remaining XOR branch only applies when conflicts are not true. If data.conflicts is true, the XOR may have no valid executable branch."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "The repair consists of a single branch-removal operation."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The prohibited branch is removed cleanly, but the remaining conditional structure may become incomplete for conflict cases."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The removed branch is located in the first parallel branch near the beginning of the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS2_rename_recheck_to_update_request",
+  "best_resolution_reason": "RS2 is the recommended strategy because it fully satisfies the absence requirement with the lowest change cost and without altering the process-tree structure or branch executability. It is less disruptive than removing or deleting the branch. The main drawback is that it creates duplicate activity labels, but this is preferable to creating an empty or incomplete XOR structure."
+}

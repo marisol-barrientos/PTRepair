@@ -1,0 +1,143 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_insert_consent_before_personal_data_request",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "Request personal data",
+            "new_activity_label": "obtain data processing consent"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "obtain data processing consent",
+            "new_resource": "data controller"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The missing activity obtain data processing consent is added before Request personal data, satisfying the precedence requirement. Assigning it to the data controller satisfies the executed_by requirement."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "There are no additional resolution context requirements, and the strategy does not disturb existing activities or control-flow structures."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one new activity is inserted and its resource assignment is specified."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The repair is simple and localized at the beginning of the process. It does not introduce new gateways, loops, or parallelism."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The change is applied immediately before the first activity, Request personal data."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_reuse_existing_permission_activity_as_consent",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Ask for permission",
+            "new_activity_label": "obtain data processing consent"
+          }
+        },
+        {
+          "operation": "move_before",
+          "parameters": {
+            "source_activity_label": "obtain data processing consent",
+            "target_activity_label": "Request personal data"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "obtain data processing consent",
+            "new_resource": "data controller"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The existing Ask for permission activity is reinterpreted as obtain data processing consent, moved before Request personal data, and assigned to the data controller."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "No explicit context requirements are violated, but moving the activity out of the later parallel branch may alter the intended behavior around Store Data and permission handling."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "The strategy requires three operations and relocates an existing activity across the process structure."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The repair avoids adding a new activity, but it changes the content of the parallel branch and may leave the Store Data branch semantically weaker."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The repaired consent activity is placed before the first data-request activity, although the source activity originally appears in the middle of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_copy_existing_permission_activity_before_personal_data_request",
+      "change_operations": [
+        {
+          "operation": "copy_before",
+          "parameters": {
+            "source_activity_label": "Ask for permission",
+            "target_activity_label": "Request personal data"
+          }
+        },
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Ask for permission",
+            "new_activity_label": "obtain data processing consent"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "obtain data processing consent",
+            "new_resource": "data controller"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "A copied permission activity is placed before Request personal data, renamed to obtain data processing consent, and assigned to the data controller."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The original permission activity remains in place, preserving later behavior. However, depending on label uniqueness assumptions, renaming the copied activity may be ambiguous if the copy initially has the same label as the original."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "The strategy requires copying, renaming, and resource assignment. It is slightly more complex than direct insertion."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process structure is mostly preserved, and no existing activity is removed or relocated. The only concern is potential duplication of permission-related behavior."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The effective compliance repair is placed before Request personal data at the start of the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_insert_consent_before_personal_data_request",
+  "best_resolution_reason": "RS1 is the preferred strategy because it fully restores compliance with minimal and localized change. It adds the missing consent activity exactly where required, before Request personal data, and assigns it to the required resource without modifying or relocating existing process behavior."
+}

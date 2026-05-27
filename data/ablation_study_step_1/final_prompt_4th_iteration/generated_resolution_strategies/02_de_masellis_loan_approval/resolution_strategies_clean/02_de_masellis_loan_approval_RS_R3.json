@@ -1,0 +1,149 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_insert_update_before_medical_check",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "check medical history",
+            "new_activity_label": "ask for updates"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Every execution of \"check medical history\" is preceded locally by an inserted \"ask for updates\" activity, satisfying the precedence requirement."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "There are no additional resolution context requirements, and the repair does not remove or reorder existing compliant behavior."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one localized insertion is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The change adds one activity before the violating activity without changing the surrounding parallel or exclusive structure. The main drawback is that \"ask for updates\" may now occur more than once in some executions."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The modification is applied around \"check medical history\", which occurs in the middle part of the risk-assessment branch."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_copy_existing_update_before_medical_check",
+      "change_operations": [
+        {
+          "operation": "copy_before",
+          "parameters": {
+            "source_activity_label": "ask for updates",
+            "target_activity_label": "check medical history"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "A copy of the existing \"ask for updates\" activity is placed before \"check medical history\", ensuring that \"check medical history\" is always preceded by \"ask for updates\"."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The existing process behavior is preserved, and no context requirements are violated."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "A single copy operation is required. It is slightly more involved than a simple insertion because it duplicates an existing activity."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The repair is localized and preserves the process structure. However, it introduces a duplicate occurrence of \"ask for updates\", which may create redundant executions."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The copied activity is inserted directly before \"check medical history\" in the middle of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_sequentialize_application_before_risk_branch_and_cover_conflict_case",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "ask to recheck",
+            "new_activity_label": "ask for updates"
+          }
+        },
+        {
+          "operation": "sequentialize_parallel",
+          "parameters": {
+            "first_activity_label": "check application",
+            "second_activity_label": "retrieve data"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "After the insertion, both branches of the exclusive choice following \"check application\" contain an \"ask for updates\" activity. Sequentializing the top-level parallel branches so that the application-check branch executes before the data-retrieval and risk-assessment branch ensures that \"ask for updates\" occurs before \"check medical history\" in all executions."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No explicit context requirements are violated. The strategy preserves the existing no-conflict \"ask for updates\" behavior and adds the missing update step to the conflict case."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "Two operations are required, including a structural transformation of a parallel block into a sequential order."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The repair removes top-level concurrency between the application-check branch and the risk-assessment branch. This improves precedence compliance but may reduce process parallelism and throughput."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The changes affect the early application-check branch and the top-level ordering of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_move_medical_check_after_existing_update",
+      "change_operations": [
+        {
+          "operation": "move_after",
+          "parameters": {
+            "source_activity_label": "check medical history",
+            "target_activity_label": "ask for updates"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "\"check medical history\" is moved to occur after the existing \"ask for updates\" activity, so every remaining execution of \"check medical history\" is preceded by \"ask for updates\"."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "There are no explicit context requirements, but this changes the business meaning of the process because the medical-history check becomes part of the no-conflict update branch instead of the risk-assessment branch."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one move operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The change removes \"check medical history\" from its original parallel risk-check structure with \"check career\". This may weaken the intended risk-assessment structure."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The target location is the early exclusive branch after \"check application\"."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_insert_update_before_medical_check",
+  "best_resolution_reason": "RS1 is the recommended strategy because it fully restores the precedence requirement with a single localized operation and avoids restructuring the existing parallel and exclusive blocks. Although it may introduce an additional occurrence of \"ask for updates\", it has the lowest change cost and the smallest structural impact among the full-compliance options."
+}

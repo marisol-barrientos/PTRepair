@@ -1,0 +1,114 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_rename_wait_for_user_input",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "wait for user input",
+            "new_activity_label": "user input"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The violation evidence indicates that the required activity label \"user input\" is missing, while the process already contains the semantically corresponding activity \"wait for user input\" in the timeout-alternative structure. Renaming it satisfies the required existence of \"user input\" and preserves the existing timeout structure involving timeout 60 and \"automatic screen lock\"."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The change is confined to the initial screen-lock handling fragment and does not affect the authentication XOR branches. Therefore, it should not introduce a violation of the context requirement preventing \"Unlock screen\" from following the condition \"not data.authenticated\"."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one localized rename operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The control-flow structure is unchanged. No additional branches, loops, or ordering constraints are introduced."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The modified activity is located in the initial parallel timeout/input handling block before \"Access requested\"."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_insert_user_input_and_remove_old_wait_label",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "wait for user input",
+            "new_activity_label": "user input"
+          }
+        },
+        {
+          "operation": "delete",
+          "parameters": {
+            "target_activity_label": "wait for user input"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The resulting branch contains the required activity \"user input\" in the same location where the previous input-waiting activity existed. Since the timeout structure and \"automatic screen lock\" remain unchanged, the intended timed-alternative relation can be restored while avoiding the missing-label violation."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The authentication decision structure is not modified, so the context requirement concerning \"not data.authenticated\" and \"Unlock screen\" remains preserved."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Two localized operations are required. This is slightly more costly than a direct rename but still limited in scope."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The final structure is essentially equivalent to the original structure with the correct activity label. There is no lasting additional complexity."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "Both operations occur in the initial parallel block before the access request and authentication logic."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_add_explicit_user_input_after_wait",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "wait for user input",
+            "new_activity_label": "user input"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "substantial",
+          "reason": "This strategy ensures that an activity labeled \"user input\" exists in the non-timeout input branch. It likely mitigates the timed-alternative violation because the required activity appears in the alternative branch. However, the original \"wait for user input\" activity remains, so the structure may be interpreted as an additional step before the actual required alternative rather than a clean replacement."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The inserted activity is before the access request and does not affect the authentication XOR. The context requirement involving \"Unlock screen\" is therefore preserved."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one insertion operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The strategy introduces a potentially redundant pair of activities, \"wait for user input\" followed by \"user input\", which may reduce model clarity."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The change is located in the initial screen-lock/input handling part of the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_rename_wait_for_user_input",
+  "best_resolution_reason": "RS1 is the best strategy because it directly addresses the detected root cause: the required activity label \"user input\" is missing while an equivalent activity labeled \"wait for user input\" already exists in the correct timeout-alternative context. It achieves full compliance with a single localized operation, preserves the existing process structure, and does not affect the already compliant authentication behavior."
+}

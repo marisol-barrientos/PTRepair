@@ -1,0 +1,142 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_move_notify_after_send_goods",
+      "change_operations": [
+        {
+          "operation": "move_after",
+          "parameters": {
+            "source_activity_label": "notify customer",
+            "target_activity_label": "send goods"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Moving \"notify customer\" after \"send goods\" places it after the parallel block. Since \"pack goods\" occurs before \"send goods\", every execution containing \"pack goods\" will eventually be followed by \"notify customer\"."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "There are no additional resolution context requirements, and this strategy does not introduce obvious conflicting behavior."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one process change operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The existing process structure is largely preserved. The notification is simply relocated from one payment branch to a later common sequence position, avoiding duplication."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The change places the notification after \"send goods\", which is near the end of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_move_notify_after_pack_goods",
+      "change_operations": [
+        {
+          "operation": "move_after",
+          "parameters": {
+            "source_activity_label": "notify customer",
+            "target_activity_label": "pack goods"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Placing \"notify customer\" directly after \"pack goods\" ensures that every occurrence of \"pack goods\" is followed by \"notify customer\"."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "There are no stated context requirements that would be violated. The strategy also avoids creating duplicate notification activities."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one move operation is needed."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The repair is localized around the violating activity pair. However, the notification becomes part of the shipping-side branch of the parallel block, which may cause it to occur before the payment branch has fully completed."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is applied inside the parallel block, around the shipping and packing part of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_copy_notify_after_pack_goods",
+      "change_operations": [
+        {
+          "operation": "copy_after",
+          "parameters": {
+            "source_activity_label": "notify customer",
+            "target_activity_label": "pack goods"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "A copy of \"notify customer\" is added after \"pack goods\", so the required eventual follow-up is guaranteed."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "No explicit context requirement is violated, but the original notification in the credit-card branch remains. This may lead to duplicate customer notifications in credit-card executions."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one copy operation is required, but it introduces an additional activity instance."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The process remains structurally valid, but duplicated notification behavior can reduce clarity and may be semantically undesirable."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The added notification is placed immediately after \"pack goods\" within the parallel block."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_insert_global_notify_after_send_goods",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "send goods",
+            "new_activity_label": "notify customer"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The newly inserted \"notify customer\" activity occurs after \"send goods\", and \"send goods\" occurs after \"pack goods\". Therefore, \"pack goods\" is eventually followed by a notification."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The strategy preserves the existing credit-card notification but adds another global notification, which may cause duplicate notifications in some executions."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one insertion is required, but it increases the number of activities."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The structural change is simple, but the process now contains two activities with the same label and potentially overlapping purpose."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The additional notification is inserted after \"send goods\", near the end of the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_move_notify_after_send_goods",
+  "best_resolution_reason": "RS1 is recommended because it fully restores compliance with a single operation, avoids duplicate notifications, and places \"notify customer\" after the parallel block where \"pack goods\" has necessarily completed. This makes the ordering guarantee clear while preserving a simple process structure."
+}

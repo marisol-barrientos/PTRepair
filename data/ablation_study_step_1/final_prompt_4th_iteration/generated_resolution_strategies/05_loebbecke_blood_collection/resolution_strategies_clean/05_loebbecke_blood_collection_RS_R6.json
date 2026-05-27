@@ -1,0 +1,113 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_make_rejection_status_sticky_after_direct_questions",
+      "change_operations": [
+        {
+          "operation": "modify_write",
+          "parameters": {
+            "target_activity_label": "direct questions",
+            "new_statement": "assessment_status := if assessment_status == \"rejected\" then \"rejected\" else direct_questions_assessment_status"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "If \"conduct interview and questionnaire\" sets assessment_status to \"rejected\", the modified write in \"direct questions\" preserves that rejected value instead of overwriting it. Therefore, when the following exclusive branch is reached, the rejected condition still holds and \"inform of rejection\" eventually executes, followed directly by \"terminate\"."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy preserves the existing activity order, resources, parallel structure, timeout behavior, and the existing rejection branch. It does not affect consent handling, the retract-consent branch, physician execution, or the timed alternative involving \"monitor patient\" and \"assess donor\"."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one localized data-write modification is required. No activities or control-flow structures are added, removed, or moved."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The process structure remains unchanged. The repair only modifies the data semantics of an existing activity."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is located in the assessment part of the consented branch, after consent handling and before the venepuncture-related activities."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_prevent_interview_from_setting_rejected_status",
+      "change_operations": [
+        {
+          "operation": "modify_write",
+          "parameters": {
+            "target_activity_label": "conduct interview and questionnaire",
+            "new_statement": "assessment_status := \"pending\""
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The activity \"conduct interview and questionnaire\" no longer makes the condition assessment_status == \"rejected\" true. The only remaining activity that may produce the rejected value is \"direct questions\", which occurs immediately before the exclusive branch that contains \"inform of rejection\" followed by \"terminate\"."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The control-flow and resource-related context requirements remain satisfied. However, this changes the business meaning of the interview activity by preventing it from producing a final rejection outcome."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one write statement is modified, with no structural changes."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "No process structure is changed. The sequence, parallel branch, exclusive branch, and timeout structure remain intact."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change occurs in the assessment section of the consented branch."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_remove_assessment_status_write_from_interview",
+      "change_operations": [
+        {
+          "operation": "remove_write",
+          "parameters": {
+            "target_activity_label": "conduct interview and questionnaire",
+            "removed_variable_name": "assessment_status"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Removing the assessment_status write from \"conduct interview and questionnaire\" eliminates the earlier point at which assessment_status == \"rejected\" could become true without being followed by \"inform of rejection\". The remaining write in \"direct questions\" is directly before the rejection-handling exclusive branch."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The process structure, resource assignment, parallelism, and timeout behavior are preserved. However, this may weaken the data-related context requirement involving \"conduct interview and questionnaire\" and assessment_status, depending on whether that requirement depends on the activity writing this variable."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The strategy requires only a single localized data-write removal."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The control-flow structure is not modified."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change affects the assessment activity inside the consented branch."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_make_rejection_status_sticky_after_direct_questions",
+  "best_resolution_reason": "RS1 is the best option because it restores full compliance with the rejection-handling requirement while preserving the existing process structure and most of the original business behavior. It allows both assessment activities to contribute to the rejection decision, but ensures that once assessment_status becomes \"rejected\", it cannot be overwritten before the exclusive branch that informs the donor and terminates the process.",
+  "alternative_suggestion": {
+    "reason": "A more explicit control-flow repair would require inserting a complete conditional branch after each activity that can set assessment_status to \"rejected\". The provided operations do not support inserting a full XOR structure with a multi-activity branch containing both \"inform of rejection\" and \"terminate\" while preserving the existing continuation path.",
+    "conceptual_solution": "After each activity that may set assessment_status to \"rejected\", insert an XOR decision: if assessment_status == \"rejected\", execute \"inform of rejection\" followed directly by \"terminate\"; otherwise continue with the normal assessment flow.",
+    "expected_compliance_impact": "This would fully satisfy the requirement because every point at which the rejected condition can become true would be followed by the required rejection notification and immediate termination."
+  }
+}

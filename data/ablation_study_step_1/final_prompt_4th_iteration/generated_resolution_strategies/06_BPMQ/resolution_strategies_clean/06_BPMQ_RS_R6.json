@@ -1,0 +1,108 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_copy_certificate_check_before_open_account",
+      "change_operations": [
+        {
+          "operation": "copy_before",
+          "parameters": {
+            "source_activity_label": "check respondent bank certificate",
+            "target_activity_label": "open bank account"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Every trace that executes \"open bank account\" will first execute a copied \"check respondent bank certificate\" activity immediately before it. This removes the current violating trace where the data.record branch can reach account opening without certificate checking."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The existing annual report activities required by R1 are untouched, and the risk branch where data.risk directly leads to terminate required by R3 is not modified."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one localized copy operation is required. No existing activities, conditions, or branches are removed or reordered."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process remains structurally sound, but the certificate check may be duplicated in traces that already performed it earlier in the process."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The change is applied directly before the late-stage activity \"open bank account\" where the violation manifests."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_move_certificate_check_to_common_prefix",
+      "change_operations": [
+        {
+          "operation": "move_after",
+          "parameters": {
+            "source_activity_label": "check respondent bank certificate",
+            "target_activity_label": "Identify Respondent Bank"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Moving \"check respondent bank certificate\" to the common sequence after \"Identify Respondent Bank\" ensures it occurs before both the record and no-record paths can later reach \"open bank account\"."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "R1 remains satisfied because the annual report activities are not changed. R3 remains satisfied because the data.risk branch and its directly following terminate activity are not modified."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "The strategy uses a single operation, but it moves an activity out of its current parallel branch and makes it mandatory for all cases, including cases where it was previously skipped."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The process remains well-structured, but the parallel block is changed because one branch is removed from its original context and placed in the common prefix."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The modification is applied near the beginning of the process, immediately after respondent bank identification."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_restrict_open_account_to_checked_no_record_cases",
+      "change_operations": [
+        {
+          "operation": "modify_condition",
+          "parameters": {
+            "target_activity_label": "open bank account",
+            "new_condition": "(!data.record) and (data.eval and data.rating)"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The modified condition prevents \"open bank account\" from executing on the data.record path, which is the path where \"check respondent bank certificate\" may be skipped. Remaining account-opening executions are restricted to the no-record path where the certificate check occurs earlier."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The required annual report activities remain present and unchanged, and the data.risk-to-terminate behavior is not affected."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one condition is modified and no activities or structural blocks are added, moved, or deleted."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The structured tree topology is unchanged. However, the behavioral impact is restrictive because existing-record cases can no longer open an account through this branch."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The modification is made on the final exclusive branch containing \"open bank account\"."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_copy_certificate_check_before_open_account",
+  "best_resolution_reason": "RS1 is recommended because it fully restores the precedence requirement while preserving the existing process behavior as much as possible. It is localized to the violating activity, avoids changing earlier branching logic, does not interfere with the satisfied context requirements R1 and R3, and has only a low structural impact due to possible duplication of the certificate check."
+}

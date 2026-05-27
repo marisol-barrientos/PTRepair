@@ -1,0 +1,170 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_insert_verification_after_data_request",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "Request personal data",
+            "new_activity_label": "verify user data"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "verify user data",
+            "new_resource": "telephone company"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The missing activity \"verify user data\" is inserted into the process and assigned to the required resource \"telephone company\", satisfying both exists and executed_by requirements."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "No resolution context requirements are provided, and the added activity is placed immediately after personal data is requested, which is semantically consistent and unlikely to disturb existing compliant behavior."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The strategy requires only one insertion and one resource assignment. The modification is simple and localized."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process remains a simple sequence at this point. No additional branching, looping, or parallel complexity is introduced."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The change is made near the beginning of the process, directly after \"Request personal data\"."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_insert_verification_before_contract",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "Sign contract",
+            "new_activity_label": "verify user data"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "verify user data",
+            "new_resource": "telephone company"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The required activity is added and assigned to the required resource, so the detected violation is fully repaired."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "Placing verification before signing the contract is semantically reasonable and does not interfere with the existing branching or parallel sections."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only two localized operations are required: inserting the missing activity and assigning its resource."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The activity is inserted into an existing sequential part of the model without changing control-flow constructs."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change occurs after the portability and number-assignment logic but before contract signing."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_insert_verification_before_activation",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "Activate Sim Card",
+            "new_activity_label": "verify user data"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "verify user data",
+            "new_resource": "telephone company"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The activity \"verify user data\" is introduced and explicitly assigned to \"telephone company\", satisfying the detected existence and resource constraints."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The strategy does not violate any given context requirement, but verifying user data only shortly before SIM activation may be later than desirable from a business perspective."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The repair consists of one insertion and one resource modification."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "No complex control-flow changes are introduced; the activity is simply inserted into the late sequential part of the process."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The change is placed near the end of the process, immediately before \"Activate Sim Card\"."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_rename_data_request_to_verification",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Request personal data",
+            "new_activity_label": "verify user data"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "verify user data",
+            "new_resource": "telephone company"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "After renaming, the required activity label exists and the activity is assigned to the required resource."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "No explicit context requirement is violated, but the original \"Request personal data\" activity would disappear as a distinct process step, which may remove useful existing behavior."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The strategy requires only a rename and a resource modification."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The control-flow structure is unchanged because no activity is inserted, deleted, or moved."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The modified activity is the first activity in the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_insert_verification_after_data_request",
+  "best_resolution_reason": "RS1 is the recommended strategy because it fully restores compliance with minimal localized changes while preserving the existing process behavior. Placing \"verify user data\" immediately after \"Request personal data\" is semantically appropriate, avoids unnecessary restructuring, and ensures verification occurs before later customer onboarding, contract, payment, SIM shipment, and activation steps."
+}

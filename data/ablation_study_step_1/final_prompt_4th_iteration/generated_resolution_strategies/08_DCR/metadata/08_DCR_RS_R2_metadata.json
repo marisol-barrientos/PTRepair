@@ -1,0 +1,16 @@
+{
+  "model": "openai/gpt-5.5",
+  "scenario_name": "08_DCR",
+  "requirement_id": "R2",
+  "output_prefix": "08_DCR_RS_R2",
+  "execution_time_milliseconds": 120753.39,
+  "execution_time_seconds": 120.75,
+  "resolution_context_requirements": 2,
+  "problems_detected": [],
+  "usage": {
+    "prompt_tokens": 2886,
+    "completion_tokens": 6123,
+    "total_tokens": 9009,
+    "reasoning_tokens": null
+  }
+}

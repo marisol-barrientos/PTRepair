@@ -1,0 +1,148 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_remove_late_state_write",
+      "change_operations": [
+        {
+          "operation": "remove_write",
+          "parameters": {
+            "target_activity_label": "Enter New Customer Information",
+            "removed_variable_name": "state"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The violation indicates that a write influencing the condition data.state == \"new\" may occur inside the branch. Removing the late write to state ensures the condition is determined before the XOR branching decision, so the existing Identity Check in the new-customer branch eventually follows whenever the condition holds."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy does not affect Initiate Account, so the context requirement exists('initiate account') remains satisfied."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one data-write removal is required, with no structural restructuring of the process tree."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The process control-flow structure remains unchanged; only the data side effect of one activity is modified."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The change is located in the early customer-identification part of the process, inside the new-customer branch."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_move_identity_check_to_common_path",
+      "change_operations": [
+        {
+          "operation": "delete",
+          "parameters": {
+            "target_activity_label": "Identity Check"
+          }
+        },
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "Approve Account Opening",
+            "new_activity_label": "Identity Check"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "By placing Identity Check after the customer-type XOR block and before account approval, the check occurs on the common path after the condition data.state == \"new\" may have been established. Therefore, whenever the condition holds, Identity Check eventually follows."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The activity Initiate Account is preserved and remains in the process, so the context requirement is not violated."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The strategy requires two simple operations: deleting the branch-local Identity Check and reinserting it on the common path."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The strategy avoids duplicate Identity Check activities and keeps the process structured. However, it broadens the check to all customer paths, including existing customers."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is located between the customer-classification block and the account-approval phase."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_add_common_identity_check_after_xor",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "Approve Account Opening",
+            "new_activity_label": "Identity Check"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Adding Identity Check on the common path before Approve Account Opening ensures that, even if data.state == \"new\" becomes true due to data updates in the customer-information branch, an Identity Check will eventually occur afterward."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy does not modify or remove Initiate Account, so the context requirement remains satisfied."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one insertion operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The structure remains valid, but the process now contains two Identity Check activities on the new-customer path, which may introduce redundant checks."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The inserted activity is placed immediately after the customer-type XOR block and before account approval."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_add_early_identity_check_after_request",
+      "change_operations": [
+        {
+          "operation": "copy_after",
+          "parameters": {
+            "source_activity_label": "Identity Check",
+            "target_activity_label": "Customer Request Arrives"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "substantial",
+          "reason": "Copying Identity Check immediately after Customer Request Arrives ensures that if the initial write of state already makes data.state == \"new\" true, the required activity follows. The existing branch-local Identity Check still covers the normal new-customer branch. However, this is less precise if later state changes outside the new-customer branch are possible."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy leaves Initiate Account unchanged and therefore preserves the context requirement."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one copy operation is needed."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The process remains structurally valid, but the copied Identity Check may be executed unnecessarily for existing or invalid-state customers and may duplicate the existing check for new customers."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The change is applied immediately after the initial customer request activity."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_remove_late_state_write",
+  "best_resolution_reason": "RS1 is the most localized and lowest-cost repair. It directly addresses the apparent root cause: the condition data.state == \"new\" can be influenced inside the XOR branch rather than being fully determined before the branch. Removing the late write to state preserves the existing Identity Check placement, avoids adding duplicate activities, does not alter the control-flow structure, and keeps the context requirement exists('initiate account') satisfied."
+}

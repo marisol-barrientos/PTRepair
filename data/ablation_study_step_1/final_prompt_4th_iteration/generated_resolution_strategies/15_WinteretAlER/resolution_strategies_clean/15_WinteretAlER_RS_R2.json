@@ -1,0 +1,113 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_rename_existing_activity_to_required_label",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "activate screen lock",
+            "new_activity_label": "activate screeen lock"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The violated requirement checks for the exact existence of activity label \"activate screeen lock\". Renaming the existing activity \"activate screen lock\" to that exact label satisfies the exists requirement."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The change is limited to the screen-lock activity in the early parallel block and does not affect the authentication decision or the branch where \"Unlock screen\" is executed. Therefore, it should not introduce a violation of R1."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one activity label is changed, with no structural modification to the process tree."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The process structure remains unchanged. Only the activity label is modified."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The modified activity is located in the initial parallel section before access is requested and authentication is checked."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_insert_required_activity_after_existing_screen_lock",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "activate screen lock",
+            "new_activity_label": "activate screeen lock"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The process will contain an activity with the exact required label \"activate screeen lock\", satisfying the exists requirement."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The inserted activity is placed near the existing screen-lock activity and does not modify the authentication condition or the execution path leading to \"Unlock screen\". R1 remains preserved."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The strategy requires a single insertion operation, but it adds an additional activity rather than only correcting the existing one."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process gains a potentially redundant screen-lock-related activity. This slightly increases complexity but keeps the structured tree intact."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The change is made in the initial screen-lock preparation section before access handling begins."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_insert_required_activity_before_access_requested",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "Access requested",
+            "new_activity_label": "activate screeen lock"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The required activity label \"activate screeen lock\" is introduced before the access request step, so the exists requirement is satisfied."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The insertion occurs before authentication and does not change the conditional branches involving \"Unlock screen\" or \"Reject access\". Therefore, the satisfied context requirement R1 is preserved."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one activity is inserted, but the process now contains both the original \"activate screen lock\" and the required misspelled variant."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "Although the structured tree remains valid, adding a second screen-lock activity immediately before access handling may create behavioral redundancy and reduce process clarity."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The new activity is inserted immediately before \"Access requested\", still in the early part of the process before authentication."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_rename_existing_activity_to_required_label",
+  "best_resolution_reason": "RS1 is the most minimal and localized repair. It fully satisfies the exact-label existence requirement with a single rename operation, introduces no additional process structure, and does not affect the authentication-related context requirement R1.",
+  "alternative_suggestion": {
+    "reason": "The detected violation appears to be caused by a spelling mismatch between the requirement label \"activate screeen lock\" and the existing process activity \"activate screen lock\". Correcting the compliance requirement itself is not supported by the provided process change operations, which only modify the process tree.",
+    "conceptual_solution": "Revise requirement R2 from exists(tree, 'activate screeen lock') to exists(tree, 'activate screen lock') if the misspelled label is unintended.",
+    "expected_compliance_impact": "This would likely restore compliance without changing the process model, preserving both process behavior and structural quality."
+  }
+}

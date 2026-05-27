@@ -1,0 +1,120 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_move_contract_send_to_common_continuation",
+      "change_operations": [
+        {
+          "operation": "move_before",
+          "parameters": {
+            "source_activity_label": "send legitimation & custody account documents",
+            "target_activity_label": "conduct risk disclosure"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Moving the activity that sends the custody_account_contract to the common continuation after the first exclusive block ensures that whenever 'conclude custody account' occurs, the sending activity necessarily occurs afterwards on all following paths."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy does not modify 'conduct risk disclosure', 'conduct investment advice', 'conclude custody account', 'conduct customer identification & legitimation', or 'update customer data'. Therefore, the listed context requirements R1, R4, R6, and R7 are preserved."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one move operation is required, and no new activities, branches, or data operations are introduced."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process remains sequential around the repaired area and no additional control-flow complexity is introduced. However, the send activity becomes part of the common path, so it may also execute for non-new customers."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The modification is located after the initial customer-arrival and customer-status handling fragment, but before the risk disclosure and investment-advice part of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_copy_contract_send_to_existing_customer_branch",
+      "change_operations": [
+        {
+          "operation": "copy_after",
+          "parameters": {
+            "source_activity_label": "send legitimation & custody account documents",
+            "target_activity_label": "update customer data"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Copying the contract-sending activity into the branch for existing customers removes the branch-coverage issue identified in the violation evidence. The original sending activity remains after 'conclude custody account' in the new-customer branch."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The repair does not affect the activities or resources involved in R1, R4, R6, or R7. The existing branch condition leading to 'update customer data' is preserved."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one copy operation is required. The operation is localized to the exclusive block where the violation was detected."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The original structure of the exclusive block is preserved, but the process now contains a duplicated sending activity. This may create redundancy and possible ambiguity if duplicate activity labels are not handled carefully."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is made inside the customer-status exclusive block, before the common risk-disclosure and advisory part of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_add_explicit_common_contract_send",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "conduct risk disclosure",
+            "new_activity_label": "send custody_account_contract"
+          }
+        },
+        {
+          "operation": "add_write",
+          "parameters": {
+            "target_activity_label": "send custody_account_contract",
+            "added_statement": "custody_account_contract"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "A new explicit activity that sends or produces the custody_account_contract is inserted in the common path before 'conduct risk disclosure'. Therefore, after 'conclude custody account' occurs in the new-customer branch, the contract-sending activity is guaranteed to occur later."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy leaves the activities referenced by the resolution context requirements unchanged. It does not alter the resource assignment of 'conduct investment advice', the precedence relation for 'conduct risk disclosure', or the customer-status branch leading to 'update customer data'."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "The strategy requires two operations: inserting a new activity and adding the data-production statement to it."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The process remains structurally simple, but an additional sending activity is introduced while the original 'send legitimation & custody account documents' activity remains in the new-customer branch. This can lead to duplicate or overlapping document-sending behavior."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The inserted activity is placed immediately after the customer-status handling fragment and before the downstream advisory process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_move_contract_send_to_common_continuation",
+  "best_resolution_reason": "RS1 is recommended because it restores the violated leads_to requirement with a single localized operation, avoids duplicating activity labels, and preserves the existing resolution context requirements. It also keeps the process structurally simple by moving the existing contract-sending activity to a common continuation instead of adding new branches or duplicate activities.",
+  "alternative_suggestion": {
+    "reason": "The available change operations do not directly support adding a path-sensitive obligation such as 'send the custody_account_contract only on traces where conclude custody account occurred' without potentially introducing another XOR branch that a branch-insensitive checker may still report as incomplete.",
+    "conceptual_solution": "Model the contract-sending obligation as a guarded common activity that executes only if a custody account was concluded, for example by introducing an explicit process variable such as custody_account_concluded and conditioning the send activity on that variable. Alternatively, refine the compliance analysis so that it recognizes that 'conclude custody account' and the existing send activity are both located in the same new-customer branch.",
+    "expected_compliance_impact": "This would provide a semantically precise repair: the contract is sent after account conclusion, while avoiding unnecessary sending for existing customers."
+  }
+}

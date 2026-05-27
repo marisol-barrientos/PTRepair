@@ -1,0 +1,108 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_sequentialize_rating_branch_after_analysis",
+      "change_operations": [
+        {
+          "operation": "sequentialize_parallel",
+          "parameters": {
+            "first_activity_label": "analyze respondent bank annual report",
+            "second_activity_label": "Review Respondent Bank rating"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Sequentializing the parallel branches makes the rating review and its following rejection-handling branch occur in a deterministic sequence after the annual report analysis. Once the condition data.respondent_bank_rating == \"rejected\" becomes true, the process proceeds through the rejected branch containing handle rejection followed by terminate."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The activities required by R1, obtain respondent bank annual report and analyze respondent bank annual report, are preserved. The earlier risk-related terminate behavior required by R3 is not modified."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one structural change operation is required. The repair is localized to the parallel block involving annual-report analysis and respondent-bank rating review."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The repair removes parallelism between annual-report analysis and rating review, reducing concurrency. However, it also improves control-flow clarity by ensuring the rating decision is evaluated after the relevant analysis step."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is applied in the middle of the process, after obtaining the annual report and before the final account-opening decision."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_move_rating_review_before_parallel_block",
+      "change_operations": [
+        {
+          "operation": "move_after",
+          "parameters": {
+            "source_activity_label": "Review Respondent Bank rating",
+            "target_activity_label": "obtain respondent bank annual report"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "substantial",
+          "reason": "Moving Review Respondent Bank rating directly after obtaining the annual report makes the write influencing data.respondent_bank_rating == \"rejected\" occur before the subsequent branch that handles rejection and terminates. This mitigates the detected ordering ambiguity, although the rejection-handling structure remains inside the following parallel block."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The required activities from R1 remain present, and the risk-related condition_directly_follows requirement in R3 is untouched."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one activity move is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The overall structured tree is largely preserved, including the existing parallel block. However, the rating review is moved before the annual-report analysis activity, which may be semantically less natural if the review depends on that analysis."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The move is applied around the annual-report and rating-review part of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_insert_terminate_after_rating_review",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "Review Respondent Bank rating",
+            "new_activity_label": "terminate"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "A terminate activity would occur immediately after Review Respondent Bank rating, so if the condition data.respondent_bank_rating == \"rejected\" becomes true due to that review, terminate will eventually occur."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The context requirements R1 and R3 remain structurally satisfied because the referenced activities and the risk-related terminate branch are not removed. However, this change may prematurely terminate cases that are not rejected, potentially disrupting otherwise compliant behavior."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only a single insertion is required."
+        },
+        "structural_quality_impact": {
+          "value": "high",
+          "reason": "Although structurally simple, the inserted terminate activity makes the later rating-based exclusive branch and the final account-opening decision potentially unreachable after rating review. This significantly degrades behavioral quality."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The inserted terminate is located in the middle part of the process, directly after the respondent-bank rating review."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_sequentialize_rating_branch_after_analysis",
+  "best_resolution_reason": "RS1 is recommended because it provides full compliance while preserving the intended rejection-handling logic. It avoids prematurely terminating non-rejected cases and keeps the rating decision after the annual-report analysis, which is semantically preferable to moving the review earlier. Although it reduces parallelism, the change is localized and maintains consistency with the existing context requirements."
+}

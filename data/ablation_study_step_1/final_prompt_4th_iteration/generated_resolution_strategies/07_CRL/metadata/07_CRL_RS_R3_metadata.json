@@ -1,0 +1,16 @@
+{
+  "model": "openai/gpt-5.5",
+  "scenario_name": "07_CRL",
+  "requirement_id": "R3",
+  "output_prefix": "07_CRL_RS_R3",
+  "execution_time_milliseconds": 119468.72,
+  "execution_time_seconds": 119.47,
+  "resolution_context_requirements": 2,
+  "problems_detected": [],
+  "usage": {
+    "prompt_tokens": 3357,
+    "completion_tokens": 6540,
+    "total_tokens": 9897,
+    "reasoning_tokens": null
+  }
+}

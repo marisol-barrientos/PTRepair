@@ -1,0 +1,113 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_insert_notify_immediately_after_credit_check",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "check credit worthiness",
+            "new_activity_label": "notify customer"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The inserted activity labeled \"notify customer\" directly follows \"check credit worthiness\", satisfying the directly_follows requirement."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "There are no additional resolution context requirements. Existing behavior is mostly preserved because no existing activities or branches are removed or reordered."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one localized insertion is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process structure remains unchanged except for one additional activity in the same local sequence. However, it may introduce duplicate customer notifications later in approved paths."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is applied inside the loan assessment part of the process, after initial request handling and before final settlement."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_copy_existing_notify_after_credit_check",
+      "change_operations": [
+        {
+          "operation": "copy_after",
+          "parameters": {
+            "source_activity_label": "notify customer",
+            "target_activity_label": "check credit worthiness"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Copying an existing \"notify customer\" activity immediately after \"check credit worthiness\" creates the required direct-follow relation."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "No explicit context requirement is violated. However, because there are multiple existing \"notify customer\" activities, the copied source occurrence may be ambiguous unless the implementation treats them equivalently."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one copy operation is needed."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The control-flow structure is preserved. The main impact is the introduction of an additional notification activity, which may cause duplicate notifications in some paths."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The modification is located in the credit-worthiness assessment segment of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_move_credit_check_directly_before_existing_notify",
+      "change_operations": [
+        {
+          "operation": "move_before",
+          "parameters": {
+            "source_activity_label": "check credit worthiness",
+            "target_activity_label": "notify customer"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "substantial",
+          "reason": "If the intended target is the \"notify customer\" activity in the low-amount approved branch, the direct-follow relation can be achieved. However, the process contains multiple activities with the label \"notify customer\", so the operation is ambiguous without occurrence-specific targeting."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "There are no explicit context requirements, but moving the credit-worthiness check may weaken the logical ordering of the credit decision because the check would no longer occur before the credit-quality branch."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one move operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The control-flow structure is not expanded, but the semantic quality of the process may degrade because credit evaluation logic may depend on the credit-worthiness check occurring before the branch on loan.credit."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The affected activity belongs to the middle loan evaluation fragment."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_insert_notify_immediately_after_credit_check",
+  "best_resolution_reason": "RS1 is the best strategy because it fully restores the directly_follows compliance requirement using a single, localized, unambiguous operation. It preserves the existing process behavior and avoids the ambiguity caused by multiple existing \"notify customer\" activities. Its main drawback is the possibility of duplicate notifications, but this is less disruptive than moving the credit-worthiness check or relying on an ambiguous copied source.",
+  "alternative_suggestion": {
+    "reason": "The available operations identify activities only by label and do not support occurrence-specific targeting or detailed branch refactoring. Since the process contains multiple \"notify customer\" activities, some semantically cleaner repairs cannot be represented unambiguously.",
+    "conceptual_solution": "Use occurrence-specific editing to move or refactor the intended customer notification in the low-amount approved branch so that it occurs directly after \"check credit worthiness\", while preserving later contract-specific notifications under a distinct label such as \"notify customer of contract\".",
+    "expected_compliance_impact": "This would fully satisfy the directly_follows requirement while reducing duplicate or premature notifications and improving semantic clarity."
+  }
+}

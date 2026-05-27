@@ -1,0 +1,150 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_move_and_conditionally_embed_accept_empty_balance",
+      "change_operations": [
+        {
+          "operation": "move_before",
+          "parameters": {
+            "source_activity_label": "Accept Empty Initial Balance",
+            "target_activity_label": "Initiate Account"
+          }
+        },
+        {
+          "operation": "embed_activity_in_xor",
+          "parameters": {
+            "target_activity_label": "Accept Empty Initial Balance",
+            "condition": "data.special_allowance",
+            "mode": "skip"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The activity Accept Empty Initial Balance is moved to a common downstream position before Initiate Account and is then guarded by the condition data.special_allowance. Therefore, whenever data.special_allowance holds, the activity is eventually executed on the common continuation path."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The activity Initiate Account remains present and reachable, so the existing context requirement R2 is preserved."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "The strategy requires two localized operations: moving the existing activity and embedding it in a conditional XOR structure."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The strategy preserves the intended conditional behavior but introduces an additional XOR around Accept Empty Initial Balance. The original special-allowance branch becomes structurally lighter, but the process remains well structured."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The change is located around the initial-balance handling and account initiation part of the process, which occurs late in the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_copy_accept_empty_balance_to_non_special_branch",
+      "change_operations": [
+        {
+          "operation": "copy_after",
+          "parameters": {
+            "source_activity_label": "Accept Empty Initial Balance",
+            "target_activity_label": "Accept Initial Deposit"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "substantial",
+          "reason": "Adding Accept Empty Initial Balance to the alternative branch ensures that the activity appears in all branches of the special-allowance XOR, mitigating the detected branch-coverage issue. However, it may cause the activity to execute even when data.special_allowance is false."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The activity Initiate Account remains unchanged and reachable, so R2 is preserved."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one localized copy operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The process structure remains valid, but the copied activity creates duplicated behavior and may reduce semantic clarity because Accept Empty Initial Balance would also occur after Accept Initial Deposit."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The change is confined to the initial-balance handling section immediately before Initiate Account."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_make_accept_empty_balance_common_before_initiation",
+      "change_operations": [
+        {
+          "operation": "move_before",
+          "parameters": {
+            "source_activity_label": "Accept Empty Initial Balance",
+            "target_activity_label": "Initiate Account"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "By moving Accept Empty Initial Balance to the common path before Initiate Account, every execution path after the special-allowance decision eventually reaches the required activity."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "Initiate Account is not removed or renamed, so the context requirement R2 remains satisfied."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one move operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The process remains structurally simple, but the activity becomes unconditional and may execute even for customers without special allowance, which weakens the semantic alignment of the model."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The change is applied immediately before Initiate Account in the late account-opening phase."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_insert_accept_empty_balance_immediately_after_request",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "Customer Request Arrives",
+            "new_activity_label": "Accept Empty Initial Balance"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "partial",
+          "reason": "The inserted activity occurs shortly after the activity that writes data.special_allowance, so the eventual-follow condition is mitigated. However, the original conditional placement remains unchanged and the new activity executes too early and unconditionally, so this is only a partial and less semantically accurate repair."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The existing Initiate Account activity remains present and unaffected."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one insertion is required."
+        },
+        "structural_quality_impact": {
+          "value": "high",
+          "reason": "The inserted activity is placed before identity checking, approval, account opening, and policy application, which is likely inconsistent with the intended process ordering."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The change is applied immediately after Customer Request Arrives at the beginning of the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_move_and_conditionally_embed_accept_empty_balance",
+  "best_resolution_reason": "RS1 is recommended because it restores the required condition-eventual-follow behavior while preserving the intended distinction between customers with and without special allowance. It also keeps the existing Initiate Account activity intact, thereby maintaining the resolution context requirement. Although it costs slightly more than a single-operation repair, it avoids the semantic problems of making Accept Empty Initial Balance unconditional or executing it in the non-special-allowance branch."
+}

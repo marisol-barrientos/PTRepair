@@ -1,0 +1,180 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_move_report_payment_before_close_bill",
+      "change_operations": [
+        {
+          "operation": "move_before",
+          "parameters": {
+            "source_activity_label": "Report Payment",
+            "target_activity_label": "Close Bill"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Moving \"Report Payment\" to immediately before \"Close Bill\" places it after the exclusive branch, so every trace that reaches \"Close Bill\" is preceded by \"Report Payment\". The requirement precedence('Close Bill', 'Report Payment') is therefore satisfied. The leads_to('Receive Payment', 'Report Payment') relation is also preserved because \"Report Payment\" still occurs after \"Receive Payment\" on the payment path."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The context requirement precedence('Close Bill', 'Report Order') remains satisfied because \"Report Order\" still occurs before the exclusive branch and before \"Close Bill\"."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one existing activity is moved. No new activities or branches are introduced."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process remains structurally simple. However, \"Report Payment\" becomes common to both accepted and rejected order paths, which may be semantically questionable for rejected orders."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The change is applied near \"Close Bill\", which is at the end of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_insert_report_payment_before_close_bill",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "Close Bill",
+            "new_activity_label": "Report Payment"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Adding a common \"Report Payment\" directly before \"Close Bill\" ensures that every execution of \"Close Bill\" is preceded by \"Report Payment\". The existing payment branch still preserves leads_to('Receive Payment', 'Report Payment')."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The existing ordering of \"Report Order\" before \"Close Bill\" is not changed, so the context requirement remains satisfied."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "This strategy requires only one insertion and does not move or delete any existing activity."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The strategy introduces a duplicate \"Report Payment\" activity. In accepted-order traces, \"Report Payment\" may occur twice, which may create redundancy or reporting inconsistency."
+        },
+        "change_location": {
+          "value": "late",
+          "reason": "The inserted activity is placed immediately before the late-stage activity \"Close Bill\"."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_copy_report_payment_to_rejected_branch",
+      "change_operations": [
+        {
+          "operation": "copy_after",
+          "parameters": {
+            "source_activity_label": "Report Payment",
+            "target_activity_label": "Report Rejected Order"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Copying \"Report Payment\" into the rejected-order branch ensures that both exclusive branches contain \"Report Payment\" before the process continues to \"Close Bill\". Therefore, every trace reaching \"Close Bill\" has a preceding \"Report Payment\". The original leads_to('Receive Payment', 'Report Payment') relation remains satisfied in the payment branch."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The operation does not affect \"Report Order\" or \"Close Bill\", so precedence('Close Bill', 'Report Order') remains satisfied."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one copy operation is required, and the change is localized to the branch that currently lacks \"Report Payment\"."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The structure remains valid and localized, but adding \"Report Payment\" after \"Report Rejected Order\" may be semantically questionable because rejected orders may not have a payment to report."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is applied inside the exclusive branch, before the final \"Close Bill\" activity."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_rename_rejected_report_to_report_payment",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Report Rejected Order",
+            "new_activity_label": "Report Payment"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Renaming \"Report Rejected Order\" to \"Report Payment\" means that both exclusive branches contain an activity labeled \"Report Payment\" before \"Close Bill\". This satisfies precedence('Close Bill', 'Report Payment'), and the existing leads_to('Receive Payment', 'Report Payment') relation remains satisfied."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The ordering between \"Report Order\" and \"Close Bill\" remains unchanged, so the context requirement is preserved."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one activity label is changed."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "No structural complexity is introduced, but the meaning of the rejected-order branch is weakened because the specific rejected-order reporting activity is lost."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The renamed activity is located inside the exclusive rejected-order branch."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS5_remove_rejected_order_branch",
+      "change_operations": [
+        {
+          "operation": "remove_branch",
+          "parameters": {
+            "target_activity_label": "Report Rejected Order"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "Removing the rejected-order branch eliminates the trace variant in which \"Close Bill\" is reached without a preceding \"Report Payment\". Remaining traces contain \"Receive Payment\" followed by \"Report Payment\" before \"Close Bill\"."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The remaining traces still execute \"Report Order\" before \"Close Bill\", so the context requirement remains satisfied."
+        },
+        "change_cost": {
+          "value": "high",
+          "reason": "Although only one operation is required, it removes an entire business-relevant branch and therefore has a large behavioral cost."
+        },
+        "structural_quality_impact": {
+          "value": "high",
+          "reason": "The process becomes simpler structurally, but loses the rejected-order handling path, which is a significant behavioral degradation."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change removes one branch of the middle exclusive decision structure."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_move_report_payment_before_close_bill",
+  "best_resolution_reason": "RS1 is recommended because it achieves full compliance with a single operation, avoids duplicate activity labels, preserves the existing payment-reporting activity, and keeps the context requirement precedence('Close Bill', 'Report Order') satisfied. While it may introduce some semantic ambiguity for rejected orders, it is less structurally disruptive than removing a branch and cleaner than duplicating or renaming reporting activities.",
+  "alternative_suggestion": {
+    "reason": "The likely intended compliance semantics are branch-sensitive: fulfilled orders should have \"Report Payment\" before \"Close Bill\", while rejected orders should have \"Report Rejected Order\" before \"Close Bill\". The available operations can modify the process tree but cannot directly refine the compliance rule or express a per-branch disjunctive precedence constraint.",
+    "conceptual_solution": "Refine the compliance requirement to explicitly allow branch-specific alternatives, for example: if data.order.status is true, \"Close Bill\" must be preceded by \"Report Payment\"; if not data.order.status is true, \"Close Bill\" must be preceded by \"Report Rejected Order\". Under that interpretation, the current process structure may already be compliant.",
+    "expected_compliance_impact": "This would likely restore full conceptual compliance without changing the process model, provided the compliance checker supports conditional or branch-sensitive precedence evaluation."
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "model": "openai/gpt-5.5",
+  "scenario_name": "09_HaarmannetAL2021",
+  "requirement_id": "R1",
+  "output_prefix": "09_HaarmannetAL2021_RS_R1",
+  "execution_time_milliseconds": 83695.58,
+  "execution_time_seconds": 83.7,
+  "resolution_context_requirements": 4,
+  "problems_detected": [],
+  "usage": {
+    "prompt_tokens": 3025,
+    "completion_tokens": 4291,
+    "total_tokens": 7316,
+    "reasoning_tokens": null
+  }
+}

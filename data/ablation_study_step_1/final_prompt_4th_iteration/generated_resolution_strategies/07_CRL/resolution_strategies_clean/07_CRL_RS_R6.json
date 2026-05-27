@@ -1,0 +1,114 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_rename_activity_to_required_label",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "Assign post processing to supervisor",
+            "new_activity_label": "assign post processing to supervisor"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The violation appears to be caused by a label mismatch: the process contains \"Assign post processing to supervisor\" on the branch with condition \"data.loan_amount > 1000000\", while the requirement expects \"assign post processing to supervisor\". Renaming the existing activity to the required label makes the required activity eventually follow the condition."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy only changes the activity label and does not alter control flow, data flow, resources, or the ordering relations relevant to the context requirements R2 and R7."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one localized rename operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The process structure remains unchanged. No additional branches, activities, loops, or parallel constructs are introduced."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The modified activity is located inside the loan evaluation part of the process, after bank information validation and before credit worthiness checking."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_insert_required_activity_after_existing_assignment",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "Assign post processing to supervisor",
+            "new_activity_label": "assign post processing to supervisor"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The required activity label is inserted directly after the existing supervisor assignment activity within the branch guarded by \"data.loan_amount > 1000000\". Therefore, whenever that condition holds and the branch executes, the required activity eventually occurs."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The inserted activity is local to the high-loan-amount branch and does not change the order of customer bank privilege checking, credit worthiness checking, or loan risk evaluation. It also does not introduce execution of evaluate loan risk under the context condition prohibited by R7."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one insertion is required, but it adds a new activity instead of simply correcting the existing label."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The control-flow structure remains valid, but the process now contains two semantically similar consecutive activities, which may introduce redundancy."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is applied in the loan assessment section, specifically inside the high-value loan branch before credit worthiness checking."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_replace_existing_assignment_with_required_activity",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "Assign post processing to supervisor",
+            "new_activity_label": "assign post processing to supervisor"
+          }
+        },
+        {
+          "operation": "delete",
+          "parameters": {
+            "target_activity_label": "Assign post processing to supervisor"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The required activity is inserted in the same high-loan-amount branch before the old mismatching activity is removed. After both operations, the branch guarded by \"data.loan_amount > 1000000\" contains the required activity label."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The control-flow position of the assignment step is preserved, so R2 and R7 are unlikely to be affected. However, deleting the original activity may remove its write statement for post_processing_resource unless the inserted activity is separately configured to produce the same data, which is not expressible in the same insert operation."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "Two operations are required, and the replacement may require additional manual validation of data effects because the newly inserted activity does not explicitly inherit the write behavior of the deleted activity."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The number of activities remains effectively the same and the control-flow structure is preserved, but there is a potential data-flow quality concern if the inserted activity does not write post_processing_resource."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The replacement is performed inside the high-value loan branch in the middle of the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_rename_activity_to_required_label",
+  "best_resolution_reason": "RS1 is the best strategy because it directly addresses the apparent label mismatch with a single localized rename. It restores full compliance without changing the process structure, execution order, branching behavior, resource assignments, or data-flow behavior, and it is the least costly option while preserving the existing context requirements."
+}

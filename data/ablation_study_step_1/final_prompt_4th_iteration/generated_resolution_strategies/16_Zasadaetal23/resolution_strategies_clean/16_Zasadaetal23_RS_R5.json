@@ -1,0 +1,149 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_insert_missing_activity_unconditional",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "conduct customer identification & legitimation",
+            "new_activity_label": "legitimiation of suspected customer"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "legitimiation of suspected customer",
+            "new_resource": "money laundering officer"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The missing activity required by R5 is added with the exact referenced label and assigned to the money laundering officer. The existing activity 'conduct customer identification & legitimation' remains assigned to the customer advisor, so both parts of R5 are satisfied."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The change is localized inside the new-customer branch and does not affect customer data availability before risk disclosure, the resource of investment advice, or the update-customer-data branch. It also preserves the ordering before 'conclude custody account'."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only two simple operations are required: insertion of the missing activity and assignment of its required resource."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The strategy preserves the current sequence structure and only adds one activity. However, the activity would execute for all new customers, not only for suspected or untrusted customers."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The repair is applied in the early customer-identification part of the process, before the custody account is concluded."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_insert_missing_activity_conditionally_for_untrusted_customer",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "conduct customer identification & legitimation",
+            "new_activity_label": "legitimiation of suspected customer"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "legitimiation of suspected customer",
+            "new_resource": "money laundering officer"
+          }
+        },
+        {
+          "operation": "embed_activity_in_xor",
+          "parameters": {
+            "target_activity_label": "legitimiation of suspected customer",
+            "condition": "data.customer_status == \"untrusted\"",
+            "mode": "skip"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The missing activity required by R5 is introduced and assigned to the money laundering officer. The original 'conduct customer identification & legitimation' activity is not changed and therefore remains executable by the customer advisor."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The added activity is guarded by the untrusted-customer condition, which is conceptually aligned with the suspected-customer legitimation requirement and avoids executing the additional legitimation step for ordinary customers. Existing context requirements R1, R4, R6, and R7 are not directly disturbed."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "Three operations are required, including a control-flow restructuring operation to embed the new activity in an XOR structure."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The strategy adds a conditional control-flow structure, increasing model complexity. However, the complexity is localized and justified because the new activity should only occur for suspected or untrusted customers."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The repair is made in the early customer-identification and legitimation part of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_copy_identification_activity_and_specialize_resource",
+      "change_operations": [
+        {
+          "operation": "copy_after",
+          "parameters": {
+            "source_activity_label": "conduct customer identification & legitimation",
+            "target_activity_label": "conduct customer identification & legitimation"
+          }
+        },
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "conduct customer identification & legitimation",
+            "new_activity_label": "legitimiation of suspected customer"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "legitimiation of suspected customer",
+            "new_resource": "money laundering officer"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "A copied activity is renamed to the missing R5 activity and assigned to the money laundering officer. The original identification and legitimation activity remains in place for execution by the customer advisor."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The change preserves the main ordering and does not alter unrelated activities. However, copying and renaming an existing activity may unintentionally duplicate semantics from the original identification step."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "This strategy requires three operations and is less direct than simply inserting the missing activity."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The process remains sequential in this area, but copying an activity can reduce clarity because the copied activity may inherit semantics that are not fully equivalent to suspected-customer legitimation."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The copied and specialized activity is placed directly after the customer identification and legitimation step."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS2_insert_missing_activity_conditionally_for_untrusted_customer",
+  "best_resolution_reason": "RS2 is recommended because it fully resolves the detected R5 violation while limiting the new suspected-customer legitimation step to the relevant untrusted-customer condition. Although it has slightly higher cost and structural impact than the unconditional insertion, it better preserves already compliant behavior and avoids unnecessarily executing money-laundering legitimation for all new customers.",
+  "alternative_suggestion": {
+    "reason": "The detected requirement uses the label 'legitimiation of suspected customer', while the resolution context refers to 'legitimation of suspected customer'. If labels are matched literally, this spelling inconsistency cannot be fully corrected without changing the compliance requirement itself or adding duplicate activities with both spellings.",
+    "conceptual_solution": "Normalize the compliance rule and process terminology to the intended label 'legitimation of suspected customer', then model it as a conditional money-laundering-officer activity triggered when the customer is suspected or untrusted.",
+    "expected_compliance_impact": "This would improve semantic consistency and avoid future false violations caused by spelling mismatches, while preserving the intended compliance behavior."
+  }
+}

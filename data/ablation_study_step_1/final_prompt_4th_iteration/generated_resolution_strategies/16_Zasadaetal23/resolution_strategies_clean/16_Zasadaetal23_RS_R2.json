@@ -1,0 +1,129 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_add_customer_brochures_output_to_existing_activity",
+      "change_operations": [
+        {
+          "operation": "add_write",
+          "parameters": {
+            "target_activity_label": "provide customer brochurs",
+            "added_statement": "customer_brochures"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The existing activity 'provide customer brochurs' is already executed by resource 'customer_advisor'. Adding a write statement for 'customer_brochures' makes this activity produce or send the required data object, satisfying the requirement."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The change is localized to an early brochure-provision activity and does not affect the ordering, resources, or conditions involved in the existing satisfied requirements R1, R4, R6, or R7."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one data-write statement is added to an existing activity. No control-flow restructuring or additional activities are required."
+        },
+        "structural_quality_impact": {
+          "value": "none",
+          "reason": "The process structure remains unchanged. The strategy only enriches the data semantics of an existing activity."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The modified activity occurs near the beginning of the process, immediately after the customer arrival activity."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_rename_and_add_customer_brochures_output",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "provide customer brochurs",
+            "new_activity_label": "provide customer brochures"
+          }
+        },
+        {
+          "operation": "add_write",
+          "parameters": {
+            "target_activity_label": "provide customer brochures",
+            "added_statement": "customer_brochures"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "After renaming, the activity more clearly represents brochure provision, and the added write statement ensures that the required data object 'customer_brochures' is produced or sent. The resource assignment to 'customer_advisor' is preserved."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy does not alter control-flow, branching conditions, or resources relevant to the currently satisfied context requirements. It only improves the label and adds the missing data output."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The strategy requires two simple local changes: one rename and one data-write addition."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The structure is preserved, and the rename improves readability by correcting the apparent spelling issue in the activity label."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "Both changes are applied to an activity located near the start of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_insert_explicit_send_customer_brochures_activity",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "provide customer brochurs",
+            "new_activity_label": "send customer brochures"
+          }
+        },
+        {
+          "operation": "modify_resource",
+          "parameters": {
+            "target_activity_label": "send customer brochures",
+            "new_resource": "customer_advisor"
+          }
+        },
+        {
+          "operation": "add_write",
+          "parameters": {
+            "target_activity_label": "send customer brochures",
+            "added_statement": "customer_brochures"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The inserted activity explicitly sends or produces 'customer_brochures' and is assigned to the required resource 'customer_advisor'."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The new activity is inserted early and does not interfere with the ordering or resources of the already satisfied requirements. Existing behavior is preserved because no existing activity is removed or reordered."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "This strategy requires adding a new activity and then configuring its resource and data output, resulting in more changes than modifying the existing brochure-provision activity."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The process becomes slightly more complex by introducing an additional activity. It is structurally valid but may duplicate the intent of the existing 'provide customer brochurs' activity."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The inserted activity is placed directly after the existing brochure-provision activity near the beginning of the process."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_add_customer_brochures_output_to_existing_activity",
+  "best_resolution_reason": "RS1 is the recommended strategy because it fully restores compliance with the smallest possible change. The existing activity is already assigned to the required resource 'customer_advisor' and semantically corresponds to providing brochures. Adding the missing 'customer_brochures' write statement resolves the violation without changing the control-flow structure or affecting the satisfied context requirements."
+}

@@ -1,0 +1,149 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_copy_blacklist_after_lookup_partner_banks",
+      "change_operations": [
+        {
+          "operation": "copy_after",
+          "parameters": {
+            "source_activity_label": "add respondent bank to blacklist",
+            "target_activity_label": "Lookup Partner Banks"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The detected violation arises because the condition not data.evaluation can become true inside the due diligence loop, specifically on the branch that executes Lookup Partner Banks, but add respondent bank to blacklist is not guaranteed on that branch. Copying the blacklist activity immediately after Lookup Partner Banks ensures that whenever the not data.evaluation branch is taken during due diligence, the required blacklist activity eventually follows. The existing later blacklist activity remains in place for the post-loop not data.evaluation case."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy does not remove or rename obtain respondent bank annual report or analyze respondent bank annual report, preserving R1. It also does not affect the data.risk branch or the direct terminate following data.risk, preserving R3."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one localized operation is required. No existing control-flow structure needs to be reworked."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The change adds one activity to an already existing sequence branch. It does not introduce new gateways, loops, or parallel structures. The main drawback is the possible duplication of the blacklist activity if the later post-loop blacklist is also reached."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is located in the due diligence and evaluation portion of the process, before the annual report handling and account opening phases."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_persist_failed_evaluation_flag",
+      "change_operations": [
+        {
+          "operation": "add_write",
+          "parameters": {
+            "target_activity_label": "conduct due diligence study",
+            "added_statement": "evaluation_failed = data.evaluation_failed or not data.evaluation"
+          }
+        },
+        {
+          "operation": "modify_condition",
+          "parameters": {
+            "target_activity_label": "add respondent bank to blacklist",
+            "new_condition": "not data.evaluation or data.evaluation_failed"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "substantial",
+          "reason": "This strategy records that not data.evaluation became true during the due diligence loop and later uses that persistent flag to route the process to add respondent bank to blacklist. It mitigates the issue where a later due diligence iteration could overwrite data.evaluation before the blacklist decision point. Compliance depends on the process engine supporting persistent Boolean data expressions in write statements and branch conditions."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The strategy leaves the annual report activities unchanged, so R1 remains satisfied. It also does not alter the data.risk condition or the terminate activity following it, so R3 remains satisfied."
+        },
+        "change_cost": {
+          "value": "medium",
+          "reason": "Two changes are required: one data-write extension and one branch-condition modification. The control-flow structure is preserved, but the data logic becomes more complex."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "No new structural elements are introduced. The only impact is an additional data flag and a slightly more complex branch condition."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "Both changes are localized around the due diligence and blacklist decision part of the process."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_move_blacklist_before_annual_report",
+      "change_operations": [
+        {
+          "operation": "move_before",
+          "parameters": {
+            "source_activity_label": "add respondent bank to blacklist",
+            "target_activity_label": "obtain respondent bank annual report"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "substantial",
+          "reason": "Moving add respondent bank to blacklist before obtain respondent bank annual report makes the blacklist activity occur after the initial evaluation phase on all non-terminated paths that continue to the annual report phase. This ensures that a prior not data.evaluation condition is eventually followed by the blacklist activity. However, it may over-apply blacklisting even in cases where data.evaluation is not false at the final decision point."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "R1 is preserved because both annual report activities remain present. R3 is also preserved because the data.risk to terminate branch is not modified. However, the strategy changes the business meaning of blacklisting by making it less conditional."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only one move operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The process remains structurally valid, but the blacklist activity is moved out of its conditional branch, which weakens the semantic alignment between the not data.evaluation condition and the blacklist action. The original XOR branch may also become less meaningful."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change occurs at the transition between the evaluation/blacklist phase and the annual report phase."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_insert_blacklist_before_annual_report",
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "obtain respondent bank annual report",
+            "new_activity_label": "add respondent bank to blacklist"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "substantial",
+          "reason": "Inserting an additional add respondent bank to blacklist before the annual report phase ensures that any earlier occurrence of not data.evaluation is followed by a blacklist activity on continuing paths. The original conditional blacklist remains in place. This is effective as a mitigation but may introduce unnecessary blacklist executions on paths where the condition is not true."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "The annual report activities required by R1 are preserved, and the data.risk to terminate behavior required by R3 is untouched. The main consistency concern is that blacklisting may now happen outside the intended condition."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Only a single insertion operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The strategy keeps the control-flow structure intact but introduces a duplicate blacklist activity, which may reduce process clarity and cause redundant behavior."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The inserted activity is placed immediately before the annual report phase, after the evaluation and blacklist decision area."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_copy_blacklist_after_lookup_partner_banks",
+  "best_resolution_reason": "RS1 is the recommended strategy because it directly addresses the detected violating branch where not data.evaluation can hold during the due diligence loop. It requires only one localized operation, preserves the existing risk termination and annual report requirements, and avoids broad unconditional blacklisting. Compared with the other strategies, it provides the best balance between compliance restoration, low change cost, and preservation of the original process semantics."
+}

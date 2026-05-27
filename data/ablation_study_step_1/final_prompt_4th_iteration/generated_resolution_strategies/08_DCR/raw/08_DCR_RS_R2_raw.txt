@@ -1,0 +1,156 @@
+{
+  "resolution_strategies": [
+    {
+      "resolution_strategy_id": "RS1_insert_generic_diagnosis_after_verify_symptoms",
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "verify symptoms",
+            "new_activity_label": "diagnosis"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The activity \"diagnosis\" is inserted immediately after \"verify symptoms\". Therefore, whenever \"verify symptoms\" occurs, \"diagnosis\" eventually occurs afterwards, satisfying leads_to('verify symptoms', 'diagnosis')."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The existing ordering of \"consult\" before \"verify symptoms\" is preserved, so R1 remains satisfied. No \"prescribe medicine\" activity is introduced or moved, so R3 is not negatively affected."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one localized insertion is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The process structure remains unchanged except for one additional activity in the existing sequence. The change is simple and does not introduce additional gateways, loops, or branches."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "The change is applied directly after \"verify symptoms\", which occurs near the beginning of the loop body after \"consult\"."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS2_rename_verify_to_diagnosis_and_insert_new_verify_before_it",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "verify symptoms",
+            "new_activity_label": "diagnosis"
+          }
+        },
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "diagnosis",
+            "new_activity_label": "verify symptoms"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "After the operations, a new \"verify symptoms\" activity directly precedes the renamed \"diagnosis\" activity. Thus, every occurrence of \"verify symptoms\" is followed by \"diagnosis\"."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "R1 remains satisfied because the inserted \"verify symptoms\" still occurs after \"consult\". R3 is not directly affected. However, the original symptom-verification activity is relabeled as \"diagnosis\", which may weaken the semantic consistency of the process."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "Two simple localized operations are required: one rename and one insertion."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The control-flow structure remains simple, but the semantic meaning of the original \"verify symptoms\" activity is changed, which may make the model less clear."
+        },
+        "change_location": {
+          "value": "early",
+          "reason": "Both operations affect the early part of the loop body around \"verify symptoms\"."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS3_move_existing_cold_diagnosis_after_verify_and_generalize_label",
+      "change_operations": [
+        {
+          "operation": "move_after",
+          "parameters": {
+            "source_activity_label": "diagnosis: cold",
+            "target_activity_label": "verify symptoms"
+          }
+        },
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "diagnosis: cold",
+            "new_activity_label": "diagnosis"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "full",
+          "reason": "The moved and renamed activity \"diagnosis\" is placed immediately after \"verify symptoms\", ensuring that \"diagnosis\" eventually occurs after every \"verify symptoms\" occurrence."
+        },
+        "resolution_context_consistency": {
+          "value": "medium",
+          "reason": "R1 and R3 are not directly violated. However, the original branch-specific diagnosis for the cold path is removed from its conditional context and made unconditional, which may reduce behavioral consistency."
+        },
+        "change_cost": {
+          "value": "low",
+          "reason": "The strategy requires two operations: one move and one rename."
+        },
+        "structural_quality_impact": {
+          "value": "medium",
+          "reason": "The process remains structurally valid, but moving a branch-specific diagnosis outside its XOR branch may reduce the clarity and correctness of the diagnostic logic."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The source activity is located inside the diagnostic XOR structure, although the target position is early after \"verify symptoms\"."
+        }
+      }
+    },
+    {
+      "resolution_strategy_id": "RS4_partial_rename_cold_diagnosis_only",
+      "change_operations": [
+        {
+          "operation": "rename",
+          "parameters": {
+            "target_activity_label": "diagnosis: cold",
+            "new_activity_label": "diagnosis"
+          }
+        }
+      ],
+      "evaluation": {
+        "compliance_degree": {
+          "value": "partial",
+          "reason": "The exact activity label \"diagnosis\" would exist after the change, and the cold branch would satisfy the requirement. However, other paths after \"verify symptoms\" may still not lead to an activity labeled exactly \"diagnosis\"."
+        },
+        "resolution_context_consistency": {
+          "value": "high",
+          "reason": "The operation does not move \"verify symptoms\", \"consult\", or introduce \"prescribe medicine\", so the existing context requirements remain unaffected."
+        },
+        "change_cost": {
+          "value": "very_low",
+          "reason": "Only one rename operation is required."
+        },
+        "structural_quality_impact": {
+          "value": "low",
+          "reason": "The control-flow structure is unchanged. The only impact is loss of specificity in the cold diagnosis label."
+        },
+        "change_location": {
+          "value": "middle",
+          "reason": "The change is applied inside the conditional diagnostic branch following \"verify symptoms\"."
+        }
+      }
+    }
+  ],
+  "best_resolution_strategy_id": "RS1_insert_generic_diagnosis_after_verify_symptoms",
+  "best_resolution_reason": "RS1 is the best strategy because it fully restores compliance with the leads_to requirement using a single localized insertion. It preserves the existing ordering constraints, avoids moving or relabeling existing activities, and has the lowest change cost with only a low structural impact."
+}
