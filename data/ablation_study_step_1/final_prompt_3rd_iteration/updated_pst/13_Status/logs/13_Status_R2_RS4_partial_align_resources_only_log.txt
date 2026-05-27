@@ -1,0 +1,6 @@
+ChangeOperationValidator: SUCCESS (modify_resource)
+{'type': 'modify_resource', 'target_activity_label': 'Analyse reports', 'old_resource': 'Tech. MD Position', 'new_resource': 'Tech.MD Position'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Execution time (milliseconds): 2.2

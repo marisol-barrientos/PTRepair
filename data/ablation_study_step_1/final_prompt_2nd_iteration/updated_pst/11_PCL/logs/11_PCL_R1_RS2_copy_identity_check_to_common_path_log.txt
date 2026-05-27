@@ -1,0 +1,7 @@
+ChangeOperationValidator: SUCCESS (copy_before)
+{'type': 'copy_before', 'source_activity_label': 'Identity Check', 'target_activity_label': 'Approve Account Opening', 'new_node': 'Identity Check'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Structural WARNING: WARNING: Duplicate label detected: Identity Check
+Execution time (milliseconds): 3.69

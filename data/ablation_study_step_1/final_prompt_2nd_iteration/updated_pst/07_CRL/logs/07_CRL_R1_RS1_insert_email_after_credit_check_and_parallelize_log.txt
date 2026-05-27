@@ -1,0 +1,11 @@
+ChangeOperationValidator: SUCCESS (insert_after)
+{'type': 'insert_after', 'target_activity': 'Check Credit Worthiness', 'new_activity': 'Send Automated Email'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+ChangeOperationValidator: SUCCESS (parallelize)
+{'type': 'parallelize', 'first_activity_label': 'Check Credit Worthiness', 'second_activity_label': 'Send Automated Email'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Execution time (milliseconds): 10.7

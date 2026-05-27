@@ -1,0 +1,19 @@
+ChangeOperationValidator: SUCCESS (rename)
+{'type': 'rename', 'target_activity_label': 'evaluate loan risk', 'new_activity_label': 'notify customer'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Structural WARNING: WARNING: Duplicate label detected: initialize loan contract
+Structural WARNING: WARNING: Duplicate label detected: notify customer
+Structural WARNING: WARNING: Duplicate label detected: send loan contract
+Structural WARNING: WARNING: Duplicate label detected: sign officially loan contract
+ChangeOperationValidator: SUCCESS (rename)
+{'type': 'rename', 'target_activity_label': 'decline due to bad credit worthiness', 'new_activity_label': 'notify customer'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Structural WARNING: WARNING: Duplicate label detected: initialize loan contract
+Structural WARNING: WARNING: Duplicate label detected: notify customer
+Structural WARNING: WARNING: Duplicate label detected: send loan contract
+Structural WARNING: WARNING: Duplicate label detected: sign officially loan contract
+Execution time (milliseconds): 15.27

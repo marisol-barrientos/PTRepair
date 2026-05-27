@@ -1,0 +1,7 @@
+ChangeOperationValidator: SUCCESS (insert_before)
+{'type': 'insert_before', 'target_activity': 'check medical history', 'new_activity': 'ask for updates'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Structural WARNING: WARNING: Duplicate label detected: ask for updates
+Execution time (milliseconds): 2.73

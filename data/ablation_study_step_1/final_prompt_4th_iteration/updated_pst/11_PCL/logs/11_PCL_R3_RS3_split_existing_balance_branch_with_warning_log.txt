@@ -1,0 +1,3 @@
+ChangeOperationValidator: SUCCESS (add_xor_branch)
+APPLICATION FAILED: No XOR found containing condition 'not (data.special_allowance)'
+Execution time (milliseconds): 0.3

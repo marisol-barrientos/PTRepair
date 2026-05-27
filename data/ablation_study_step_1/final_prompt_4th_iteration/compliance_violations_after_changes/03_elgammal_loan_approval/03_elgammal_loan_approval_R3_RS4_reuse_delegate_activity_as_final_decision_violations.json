@@ -1,0 +1,23 @@
+{
+    "scenario_name": "03_elgammal_loan_approval",
+    "pst_file": "03_elgammal_loan_approval_R3_RS4_reuse_delegate_activity_as_final_decision.xml",
+    "verified_violation_requirements": [
+        "R2",
+        "R3"
+    ],
+    "verified_resolution_context_requirements": [],
+    "all_verified_requirements": [
+        "R2",
+        "R3"
+    ],
+    "violation_report": [
+        {
+            "requirement_id": "R2",
+            "requirement": "directly_follows (tree, 'check credit worthiness', 'notify customer')",
+            "assurance": 100,
+            "evidence": [
+                "Activity \"notify customer\" does not directly follow \"check credit worthiness\""
+            ]
+        }
+    ]
+}

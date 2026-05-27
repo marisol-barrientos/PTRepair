@@ -1,0 +1,6 @@
+ChangeOperationValidator: SUCCESS (move_after)
+{'type': 'move_after', 'source_activity_label': 'notify customer', 'target_activity_label': 'send goods'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Execution time (milliseconds): 2.93

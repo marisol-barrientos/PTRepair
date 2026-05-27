@@ -1,0 +1,6 @@
+ChangeOperationValidator: SUCCESS (modify_condition)
+{'type': 'modify_condition', 'target_activity_label': 'open bank account', 'old_condition': 'data.record or (data.eval and data.rating)', 'new_condition': '(!data.record) and (data.eval and data.rating)'}
+BehavioralValidator WARNING: Behavioral risk: terminate inside parallel block may cause synchronization anomalies
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Execution time (milliseconds): 4.34

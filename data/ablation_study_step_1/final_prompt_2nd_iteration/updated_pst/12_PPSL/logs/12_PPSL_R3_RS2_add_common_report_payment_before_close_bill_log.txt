@@ -1,0 +1,7 @@
+ChangeOperationValidator: SUCCESS (insert_before)
+{'type': 'insert_before', 'target_activity': 'Close Bill', 'new_activity': 'Report Payment'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Structural WARNING: WARNING: Duplicate label detected: Report Payment
+Execution time (milliseconds): 3.77

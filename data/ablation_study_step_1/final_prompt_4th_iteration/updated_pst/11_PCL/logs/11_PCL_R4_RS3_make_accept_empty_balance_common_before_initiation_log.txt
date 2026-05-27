@@ -1,0 +1,6 @@
+ChangeOperationValidator: SUCCESS (move_before)
+{'type': 'move_before', 'source_activity_label': 'Accept Empty Initial Balance', 'target_activity_label': 'Initiate Account'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Execution time (milliseconds): 3.62

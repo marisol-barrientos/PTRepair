@@ -1,0 +1,6 @@
+ChangeOperationValidator: SUCCESS (move_after)
+{'type': 'move_after', 'source_activity_label': 'Review Respondent Bank rating', 'target_activity_label': 'obtain respondent bank annual report'}
+BehavioralValidator WARNING: Behavioral risk: terminate inside parallel block may cause synchronization anomalies
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Execution time (milliseconds): 4.85

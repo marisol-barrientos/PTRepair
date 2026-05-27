@@ -1,0 +1,10 @@
+ChangeOperationValidator: SUCCESS (copy_after)
+{'type': 'copy_after', 'source_activity_label': 'conduct customer identification & legitimation', 'target_activity_label': 'conduct customer identification & legitimation', 'copied_activity_label': 'conduct customer identification & legitimation'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Structural WARNING: WARNING: Duplicate label detected: conduct customer identification & legitimation
+Structural WARNING: WARNING: Duplicate label detected: execute plausibility check
+ChangeOperationValidator: SUCCESS (rename)
+APPLICATION FAILED: Ambiguous label 'conduct customer identification & legitimation' found in nodes ['a3', 'n_66a79e']
+Execution time (milliseconds): 12.38

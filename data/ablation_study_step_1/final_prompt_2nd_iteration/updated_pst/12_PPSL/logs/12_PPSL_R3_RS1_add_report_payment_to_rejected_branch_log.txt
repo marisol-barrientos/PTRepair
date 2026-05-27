@@ -1,0 +1,7 @@
+ChangeOperationValidator: SUCCESS (insert_after)
+{'type': 'insert_after', 'target_activity': 'Report Rejected Order', 'new_activity': 'Report Payment'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Structural WARNING: WARNING: Duplicate label detected: Report Payment
+Execution time (milliseconds): 3.73

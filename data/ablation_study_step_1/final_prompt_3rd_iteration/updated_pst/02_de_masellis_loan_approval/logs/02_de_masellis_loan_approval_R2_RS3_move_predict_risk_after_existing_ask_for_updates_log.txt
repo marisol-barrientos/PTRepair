@@ -1,0 +1,6 @@
+ChangeOperationValidator: SUCCESS (move_after)
+{'type': 'move_after', 'source_activity_label': 'predict risk', 'target_activity_label': 'ask for updates'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Execution time (milliseconds): 2.64

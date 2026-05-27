@@ -1,0 +1,15 @@
+scenario,total_strategies,applied,warnings,errors,application_rate
+01_awad_delivery_of_goods,16,15,7,1,93.75
+02_de_masellis_loan_approval,13,12,5,1,92.31
+03_elgammal_loan_approval,7,7,7,0,100.0
+04_ghose_package_screening,3,3,0,0,100.0
+05_loebbecke_blood_collection,4,4,4,0,100.0
+06_BPMQ,14,14,14,0,100.0
+07_CRL,11,8,0,3,72.73
+08_DCR,4,4,0,0,100.0
+11_PCL,10,9,3,1,90.0
+12_PPSL,11,11,5,0,100.0
+13_Status,7,7,0,0,100.0
+14_SunetAl24,3,3,0,0,100.0
+15_WinteretAlER,6,6,0,0,100.0
+16_Zasadaetal23,11,11,11,0,100.0

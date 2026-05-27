@@ -1,0 +1,22 @@
+[
+    {
+        "requirement_id": "R2",
+        "requirement": "executed_by (tree, send_exist (tree, 'customer_brochures'), 'customer_advisor')",
+        "assurance": 100,
+        "evidence": [
+            "did not find any activity which sends dataobject \"customer_brochures\"",
+            "Activity \"None\" existence was checked but not found",
+            "Activity \"None\" is missing in the process"
+        ]
+    },
+    {
+        "requirement_id": "R5",
+        "requirement": "executed_by (tree, 'conduct customer identification & legitimation', 'customer advisor') and executed_by (tree, 'legitimiation of suspected customer', 'money laundering officer')",
+        "assurance": 100,
+        "evidence": [
+            "Activity \"conduct customer identification & legitimation\" is executed by Resource \"customer advisor\"",
+            "Activity \"legitimiation of suspected customer\" existence was checked but not found",
+            "Activity \"legitimiation of suspected customer\" is missing in the process"
+        ]
+    }
+]

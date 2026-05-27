@@ -1,0 +1,16 @@
+ChangeOperationValidator: SUCCESS (insert_after)
+{'type': 'insert_after', 'target_activity': 'Check Credit Worthiness', 'new_activity': 'send automated email'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+ChangeOperationValidator: SUCCESS (modify_resource)
+{'type': 'modify_resource', 'target_activity_label': 'send automated email', 'old_resource': None, 'new_resource': 'Email Automation Service'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+ChangeOperationValidator: SUCCESS (parallelize)
+{'type': 'parallelize', 'first_activity_label': 'Check Credit Worthiness', 'second_activity_label': 'send automated email'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Execution time (milliseconds): 19.5

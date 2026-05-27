@@ -1,0 +1,12 @@
+ChangeOperationValidator: SUCCESS (sequentialize_parallel)
+{'type': 'sequentialize_parallel', 'first_activity_label': 'check application', 'second_activity_label': 'retrieve data'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+ChangeOperationValidator: SUCCESS (insert_after)
+{'type': 'insert_after', 'target_activity': 'ask to recheck', 'new_activity': 'ask for updates'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Structural WARNING: WARNING: Duplicate label detected: ask for updates
+Execution time (milliseconds): 4.97

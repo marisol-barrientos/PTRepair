@@ -1,0 +1,14 @@
+[
+    {
+        "requirement_id": "R1",
+        "requirement": "condition_eventually_follows (tree, 'package.status == \"held\"', 'clear package status') and precedence (tree, 'clear package status', 'route package') and executed_by (tree, 'clear package status', 'regulatory authority')",
+        "assurance": 100,
+        "evidence": [
+            "Activity \"clear package status\" existence was checked but not found",
+            "While branch following condition \"package.status == \"held\"\" was found, the Activity \"clear package status\" was not found on the branch",
+            "Activity \"route package\" was found before \"clear package status\". Ensuring that \"route package\" is not on an exclusive branch which could lead to violations in some traces",
+            "Activity \"route package\" was found before \"clear package status\", but it is in a different exclusive branch, so precedence can not be guaranteed in every trace",
+            "Activity \"clear package status\" is executed by Resource \"regulatory authority\""
+        ]
+    }
+]

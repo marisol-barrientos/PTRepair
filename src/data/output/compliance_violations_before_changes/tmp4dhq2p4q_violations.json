@@ -1,0 +1,18 @@
+[
+    {
+        "requirement_id": "R1",
+        "requirement": "absence (tree, 'ask to recheck')",
+        "assurance": 100,
+        "evidence": [
+            "Activity \"ask to recheck\" exists in the process"
+        ]
+    },
+    {
+        "requirement_id": "R3",
+        "requirement": "precedence (tree, 'check medical history', 'ask for updates')",
+        "assurance": 100,
+        "evidence": [
+            "Activity \"check medical history\" was found before \"ask for updates\", so precedence \"check medical history\" requires \"ask for updates\" before is False"
+        ]
+    }
+]

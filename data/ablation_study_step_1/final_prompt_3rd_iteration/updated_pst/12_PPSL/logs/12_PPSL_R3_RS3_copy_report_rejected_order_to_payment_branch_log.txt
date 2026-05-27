@@ -1,0 +1,7 @@
+ChangeOperationValidator: SUCCESS (copy_after)
+{'type': 'copy_after', 'source_activity_label': 'Report Rejected Order', 'target_activity_label': 'Report Payment', 'copied_activity_label': 'Report Rejected Order'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Structural WARNING: WARNING: Duplicate label detected: Report Rejected Order
+Execution time (milliseconds): 4.34

@@ -1,0 +1,14 @@
+ChangeOperationValidator: SUCCESS (insert_after)
+{'type': 'insert_after', 'target_activity': 'Report Rejected Order', 'new_activity': 'Ship'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Structural WARNING: WARNING: Duplicate label detected: Ship
+ChangeOperationValidator: SUCCESS (insert_after)
+{'type': 'insert_after', 'target_activity': 'Report Rejected Order', 'new_activity': 'Send Invoice'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Structural WARNING: WARNING: Duplicate label detected: Send Invoice
+Structural WARNING: WARNING: Duplicate label detected: Ship
+Execution time (milliseconds): 8.41

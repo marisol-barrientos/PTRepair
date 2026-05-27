@@ -1,0 +1,6 @@
+ChangeOperationValidator: SUCCESS (sequentialize_parallel)
+{'type': 'sequentialize_parallel', 'first_activity_label': 'pay by bank transfer', 'second_activity_label': 'pack goods'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Execution time (milliseconds): 2.67

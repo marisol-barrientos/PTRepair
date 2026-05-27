@@ -1,0 +1,11 @@
+ChangeOperationValidator: SUCCESS (insert_before)
+{'type': 'insert_before', 'target_activity': 'Initiate Account', 'new_activity': 'Send Warning'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+ChangeOperationValidator: SUCCESS (embed_activity_in_xor)
+{'type': 'embed_activity_in_xor', 'target_activity_label': 'Send Warning', 'condition': 'data.balance < 0 and not data.special_allowance', 'mode': 'skip'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Execution time (milliseconds): 7.6

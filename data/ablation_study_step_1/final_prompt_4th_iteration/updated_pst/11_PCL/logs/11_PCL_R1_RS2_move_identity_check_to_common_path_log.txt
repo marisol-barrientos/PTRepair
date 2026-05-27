@@ -1,0 +1,11 @@
+ChangeOperationValidator: SUCCESS (delete)
+{'type': 'delete', 'target_activity_label': 'Identity Check'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+ChangeOperationValidator: SUCCESS (insert_before)
+{'type': 'insert_before', 'target_activity': 'Approve Account Opening', 'new_activity': 'Identity Check'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Execution time (milliseconds): 6.61

@@ -1,0 +1,26 @@
+ChangeOperationValidator: SUCCESS (rename)
+{'type': 'rename', 'target_activity_label': 'Evaluate LoanRisk', 'new_activity_label': 'evaluate loan risk'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+ChangeOperationValidator: SUCCESS (modify_resource)
+{'type': 'modify_resource', 'target_activity_label': 'evaluate loan risk', 'old_resource': None, 'new_resource': 'Manager'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+ChangeOperationValidator: SUCCESS (embed_activity_in_xor)
+{'type': 'embed_activity_in_xor', 'target_activity_label': 'evaluate loan risk', 'condition': 'not (data.customer_status == gold && data.loan_amount < 1000000)', 'mode': 'skip'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+ChangeOperationValidator: SUCCESS (add_write)
+{'type': 'add_write', 'target_activity_label': 'Check Credit Worthiness', 'added_statement': 'if data.customer_status == gold && data.loan_amount < 1000000 then low_risk = true'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+ChangeOperationValidator: SUCCESS (rename)
+{'type': 'rename', 'target_activity_label': 'Sign officially Loan Contract', 'new_activity_label': 'officially sign loan contract'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Execution time (milliseconds): 25.82

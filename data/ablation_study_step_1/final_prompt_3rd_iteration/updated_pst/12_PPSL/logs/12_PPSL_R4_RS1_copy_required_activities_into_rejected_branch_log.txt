@@ -1,0 +1,14 @@
+ChangeOperationValidator: SUCCESS (copy_after)
+{'type': 'copy_after', 'source_activity_label': 'Ship', 'target_activity_label': 'Report Rejected Order', 'copied_activity_label': 'Ship'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Structural WARNING: WARNING: Duplicate label detected: Ship
+ChangeOperationValidator: SUCCESS (copy_after)
+{'type': 'copy_after', 'source_activity_label': 'Send Invoice', 'target_activity_label': 'Report Rejected Order', 'copied_activity_label': 'Send Invoice'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Structural WARNING: WARNING: Duplicate label detected: Send Invoice
+Structural WARNING: WARNING: Duplicate label detected: Ship
+Execution time (milliseconds): 11.91

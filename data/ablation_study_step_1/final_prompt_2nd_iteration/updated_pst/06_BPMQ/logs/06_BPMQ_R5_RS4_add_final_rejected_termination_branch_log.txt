@@ -1,0 +1,11 @@
+ChangeOperationValidator: SUCCESS (add_xor_branch)
+{'type': 'add_xor_branch', 'existing_branch_condition': 'data.record or (data.eval and data.rating)', 'new_branch_condition': 'data.respondent_bank_rating == "rejected"', 'new_activity_label': 'terminate'}
+BehavioralValidator WARNING: Behavioral risk: terminate inside parallel block may cause synchronization anomalies
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+ChangeOperationValidator: SUCCESS (modify_condition)
+{'type': 'modify_condition', 'target_activity_label': 'open bank account', 'old_condition': 'data.record or (data.eval and data.rating)', 'new_condition': '(data.record or (data.eval and data.rating)) and not (data.respondent_bank_rating == "rejected")'}
+BehavioralValidator WARNING: Behavioral risk: terminate inside parallel block may cause synchronization anomalies
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Execution time (milliseconds): 8.96

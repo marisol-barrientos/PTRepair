@@ -1,0 +1,6 @@
+ChangeOperationValidator: SUCCESS (delete)
+{'type': 'delete', 'target_activity_label': 'ask to recheck'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Execution time (milliseconds): 2.13

@@ -1,0 +1,11 @@
+ChangeOperationValidator: SUCCESS (add_write)
+{'type': 'add_write', 'target_activity_label': 'Assess Respondent Bank risk', 'added_statement': 'evaluation_extra = extra_due_diligence_required'}
+BehavioralValidator WARNING: Behavioral risk: terminate inside parallel block may cause synchronization anomalies
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+ChangeOperationValidator: SUCCESS (remove_write)
+{'type': 'remove_write', 'target_activity_label': 'conduct due diligence study', 'removed_variable_name': 'evaluation_extra'}
+BehavioralValidator WARNING: Behavioral risk: terminate inside parallel block may cause synchronization anomalies
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Execution time (milliseconds): 7.61

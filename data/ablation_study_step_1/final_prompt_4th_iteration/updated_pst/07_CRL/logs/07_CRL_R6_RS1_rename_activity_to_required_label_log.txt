@@ -1,0 +1,3 @@
+ChangeOperationValidator: SUCCESS (rename)
+APPLICATION FAILED: No node found with label 'Assign post processing to supervisor'
+Execution time (milliseconds): 0.63

@@ -1,0 +1,7 @@
+ChangeOperationValidator: SUCCESS (insert_after)
+{'type': 'insert_after', 'target_activity': 'Accept Initial Deposit', 'new_activity': 'Accept Empty Initial Balance'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Structural WARNING: WARNING: Duplicate label detected: Accept Empty Initial Balance
+Execution time (milliseconds): 3.69

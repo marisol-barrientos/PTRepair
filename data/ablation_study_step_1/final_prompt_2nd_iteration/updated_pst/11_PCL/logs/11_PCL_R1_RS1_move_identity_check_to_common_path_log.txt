@@ -1,0 +1,6 @@
+ChangeOperationValidator: SUCCESS (move_before)
+{'type': 'move_before', 'source_activity_label': 'Identity Check', 'target_activity_label': 'Approve Account Opening'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Execution time (milliseconds): 4.13

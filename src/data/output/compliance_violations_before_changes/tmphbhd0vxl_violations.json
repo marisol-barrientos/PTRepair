@@ -1,0 +1,11 @@
+[
+    {
+        "requirement_id": "R2",
+        "requirement": "leads_to (tree, 'verify symptoms', 'diagnosis')",
+        "assurance": 100,
+        "evidence": [
+            "Activity \"verify symptoms\" is before Activity \"diagnosis\"",
+            "Activity \"diagnosis\" does not occur in all exclusive branches"
+        ]
+    }
+]

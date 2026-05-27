@@ -1,0 +1,11 @@
+ChangeOperationValidator: SUCCESS (modify_write)
+{'type': 'modify_write', 'target_activity_label': 'conduct due diligence study', 'old_statement': 'data.evaluation = result\ndata.evaluation_extra = result', 'new_statement': 'evaluation, due_diligence_repeat_required'}
+BehavioralValidator WARNING: Behavioral risk: terminate inside parallel block may cause synchronization anomalies
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+ChangeOperationValidator: SUCCESS (modify_loop_condition)
+{'type': 'modify_loop_condition', 'target_activity_label': 'conduct due diligence study', 'old_condition': 'data.evaluation_extra', 'new_condition': 'data.due_diligence_repeat_required'}
+BehavioralValidator WARNING: Behavioral risk: terminate inside parallel block may cause synchronization anomalies
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Execution time (milliseconds): 8.44

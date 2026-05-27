@@ -1,0 +1,57 @@
+{
+    "scenario_name": "16_Zasadaetal23",
+    "pst_file": "16_Zasadaetal23_R3_RS2_copy_send_after_exclusive_join.xml",
+    "verified_violation_requirements": [
+        "R2",
+        "R3",
+        "R5"
+    ],
+    "verified_resolution_context_requirements": [
+        "R1",
+        "R4",
+        "R6",
+        "R7"
+    ],
+    "all_verified_requirements": [
+        "R2",
+        "R3",
+        "R5",
+        "R1",
+        "R4",
+        "R6",
+        "R7"
+    ],
+    "violation_report": [
+        {
+            "requirement_id": "R2",
+            "requirement": "executed_by (tree, send_exist (tree, 'customer_brochures'), 'customer_advisor')",
+            "assurance": 100,
+            "evidence": [
+                "did not find any activity which sends dataobject \"customer_brochures\"",
+                "Activity \"None\" existence was checked but not found",
+                "Activity \"None\" is missing in the process"
+            ]
+        },
+        {
+            "requirement_id": "R3",
+            "requirement": "leads_to (tree, 'conclude custody account', send_exist (tree, 'custody_account_contract'))",
+            "assurance": 100,
+            "evidence": [
+                "found activity \"send legitimation & custody account documents\" which sends dataobject \"custody_account_contract\"",
+                "found activity \"send legitimation & custody account documents\" which sends dataobject \"custody_account_contract\"",
+                "Activity \"conclude custody account\" is before Activity \"send legitimation & custody account documents\"",
+                "Activity \"send legitimation & custody account documents\" does not occur in all exclusive branches"
+            ]
+        },
+        {
+            "requirement_id": "R5",
+            "requirement": "executed_by (tree, 'conduct customer identification & legitimation', 'customer advisor') and executed_by (tree, 'legitimiation of suspected customer', 'money laundering officer')",
+            "assurance": 100,
+            "evidence": [
+                "Activity \"conduct customer identification & legitimation\" is executed by Resource \"customer advisor\"",
+                "Activity \"legitimiation of suspected customer\" existence was checked but not found",
+                "Activity \"legitimiation of suspected customer\" is missing in the process"
+            ]
+        }
+    ]
+}

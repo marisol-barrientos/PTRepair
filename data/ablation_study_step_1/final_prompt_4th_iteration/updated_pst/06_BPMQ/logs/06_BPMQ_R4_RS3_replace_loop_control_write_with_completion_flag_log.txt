@@ -1,0 +1,6 @@
+ChangeOperationValidator: SUCCESS (modify_write)
+{'type': 'modify_write', 'target_activity_label': 'conduct due diligence study', 'old_statement': 'data.evaluation = result\ndata.evaluation_extra = result', 'new_statement': 'evaluation, evaluation_extra_completed'}
+BehavioralValidator WARNING: Behavioral risk: terminate inside parallel block may cause synchronization anomalies
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Execution time (milliseconds): 4.6

@@ -1,0 +1,7 @@
+ChangeOperationValidator: SUCCESS (copy_after)
+{'type': 'copy_after', 'source_activity_label': 'Identity Check', 'target_activity_label': 'Customer Request Arrives', 'copied_activity_label': 'Identity Check'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Structural WARNING: WARNING: Duplicate label detected: Identity Check
+Execution time (milliseconds): 3.81

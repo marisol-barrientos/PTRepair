@@ -1,0 +1,13 @@
+[
+    {
+        "requirement_id": "R6",
+        "requirement": "data_value_alternative_eventually_follows (tree, 'assessment_status == \"rejected\"', 'inform of rejection') and directly_follows (tree, 'inform of rejection', 'terminate')",
+        "assurance": 90,
+        "evidence": [
+            "Condition mapped via in compared to ==, lower assurances",
+            "Activity \"inform of rejection\" existence was checked but not found",
+            "While branch following condition \"assessment_status == \"rejected\"\" was found, the Activity \"inform of rejection\" was not found on the branch",
+            "Found a terminate that directly follows \"inform of rejection\""
+        ]
+    }
+]

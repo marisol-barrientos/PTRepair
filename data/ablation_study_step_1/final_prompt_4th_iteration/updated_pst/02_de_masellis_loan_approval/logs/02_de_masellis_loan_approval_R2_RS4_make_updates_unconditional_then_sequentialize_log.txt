@@ -1,0 +1,8 @@
+ChangeOperationValidator: SUCCESS (remove_branch)
+{'type': 'remove_branch', 'target_activity_label': 'ask to recheck', 'removed_branch_type': 'alternative'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+ChangeOperationValidator: SUCCESS (modify_condition)
+APPLICATION FAILED: No enclosing <alternative> found for 'ask for updates'
+Execution time (milliseconds): 2.42

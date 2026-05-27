@@ -1,0 +1,33 @@
+{
+    "scenario_name": "06_BPMQ",
+    "pst_file": "06_BPMQ_R4_RS2_introduce_prior_evaluation_extra_decision.xml",
+    "verified_violation_requirements": [
+        "R2",
+        "R4",
+        "R5",
+        "R6"
+    ],
+    "verified_resolution_context_requirements": [
+        "R1",
+        "R3"
+    ],
+    "all_verified_requirements": [
+        "R2",
+        "R4",
+        "R5",
+        "R6",
+        "R1",
+        "R3"
+    ],
+    "violation_report": [
+        {
+            "requirement_id": "R6",
+            "requirement": "precedence (tree, 'open bank account', 'check respondent bank certificate')",
+            "assurance": 100,
+            "evidence": [
+                "Activity \"check respondent bank certificate\" was found before \"open bank account\". Ensuring that \"check respondent bank certificate\" is not on an exclusive branch which could lead to violations in some traces",
+                "Activity \"check respondent bank certificate\" was found before \"open bank account\", but it is in a different exclusive branch, so precedence can not be guaranteed in every trace"
+            ]
+        }
+    ]
+}

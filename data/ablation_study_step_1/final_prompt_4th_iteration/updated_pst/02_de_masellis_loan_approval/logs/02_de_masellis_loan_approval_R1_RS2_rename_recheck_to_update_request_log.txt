@@ -1,0 +1,7 @@
+ChangeOperationValidator: SUCCESS (rename)
+{'type': 'rename', 'target_activity_label': 'ask to recheck', 'new_activity_label': 'ask for updates'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Structural WARNING: WARNING: Duplicate label detected: ask for updates
+Execution time (milliseconds): 2.57

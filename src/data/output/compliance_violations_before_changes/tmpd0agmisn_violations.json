@@ -1,0 +1,36 @@
+[
+    {
+        "requirement_id": "R1",
+        "requirement": "leads_to (tree, 'go to checkout', 'notify customer')",
+        "assurance": 100,
+        "evidence": [
+            "Activity \"go to checkout\" is before Activity \"notify customer\"",
+            "Activity \"notify customer\" does not occur in all exclusive branches"
+        ]
+    },
+    {
+        "requirement_id": "R2",
+        "requirement": "leads_to (tree, 'pay by credit card', 'pack goods') and leads_to (tree, 'pay by bank transfer', 'pack goods')",
+        "assurance": 100,
+        "evidence": [
+            "Activity \"pay by credit card\" and Activity \"pack goods\" are in parrallel",
+            "Activity \"pay by bank transfer\" and Activity \"pack goods\" are in parrallel"
+        ]
+    },
+    {
+        "requirement_id": "R3",
+        "requirement": "leads_to (tree, 'pack goods', 'notify customer')",
+        "assurance": 100,
+        "evidence": [
+            "Activity \"pack goods\" and Activity \"notify customer\" are in parrallel"
+        ]
+    },
+    {
+        "requirement_id": "R4",
+        "requirement": "exists (tree, 'archive order') and directly_follows (tree, 'archive order', 'terminate')",
+        "assurance": 100,
+        "evidence": [
+            "Activity \"terminate\" is missing in the process"
+        ]
+    }
+]

@@ -1,0 +1,11 @@
+ChangeOperationValidator: SUCCESS (insert_before)
+{'type': 'insert_before', 'target_activity': 'Analyse reports', 'new_activity': 'check for new document in DMS'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+ChangeOperationValidator: SUCCESS (embed_post_loop)
+{'type': 'embed_post_loop', 'start_activity_label': 'check for new document in DMS', 'end_activity_label': 'check for new document in DMS', 'condition': '10518984 '}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Execution time (milliseconds): 5.97

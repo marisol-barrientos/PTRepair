@@ -1,0 +1,28 @@
+ChangeOperationValidator: SUCCESS (rename)
+{'type': 'rename', 'target_activity_label': 'judge high risk loan', 'new_activity_label': 'take final decision'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Structural WARNING: WARNING: Duplicate label detected: initialize loan contract
+Structural WARNING: WARNING: Duplicate label detected: notify customer
+Structural WARNING: WARNING: Duplicate label detected: send loan contract
+Structural WARNING: WARNING: Duplicate label detected: sign officially loan contract
+ChangeOperationValidator: SUCCESS (insert_before)
+{'type': 'insert_before', 'target_activity': 'take final decision', 'new_activity': 'judge high risk loan'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Structural WARNING: WARNING: Duplicate label detected: initialize loan contract
+Structural WARNING: WARNING: Duplicate label detected: notify customer
+Structural WARNING: WARNING: Duplicate label detected: send loan contract
+Structural WARNING: WARNING: Duplicate label detected: sign officially loan contract
+ChangeOperationValidator: SUCCESS (modify_resource)
+{'type': 'modify_resource', 'target_activity_label': 'judge high risk loan', 'old_resource': None, 'new_resource': 'branch office manager'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Structural WARNING: WARNING: Duplicate label detected: initialize loan contract
+Structural WARNING: WARNING: Duplicate label detected: notify customer
+Structural WARNING: WARNING: Duplicate label detected: send loan contract
+Structural WARNING: WARNING: Duplicate label detected: sign officially loan contract
+Execution time (milliseconds): 17.52

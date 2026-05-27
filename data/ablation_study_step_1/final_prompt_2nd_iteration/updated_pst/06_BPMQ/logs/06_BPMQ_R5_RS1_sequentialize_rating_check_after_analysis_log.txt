@@ -1,0 +1,6 @@
+ChangeOperationValidator: SUCCESS (sequentialize_parallel)
+{'type': 'sequentialize_parallel', 'first_activity_label': 'analyze respondent bank annual report', 'second_activity_label': 'Review Respondent Bank rating'}
+BehavioralValidator WARNING: Behavioral risk: terminate inside parallel block may cause synchronization anomalies
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Execution time (milliseconds): 4.51

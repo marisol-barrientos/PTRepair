@@ -1,0 +1,12 @@
+{
+    "scenario_name": "04_ghose_package_screening",
+    "pst_file": "04_ghose_package_screening_R1_RS5_rename_handle_to_clear.xml",
+    "verified_violation_requirements": [
+        "R1"
+    ],
+    "verified_resolution_context_requirements": [],
+    "all_verified_requirements": [
+        "R1"
+    ],
+    "violation_report": []
+}

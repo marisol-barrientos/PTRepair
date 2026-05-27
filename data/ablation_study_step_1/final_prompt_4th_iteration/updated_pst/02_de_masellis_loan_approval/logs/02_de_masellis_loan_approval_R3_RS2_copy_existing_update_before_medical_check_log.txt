@@ -1,0 +1,7 @@
+ChangeOperationValidator: SUCCESS (copy_before)
+{'type': 'copy_before', 'source_activity_label': 'ask for updates', 'target_activity_label': 'check medical history', 'new_node': 'ask for updates'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Structural WARNING: WARNING: Duplicate label detected: ask for updates
+Execution time (milliseconds): 2.78

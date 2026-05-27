@@ -1,0 +1,7 @@
+ChangeOperationValidator: SUCCESS (rename)
+{'type': 'rename', 'target_activity_label': 'Accept Initial Deposit', 'new_activity_label': 'Accept Empty Initial Balance'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Structural WARNING: WARNING: Duplicate label detected: Accept Empty Initial Balance
+Execution time (milliseconds): 3.9

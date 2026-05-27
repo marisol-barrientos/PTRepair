@@ -1,0 +1,3 @@
+ChangeOperationValidator: SUCCESS (copy_after)
+APPLICATION FAILED: Ambiguous label 'notify customer' found in nodes ['a12', 'a18']
+Execution time (milliseconds): 0.53

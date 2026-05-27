@@ -1,0 +1,17 @@
+{
+    "scenario_name": "08_DCR",
+    "pst_file": "08_DCR_R2_RS2_rename_verify_to_diagnosis_and_insert_new_verify_before_it.xml",
+    "verified_violation_requirements": [
+        "R2"
+    ],
+    "verified_resolution_context_requirements": [
+        "R1",
+        "R3"
+    ],
+    "all_verified_requirements": [
+        "R2",
+        "R1",
+        "R3"
+    ],
+    "violation_report": []
+}

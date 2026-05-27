@@ -1,0 +1,12 @@
+[
+    {
+        "requirement_id": "R3",
+        "requirement": "executed_by (tree, 'judge high risk loan', 'branch office manager') and directly_follows (tree, 'judge high risk loan', 'take final decision')",
+        "assurance": 100,
+        "evidence": [
+            "Activity \"judge high risk loan\" does not have an annotation Resource \"branch office manager\"",
+            "Activity \"take final decision\" existence was checked but not found",
+            "Activity \"take final decision\" is missing in the process"
+        ]
+    }
+]

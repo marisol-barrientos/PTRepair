@@ -1,0 +1,37 @@
+[
+    {
+        "requirement_id": "R2",
+        "requirement": "precedence (tree, 'Ship', 'Test Quality') and leads_to (tree, 'production step', 'Test Quality')",
+        "assurance": 100,
+        "evidence": [
+            "Activity \"Test Quality\" was found before \"Ship\". Ensuring that \"Test Quality\" is not on an exclusive branch which could lead to violations in some traces",
+            "Activity \"Test Quality\" was found before \"Ship\", but it is in a different exclusive branch, so precedence can not be guaranteed in every trace",
+            "Activity \"production step\" existence was checked but not found",
+            "Activity \"production step\" is not found in the tree"
+        ]
+    },
+    {
+        "requirement_id": "R3",
+        "requirement": "precedence (tree, 'Close Bill', 'Report Payment') or precedence (tree, 'Close Bill', 'Report Rejected Order') and leads_to (tree, 'Receive Payment', 'Report Payment')",
+        "assurance": 100,
+        "evidence": [
+            "Activity \"Report Payment\" was found before \"Close Bill\". Ensuring that \"Report Payment\" is not on an exclusive branch which could lead to violations in some traces",
+            "Activity \"Report Payment\" was found before \"Close Bill\", but it is in a different exclusive branch, so precedence can not be guaranteed in every trace",
+            "Activity \"Report Rejected Order\" existence was checked but not found",
+            "Activity \"Close Bill\" was found but Activity \"Report Rejected Order\" was not found, so precedence \"Close Bill\" requires \"Report Rejected Order\" before it is false",
+            "Activity \"Receive Payment\" is before Activity \"Report Payment\"",
+            "Activity \"Report Payment\" does not occur in all exclusive branches"
+        ]
+    },
+    {
+        "requirement_id": "R4",
+        "requirement": "leads_to (tree, 'Fill Order', 'Ship') and leads_to (tree, 'Fill Order', 'Send Invoice')",
+        "assurance": 100,
+        "evidence": [
+            "Activity \"Fill Order\" is before Activity \"Ship\"",
+            "Activity \"Ship\" does not occur in all exclusive branches",
+            "Activity \"Fill Order\" is before Activity \"Send Invoice\"",
+            "Activity \"Send Invoice\" does not occur in all exclusive branches"
+        ]
+    }
+]

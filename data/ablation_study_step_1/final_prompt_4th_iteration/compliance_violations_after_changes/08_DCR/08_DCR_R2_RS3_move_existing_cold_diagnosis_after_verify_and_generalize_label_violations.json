@@ -1,0 +1,17 @@
+{
+    "scenario_name": "08_DCR",
+    "pst_file": "08_DCR_R2_RS3_move_existing_cold_diagnosis_after_verify_and_generalize_label.xml",
+    "verified_violation_requirements": [
+        "R2"
+    ],
+    "verified_resolution_context_requirements": [
+        "R1",
+        "R3"
+    ],
+    "all_verified_requirements": [
+        "R2",
+        "R1",
+        "R3"
+    ],
+    "violation_report": []
+}

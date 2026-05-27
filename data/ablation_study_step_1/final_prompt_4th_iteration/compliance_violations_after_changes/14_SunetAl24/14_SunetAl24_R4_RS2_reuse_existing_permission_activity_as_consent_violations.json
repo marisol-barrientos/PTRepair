@@ -1,0 +1,36 @@
+{
+    "scenario_name": "14_SunetAl24",
+    "pst_file": "14_SunetAl24_R4_RS2_reuse_existing_permission_activity_as_consent.xml",
+    "verified_violation_requirements": [
+        "R2",
+        "R3",
+        "R4"
+    ],
+    "verified_resolution_context_requirements": [],
+    "all_verified_requirements": [
+        "R2",
+        "R3",
+        "R4"
+    ],
+    "violation_report": [
+        {
+            "requirement_id": "R2",
+            "requirement": "exists (tree, 'verify user data') and executed_by (tree, 'verify user data', 'telephone company')",
+            "assurance": 100,
+            "evidence": [
+                "Activity \"verify user data\" existence was checked but not found",
+                "Activity \"verify user data\" existence was checked but not found",
+                "Activity \"verify user data\" is missing in the process"
+            ]
+        },
+        {
+            "requirement_id": "R3",
+            "requirement": "activity_receives (tree, 'Activate Sim Card','data.sim_card_status') and executed_by (tree, 'Activate Sim Card', 'telephone company')",
+            "assurance": 100,
+            "evidence": [
+                "data object \"['data', 'sim_card_status']\" is not found in finalize of Activity \"Activate Sim Card\"",
+                "Activity \"Activate Sim Card\" does not have an annotation Resource \"telephone company\""
+            ]
+        }
+    ]
+}

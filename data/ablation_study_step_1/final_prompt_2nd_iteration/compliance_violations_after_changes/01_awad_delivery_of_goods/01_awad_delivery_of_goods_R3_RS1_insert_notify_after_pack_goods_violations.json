@@ -1,0 +1,55 @@
+{
+    "scenario_name": "01_awad_delivery_of_goods",
+    "pst_file": "01_awad_delivery_of_goods_R3_RS1_insert_notify_after_pack_goods.xml",
+    "verified_violation_requirements": [
+        "R1",
+        "R2",
+        "R3",
+        "R4"
+    ],
+    "verified_resolution_context_requirements": [],
+    "all_verified_requirements": [
+        "R1",
+        "R2",
+        "R3",
+        "R4"
+    ],
+    "violation_report": [
+        {
+            "requirement_id": "R1",
+            "requirement": "leads_to (tree, 'go to checkout', 'notify customer')",
+            "assurance": 100,
+            "evidence": [
+                "Activity \"go to checkout\" is before Activity \"notify customer\"",
+                "Activity \"notify customer\" does not occur in all exclusive branches"
+            ]
+        },
+        {
+            "requirement_id": "R2",
+            "requirement": "leads_to (tree, 'pay by credit card', 'pack goods') and leads_to (tree, 'pay by bank transfer', 'pack goods')",
+            "assurance": 100,
+            "evidence": [
+                "Activity \"pay by credit card\" and Activity \"pack goods\" are in parrallel",
+                "Activity \"pay by bank transfer\" and Activity \"pack goods\" are in parrallel"
+            ]
+        },
+        {
+            "requirement_id": "R3",
+            "requirement": "leads_to (tree, 'pack goods', 'notify customer')",
+            "assurance": 100,
+            "evidence": [
+                "Activity \"pack goods\" and Activity \"notify customer\" are in parrallel"
+            ]
+        },
+        {
+            "requirement_id": "R4",
+            "requirement": "exists (tree, 'archive order') and directly_follows (tree, 'archive order', 'terminate')",
+            "assurance": 100,
+            "evidence": [
+                "Activity \"archive order\" existence was checked but not found",
+                "Activity \"archive order\" existence was checked but not found",
+                "Activity \"archive order\" is missing in the process"
+            ]
+        }
+    ]
+}

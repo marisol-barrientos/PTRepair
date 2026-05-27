@@ -1,0 +1,44 @@
+{
+    "scenario_name": "06_BPMQ",
+    "pst_file": "06_BPMQ_R6_RS3_insert_certificate_directly_before_account_opening.xml",
+    "verified_violation_requirements": [
+        "R2",
+        "R4",
+        "R5",
+        "R6"
+    ],
+    "verified_resolution_context_requirements": [
+        "R1",
+        "R3"
+    ],
+    "all_verified_requirements": [
+        "R2",
+        "R4",
+        "R5",
+        "R6",
+        "R1",
+        "R3"
+    ],
+    "violation_report": [
+        {
+            "requirement_id": "R4",
+            "requirement": "condition_eventually_follows (tree, 'data.evaluation_extra', 'conduct due diligence study')",
+            "assurance": 90,
+            "evidence": [
+                "Branch was found which matches to data.evaluation_extra",
+                "Activity \"conduct due diligence study\" was found on branch following condition \"data.evaluation_extra\"",
+                "Found 1 calls that influence condition \"data.evaluation_extra\". Checking if both are prior to branch",
+                "Found a call \"conduct due diligence study\" that is not prior to the identified branch, so compliance can be violated if said call can cause the condition to evaluate to true"
+            ]
+        },
+        {
+            "requirement_id": "R6",
+            "requirement": "precedence (tree, 'open bank account', 'check respondent bank certificate')",
+            "assurance": 100,
+            "evidence": [
+                "Activity \"check respondent bank certificate\" was found before \"open bank account\". Ensuring that \"check respondent bank certificate\" is not on an exclusive branch which could lead to violations in some traces",
+                "Activity \"check respondent bank certificate\" was found before \"open bank account\", but it is in a different exclusive branch, so precedence can not be guaranteed in every trace"
+            ]
+        }
+    ]
+}

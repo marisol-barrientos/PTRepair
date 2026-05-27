@@ -1,0 +1,9 @@
+ChangeOperationValidator: SUCCESS (copy_before)
+{'type': 'copy_before', 'source_activity_label': 'Ask for permission', 'target_activity_label': 'Request personal data', 'new_node': 'Ask for permission'}
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Structural WARNING: WARNING: Duplicate label detected: Ask for permission
+ChangeOperationValidator: SUCCESS (rename)
+APPLICATION FAILED: Ambiguous label 'Ask for permission' found in nodes ['n_d02c85', 'a9']
+Execution time (milliseconds): 4.15

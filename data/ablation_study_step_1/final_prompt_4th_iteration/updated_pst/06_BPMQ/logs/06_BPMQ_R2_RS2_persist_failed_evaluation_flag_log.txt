@@ -1,0 +1,11 @@
+ChangeOperationValidator: SUCCESS (add_write)
+{'type': 'add_write', 'target_activity_label': 'conduct due diligence study', 'added_statement': 'evaluation_failed = data.evaluation_failed or not data.evaluation'}
+BehavioralValidator WARNING: Behavioral risk: terminate inside parallel block may cause synchronization anomalies
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+ChangeOperationValidator: SUCCESS (modify_condition)
+{'type': 'modify_condition', 'target_activity_label': 'add respondent bank to blacklist', 'old_condition': 'not data.evaluation', 'new_condition': 'not data.evaluation or data.evaluation_failed'}
+BehavioralValidator WARNING: Behavioral risk: terminate inside parallel block may cause synchronization anomalies
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Execution time (milliseconds): 12.94

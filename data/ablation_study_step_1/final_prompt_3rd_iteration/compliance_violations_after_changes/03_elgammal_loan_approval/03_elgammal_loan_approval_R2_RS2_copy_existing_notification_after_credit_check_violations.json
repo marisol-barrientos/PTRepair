@@ -1,0 +1,33 @@
+{
+    "scenario_name": "03_elgammal_loan_approval",
+    "pst_file": "03_elgammal_loan_approval_R2_RS2_copy_existing_notification_after_credit_check.xml",
+    "verified_violation_requirements": [
+        "R2",
+        "R3"
+    ],
+    "verified_resolution_context_requirements": [],
+    "all_verified_requirements": [
+        "R2",
+        "R3"
+    ],
+    "violation_report": [
+        {
+            "requirement_id": "R2",
+            "requirement": "directly_follows (tree, 'check credit worthiness', 'notify customer')",
+            "assurance": 100,
+            "evidence": [
+                "Activity \"notify customer\" does not directly follow \"check credit worthiness\""
+            ]
+        },
+        {
+            "requirement_id": "R3",
+            "requirement": "executed_by (tree, 'judge high risk loan', 'branch office manager') and directly_follows (tree, 'judge high risk loan', 'take final decision')",
+            "assurance": 100,
+            "evidence": [
+                "Activity \"judge high risk loan\" does not have an annotation Resource \"branch office manager\"",
+                "Activity \"take final decision\" existence was checked but not found",
+                "Activity \"take final decision\" is missing in the process"
+            ]
+        }
+    ]
+}

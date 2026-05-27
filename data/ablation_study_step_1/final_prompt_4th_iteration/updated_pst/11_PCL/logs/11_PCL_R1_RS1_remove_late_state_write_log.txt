@@ -1,0 +1,6 @@
+ChangeOperationValidator: SUCCESS (remove_write)
+None
+BehavioralValidator: SUCCESS
+PSTValidator: SUCCESS
+StructuralValidator: SUCCESS
+Execution time (milliseconds): 3.36
