@@ -1,232 +1,47 @@
 import json
 import time
-import requests
 from pathlib import Path
+from typing import Any
 
-CURRENT_DIR = Path.cwd().resolve()
-BASE_DIR = CURRENT_DIR
+import requests
 
-TARGET = "PTResolver"
-
-while BASE_DIR.name != TARGET:
-    # stop if we reached filesystem root
-    if BASE_DIR.parent == BASE_DIR:
-        raise FileNotFoundError(
-            f"Could not find '{TARGET}' in parent directories."
-        )
-
-    BASE_DIR = BASE_DIR.parent
-
-print("Project root:")
-print(BASE_DIR)
 
 SCENARIO_NAME = "02_de_masellis_loan_approval"
-
-REQUIREMENT_ID = "R1"
-
 MODEL = "openai/gpt-5.5"
-
-API_KEY_FILE = (
-    BASE_DIR
-    / "config"
-    / "api_keys.json"
-)
-
-with open(
-    API_KEY_FILE,
-    "r",
-    encoding="utf-8"
-) as f:
-
-    api_config = json.load(f)
-
-OPENROUTER_API_KEY = (
-    api_config["OPENROUTER_API_KEY"]
-)
+TARGET_PROJECT_DIR = "PTResolver"
+REQUEST_TIMEOUT_SECONDS = 300
 
 
-PROMPT_FILE = (
-    BASE_DIR
-    / "data"
-    / "input"
-    / "prompts"
-    / "V1_generate_resolution_strategies_no_process_change_operations_free_answer.txt"
-)
+def find_project_root(start_dir: Path, target_name: str) -> Path:
+    current = start_dir.resolve()
 
-PST_FILE = (
-    BASE_DIR
-    / "data"
-    / "output"
-    / "simplified_pst"
-    / f"{SCENARIO_NAME}_simplified_pst.txt"
-)
+    while current.name != target_name:
+        if current.parent == current:
+            raise FileNotFoundError(
+                f"Could not find '{target_name}' in parent directories."
+            )
+        current = current.parent
 
-VIOLATIONS_FILE = (
-    BASE_DIR
-    / "data"
-    / "output"
-    / "compliance_violations_before_changes"
-    / f"{SCENARIO_NAME}_ALL_violations.json"
-)
+    return current
 
 
-RESOLUTION_CONTEXT_FILE = (
-    BASE_DIR
-    / "data"
-    / "input"
-    / "resolution_context"
-    / f"{SCENARIO_NAME}_req_resolution_context.json"
-)
+def load_json(path: Path) -> Any:
+    with path.open("r", encoding="utf-8") as file:
+        return json.load(file)
 
 
-OUTPUT_DIR = (
-    BASE_DIR
-    / "data"
-    / "output"
-    / "generated_resolution_strategies"
-)
-
-SCENARIO_OUTPUT_DIR = (
-    OUTPUT_DIR
-    / SCENARIO_NAME
-)
-
-JSON_DIR = (
-    SCENARIO_OUTPUT_DIR
-    / "resolution_strategies_clean"
-)
-
-RAW_DIR = (
-    SCENARIO_OUTPUT_DIR
-    / "raw"
-)
-
-FULL_RESPONSE_DIR = (
-    SCENARIO_OUTPUT_DIR
-    / "full_response"
-)
-
-METADATA_DIR = (
-    SCENARIO_OUTPUT_DIR
-    / "metadata"
-)
-
-PROBLEMS_DIR = (
-    SCENARIO_OUTPUT_DIR
-    / "problems"
-)
-
-JSON_DIR.mkdir(
-    parents=True,
-    exist_ok=True
-)
-
-RAW_DIR.mkdir(
-    parents=True,
-    exist_ok=True
-)
-
-FULL_RESPONSE_DIR.mkdir(
-    parents=True,
-    exist_ok=True
-)
-
-METADATA_DIR.mkdir(
-    parents=True,
-    exist_ok=True
-)
-
-PROBLEMS_DIR.mkdir(
-    parents=True,
-    exist_ok=True
-)
-
-start_time = time.time()
-
-problems_detected = []
-
-with open(
-    PROMPT_FILE,
-    "r",
-    encoding="utf-8"
-) as f:
-
-    BASE_PROMPT = f.read()
-
-with open(
-    PST_FILE,
-    "r",
-    encoding="utf-8"
-) as f:
-
-    pst = f.read()
+def load_text(path: Path) -> str:
+    with path.open("r", encoding="utf-8") as file:
+        return file.read()
 
 
-with open(
-    VIOLATIONS_FILE,
-    "r",
-    encoding="utf-8"
-) as f:
-
-    violations = json.load(f)
-
-
-resolution_context = {}
-
-if RESOLUTION_CONTEXT_FILE.exists():
-
-    with open(
-        RESOLUTION_CONTEXT_FILE,
-        "r",
-        encoding="utf-8"
-    ) as f:
-
-        resolution_context = json.load(f)
-
-    print(
-        f"Loaded resolution context requirements: "
-        f"{len(resolution_context)}"
-    )
-
-else:
-
-    print(
-        "No resolution context file found."
-    )
-
-
-target_violation = None
-
-for violation in violations:
-
-    if violation["requirement_id"] == REQUIREMENT_ID:
-
-        target_violation = violation
-
-        break
-
-if target_violation is None:
-
-    raise ValueError(
-        f"Violation '{REQUIREMENT_ID}' not found."
-    )
-
-print(
-    f"Using violation: "
-    f"{REQUIREMENT_ID}"
-)
-
-
-OUTPUT_PREFIX = (
-    f"{SCENARIO_NAME}_RS_{REQUIREMENT_ID}"
-)
-
-print(
-    "Output prefix:",
-    OUTPUT_PREFIX
-)
-
-final_prompt = f"""{BASE_PROMPT}
+def build_prompt(
+    base_prompt: str,
+    pst: str,
+    violation: dict[str, Any],
+    resolution_context: Any,
+) -> str:
+    return f"""{base_prompt}
 
 ============================================================
 PROCESS STRUCTURED TREE
@@ -238,7 +53,7 @@ PROCESS STRUCTURED TREE
 DETECTED VIOLATION
 ============================================================
 
-{json.dumps(target_violation, indent=2)}
+{json.dumps(violation, indent=2, ensure_ascii=False)}
 
 ============================================================
 RESOLUTION CONTEXT REQUIREMENTS
@@ -249,301 +64,175 @@ satisfied whenever possible.
 
 Avoid introducing new violations of these requirements.
 
-{json.dumps(resolution_context, indent=2)}
+{json.dumps(resolution_context, indent=2, ensure_ascii=False)}
 
 IMPORTANT:
+- Generate exactly ONE resolution strategy for this requirement
 - Return ONLY valid JSON
 - Do not use markdown
 - Do not use code fences
 - Ensure output is parseable with json.loads()
 """
 
-print(
-    "\nSending request to model...\n"
-)
 
-try:
-
+def generate_resolution_strategy(
+    api_key: str,
+    prompt: str,
+) -> Any:
     response = requests.post(
-        url=(
-            "https://openrouter.ai/"
-            "api/v1/chat/completions"
-        ),
+        url="https://openrouter.ai/api/v1/chat/completions",
         headers={
-            "Authorization": (
-                f"Bearer "
-                f"{OPENROUTER_API_KEY}"
-            ),
-            "Content-Type":
-                "application/json",
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
         },
-        data=json.dumps({
+        json={
             "model": MODEL,
-            "messages": [
-                {
-                    "role": "user",
-                    "content": final_prompt
-                }
-            ],
+            "messages": [{"role": "user", "content": prompt}],
             "temperature": 0,
-            "reasoning": {
-                "enabled": True
-            }
-        }),
-        timeout=300
+            "reasoning": {"enabled": True},
+        },
+        timeout=REQUEST_TIMEOUT_SECONDS,
     )
 
-except Exception as e:
+    response.raise_for_status()
+    response_json = response.json()
 
-    problems_detected.append(
-        f"Request exception: {str(e)}"
-    )
+    try:
+        generated_text = response_json["choices"][0]["message"]["content"]
+    except (KeyError, IndexError, TypeError) as error:
+        raise ValueError("API response does not contain model output.") from error
 
-    raise e
+    try:
+        return json.loads(generated_text)
+    except json.JSONDecodeError as error:
+        raise ValueError(
+            "Model output is not valid JSON.\n"
+            f"Requirement output:\n{generated_text}"
+        ) from error
 
-# ============================================================
-# CHECK RESPONSE
-# ============================================================
 
-if response.status_code != 200:
+def attach_requirement_id(
+    requirement_id: str,
+    strategy: Any,
+) -> dict[str, Any]:
+    """Create one consistently identifiable entry per requirement."""
+    if isinstance(strategy, dict):
+        return {
+            "requirement_id": requirement_id,
+            **strategy,
+        }
 
-    problems_detected.append(
-        f"HTTP {response.status_code}"
-    )
-
-    print("ERROR:")
-
-    print(response.status_code)
-
-    print(response.text)
-
-    raise Exception(
-        "API request failed"
-    )
-
-response_json = response.json()
-
-print(
-    "\n========== FULL RESPONSE ==========\n"
-)
-
-print(
-    json.dumps(
-        response_json,
-        indent=2
-    )
-)
-
-if "choices" not in response_json:
-
-    problems_detected.append(
-        "API response missing 'choices'"
-    )
-
-    raise ValueError(
-        "API response does not contain "
-        "'choices'. See printed response above."
-    )
-
-try:
-
-    assistant_message = (
-        response_json["choices"][0]["message"]
-    )
-
-    generated_text = (
-        assistant_message["content"]
-    )
-
-except Exception as e:
-
-    problems_detected.append(
-        "Failed to extract assistant message"
-    )
-
-    raise e
-
-parsed_json = None
-
-try:
-
-    parsed_json = json.loads(
-        generated_text
-    )
-
-except Exception as e:
-
-    problems_detected.append(
-        "Model output is not valid JSON"
-    )
-
-raw_output_path = (
-    RAW_DIR
-    / f"{OUTPUT_PREFIX}_raw.txt"
-)
-
-with open(
-    raw_output_path,
-    "w",
-    encoding="utf-8"
-) as f:
-
-    f.write(generated_text)
-
-if parsed_json is not None:
-
-    json_output_path = (
-        JSON_DIR
-        / f"{OUTPUT_PREFIX}.json"
-    )
-
-    with open(
-        json_output_path,
-        "w",
-        encoding="utf-8"
-    ) as f:
-
-        json.dump(
-            parsed_json,
-            f,
-            indent=2,
-            ensure_ascii=False
-        )
-
-full_response_path = (
-    FULL_RESPONSE_DIR
-    / (
-        f"{OUTPUT_PREFIX}"
-        f"_full_response.json"
-    )
-)
-
-with open(
-    full_response_path,
-    "w",
-    encoding="utf-8"
-) as f:
-
-    json.dump(
-        response_json,
-        f,
-        indent=2,
-        ensure_ascii=False
-    )
-
-end_time = time.time()
-
-execution_time_ms = round(
-    (end_time - start_time) * 1000,
-    2
-)
-
-usage = response_json.get(
-    "usage",
-    {}
-)
-
-metadata = {
-
-    "model":
-        MODEL,
-
-    "scenario_name":
-        SCENARIO_NAME,
-
-    "requirement_id":
-        REQUIREMENT_ID,
-
-    "output_prefix":
-        OUTPUT_PREFIX,
-
-    "execution_time_milliseconds":
-        execution_time_ms,
-
-    "resolution_context_requirements":
-        len(resolution_context),
-
-    "problems_detected":
-        problems_detected,
-
-    "usage": {
-
-        "prompt_tokens":
-            usage.get(
-                "prompt_tokens"
-            ),
-
-        "completion_tokens":
-            usage.get(
-                "completion_tokens"
-            ),
-
-        "total_tokens":
-            usage.get(
-                "total_tokens"
-            ),
-
-        "reasoning_tokens":
-            usage.get(
-                "reasoning_tokens"
-            )
+    return {
+        "requirement_id": requirement_id,
+        "resolution_strategy": strategy,
     }
-}
 
-metadata_path = (
-    METADATA_DIR
-    / (
-        f"{OUTPUT_PREFIX}"
-        f"_metadata.json"
+
+def main() -> None:
+    start_time = time.time()
+    base_dir = find_project_root(Path.cwd(), TARGET_PROJECT_DIR)
+
+    print(f"Project root: {base_dir}")
+
+    api_key_file = base_dir / "config" / "api_keys.json"
+    prompt_file = (
+        base_dir
+        / "data"
+        / "input"
+        / "prompts"
+        / "generate_resolution_strategies_demo.txt"
     )
-)
+    pst_file = (
+        base_dir
+        / "data"
+        / "output"
+        / "simplified_pst"
+        / f"{SCENARIO_NAME}_simplified_pst.txt"
+    )
+    violations_file = (
+        base_dir
+        / "data"
+        / "output"
+        / "compliance_violations_before_changes"
+        / f"{SCENARIO_NAME}_ALL_violations.json"
+    )
+    resolution_context_file = (
+        base_dir
+        / "data"
+        / "input"
+        / "resolution_context"
+        / f"{SCENARIO_NAME}_req_resolution_context.json"
+    )
+    json_dir = (
+        base_dir
+        / "data"
+        / "output"
+        / "generated_resolution_strategies"
+        / SCENARIO_NAME
+        / "resolution_strategies_clean"
+    )
+    output_file = json_dir / f"{SCENARIO_NAME}_resolution_strategies.json"
 
-with open(
-    metadata_path,
-    "w",
-    encoding="utf-8"
-) as f:
+    api_key = load_json(api_key_file)["OPENROUTER_API_KEY"]
+    base_prompt = load_text(prompt_file)
+    pst = load_text(pst_file)
+    violations = load_json(violations_file)
 
-    json.dump(
-        metadata,
-        f,
-        indent=2,
-        ensure_ascii=False
+    resolution_context = (
+        load_json(resolution_context_file)
+        if resolution_context_file.exists()
+        else {}
     )
 
-problem_log_path = (
-    PROBLEMS_DIR
-    / (
-        f"{OUTPUT_PREFIX}"
-        f"_problems.log"
-    )
-)
+    if not isinstance(violations, list):
+        raise TypeError("The violations file must contain a JSON array.")
 
-with open(
-    problem_log_path,
-    "w",
-    encoding="utf-8"
-) as f:
+    accumulated_strategies: list[dict[str, Any]] = []
 
-    if len(problems_detected) == 0:
+    for index, violation in enumerate(violations, start=1):
+        requirement_id = violation.get("requirement_id")
+        if not requirement_id:
+            raise ValueError(
+                f"Violation at index {index - 1} has no 'requirement_id'."
+            )
 
-        f.write(
-            "No problems detected.\n"
+        print(
+            f"[{index}/{len(violations)}] Generating strategy for "
+            f"{requirement_id}..."
         )
 
-    else:
+        prompt = build_prompt(
+            base_prompt=base_prompt,
+            pst=pst,
+            violation=violation,
+            resolution_context=resolution_context,
+        )
+        strategy = generate_resolution_strategy(
+            api_key=api_key,
+            prompt=prompt,
+        )
+        accumulated_strategies.append(
+            attach_requirement_id(requirement_id, strategy)
+        )
 
-        for problem in problems_detected:
+    consolidated_output = {
+        "scenario_name": SCENARIO_NAME,
+        "resolution_strategies": accumulated_strategies,
+    }
 
-            f.write(problem + "\n")
+    json_dir.mkdir(parents=True, exist_ok=True)
+    with output_file.open("w", encoding="utf-8") as file:
+        json.dump(
+            consolidated_output,
+            file,
+            indent=2,
+            ensure_ascii=False,
+        )
+
+    elapsed_seconds = round(time.time() - start_time, 2)
+    print(f"Saved {len(accumulated_strategies)} strategies to: {output_file}")
+    print(f"Execution time: {elapsed_seconds} seconds")
 
 
-if len(problems_detected) == 0:
-
-    print("None")
-
-else:
-
-    for problem in problems_detected:
-
-        print("-", problem)
+if __name__ == "__main__":
+    main()

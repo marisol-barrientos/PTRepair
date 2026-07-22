@@ -1,8 +1,9 @@
-from fastapi import FastAPI, UploadFile, File
-from fastapi.responses import JSONResponse, HTMLResponse
+from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse, JSONResponse
 
 from src.step_0_preprocessing.identify_violations import identify_violations
+
 
 app = FastAPI(
     title="CompRepair API",
@@ -33,10 +34,11 @@ async def root():
 
             <p><b>Status:</b> Running</p>
 
-            <h3>Available endpoint</h3>
+            <h3>Available endpoints</h3>
 
             <ul>
-                <li>POST /comprepair/identify-violations</li>
+                <li>GET /health</li>
+                <li>POST /comprepair/violations</li>
             </ul>
 
             <p>
@@ -50,31 +52,42 @@ async def root():
 
 @app.get("/health")
 async def health():
-    return {"status": "running"}
+    return {
+        "status": "running",
+    }
 
 
 @app.post("/comprepair/violations")
 async def identify_endpoint(
-    file: UploadFile = File(...)
+    file: UploadFile = File(...),
 ):
     """
-    Upload a .xes.yaml event log and identify failed requirements.
+    Upload a .xes.yaml event log and identify failed and compliant
+    requirements.
+
+    The response contains:
+
+    - violations: failed requirements
+    - context: compliant requirements
     """
 
     try:
+        result = identify_violations(file.file)
 
-        violations = identify_violations(file.file)
+        violations = result.get("violations", [])
+        context = result.get("context", [])
 
         return JSONResponse(
             content={
                 "status": "success",
-                "count": len(violations),
+                "violation_count": len(violations),
+                "context_count": len(context),
                 "violations": violations,
+                "context": context,
             }
         )
 
     except Exception as e:
-
         return JSONResponse(
             status_code=500,
             content={
@@ -82,3 +95,6 @@ async def identify_endpoint(
                 "message": str(e),
             },
         )
+
+    finally:
+        await file.close()
