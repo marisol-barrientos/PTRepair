@@ -1,0 +1,40 @@
+{
+  "resolution_strategies": [
+    {
+      "requirement_id": "R2",
+      "resolution_strategy_id": "RS_R2_001",
+      "change_description": "Insert the blacklist activity inside the branch where the condition !data.evaluation holds, before Lookup Partner Banks, so that whenever the negative evaluation condition occurs during due diligence, the respondent bank is eventually blacklisted.",
+      "change_risk": {
+        "value": "low",
+        "reason": "The change is localized to the existing non-compliant branch and does not affect the annual report activities or the direct termination after data.risk. The main risk is possible duplicate blacklisting when the later existing blacklist step is also reached, but this can typically be handled as an idempotent action."
+      },
+      "change_operations": [
+        {
+          "operation": "insert_before",
+          "parameters": {
+            "target_activity_label": "Lookup Partner Banks",
+            "new_activity_label": "add respondent bank to blacklist"
+          }
+        }
+      ]
+    },
+    {
+      "requirement_id": "R4",
+      "resolution_strategy_id": "R4_RS1",
+      "change_description": "Remove the write to data.evaluation_extra from 'conduct due diligence study' so that the activity no longer changes the condition that controls its own loop execution. This prevents the condition from becoming true after the required activity has already executed.",
+      "change_risk": {
+        "value": "low",
+        "reason": "The change is localized to one data write in the due diligence activity and preserves the existing control-flow structure, including the annual report activities required by R1 and the risk-based termination behavior required by R3. The main risk is that the loop will no longer be controlled by updates to evaluation_extra from this activity."
+      },
+      "change_operations": [
+        {
+          "operation": "remove_write",
+          "parameters": {
+            "target_activity_label": "conduct due diligence study",
+            "removed_variable_name": "evaluation_extra"
+          }
+        }
+      ]
+    }
+  ]
+}
