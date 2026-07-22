@@ -53,7 +53,7 @@ async def health():
     return {"status": "running"}
 
 
-@app.post("/comprepair/identify-violations")
+@app.post("/comprepair/violations")
 async def identify_endpoint(
     file: UploadFile = File(...)
 ):
