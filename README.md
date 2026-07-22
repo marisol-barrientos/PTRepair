@@ -10,11 +10,10 @@ PTRepair generates, applies, and validates repair strategies for compliance viol
 - Support for control-flow, data, resource, and temporal requirements
 
 The prototype is currently being extended into:
-
 > **PC-VERA: Process Compliance Verification, Extraction, and Repair Architecture**
 
 PC-VERA brings requirement extraction, compliance verification, and process repair together in a web-based architecture.
----
+
 
 ## Run the API
 
