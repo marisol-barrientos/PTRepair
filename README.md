@@ -72,14 +72,13 @@ Send a `multipart/form-data` request containing one file:
 |---|---|
 | `file` | YAML compliance log with a `.yaml` or `.yml` extension |
 
-The YAML file contains the compliance log that will be checked against the configured compliance requirements.
 
 #### Example request
 
 ```bash
 curl -X POST \
   http://localhost:8000/comprepair/violations \
-  -F "file=@event_log.yaml"
+  -F "file=@compliance_log.yaml"
 ```
 
 #### Output
@@ -194,18 +193,6 @@ Each item in `resolution_strategies` combines:
 - validation warnings
 - error information
 - the processing log
-
-Validation outcomes are reported explicitly through:
-
-```json
-{
-  "behavioral_validator": "success",
-  "pst_validator": "success",
-  "structural_validator": "success"
-}
-```
-
-If a validator reports a warning, its value changes to `"warning"` and the details are included in `validation.warnings`.
 
 If a strategy cannot be applied:
 
