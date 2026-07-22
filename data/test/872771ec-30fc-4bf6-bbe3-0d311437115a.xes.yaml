@@ -1,0 +1,507 @@
+---
+log:
+  namespaces:
+    stream: https://cpee.org/datastream/
+    ssn: http://www.w3.org/ns/ssn/
+    sosa: http://www.w3.org/ns/sosa/
+  xes:
+    creator: cpee.org
+    features: nested-attributes
+  extension:
+    time: http://www.xes-standard.org/time.xesext
+    concept: http://www.xes-standard.org/concept.xesext
+    id: http://www.xes-standard.org/identity.xesext
+    lifecycle: http://www.xes-standard.org/lifecycle.xesext
+    cpee: http://cpee.org/cpee.xesext
+    stream: https://cpee.org/datastream/datastream.xesext
+    ptv: https://cpee.org/ptv/ptv.xesext
+  global:
+    trace:
+      concept:name: __NOTSPECIFIED__
+      cpee:name: __NOTSPECIFIED__
+    event:
+      concept:instance: -1
+      concept:name: __NOTSPECIFIED__
+      concept:endpoint: __NOTSPECIFIED__
+      id:id: __NOTSPECIFIED__
+      cpee:uuid: __NOTSPECIFIED__
+      lifecycle:transition: unknown
+      ptv:lifecycle:transition: unknown
+      time:timestamp: ''
+  trace:
+    concept:name: preprocessing
+    cpee:instance: 872771ec-30fc-4bf6-bbe3-0d311437115a
+---
+event:
+  concept:instance: preprocessing
+  concept:name: _handle_subscription
+  id:id: subscriber
+  ptv:call_uuid: 1e89e5a8-e479-400e-a38b-b49485e9e7d1
+  ptv:activity_uuid: -135205557833986516
+  cpee:instance: 872771ec-30fc-4bf6-bbe3-0d311437115a
+  lifecycle:transition: unknown
+  ptv:lifecycle:transition: unknown
+  data: No save attribute was passed, previous version will only be stored in memory
+    and not written to disk
+  time:timestamp: 2026-07-20 11:34:48,317.317
+---
+event:
+  concept:instance: preprocessing
+  concept:name: _handle_subscription
+  id:id: subscriber
+  ptv:call_uuid: 1e89e5a8-e479-400e-a38b-b49485e9e7d1
+  ptv:activity_uuid: -135205557833986516
+  cpee:instance: 872771ec-30fc-4bf6-bbe3-0d311437115a
+  lifecycle:transition: unknown
+  ptv:lifecycle:transition: unknown
+  data: Semantic matching is disabled for this endpoint, using exact label matching
+  time:timestamp: 2026-07-20 11:34:48,318.318
+---
+event:
+  concept:instance: preprocessing
+  concept:name: warning
+  id:id: utils.general_util
+  ptv:call_uuid: 1e89e5a8-e479-400e-a38b-b49485e9e7d1
+  ptv:activity_uuid: -8601632850862175475
+  cpee:instance: 872771ec-30fc-4bf6-bbe3-0d311437115a
+  lifecycle:transition: unknown
+  ptv:lifecycle:transition: unknown
+  data: Url of a subprocess is None
+  time:timestamp: 2026-07-20 11:34:48,318.318
+---
+event:
+  concept:instance: preprocessing
+  concept:name: _handle_subscription
+  id:id: subscriber
+  ptv:call_uuid: 1e89e5a8-e479-400e-a38b-b49485e9e7d1
+  ptv:activity_uuid: -135205557833986516
+  cpee:instance: 872771ec-30fc-4bf6-bbe3-0d311437115a
+  lifecycle:transition: unknown
+  ptv:lifecycle:transition: unknown
+  data: The global assurance level is 90
+  time:timestamp: 2026-07-20 11:34:48,318.318
+---
+event:
+  concept:instance: R0
+  concept:name: _handle_subscription
+  id:id: subscriber
+  ptv:call_uuid: 1e89e5a8-e479-400e-a38b-b49485e9e7d1
+  ptv:activity_uuid: 9006093296029597988
+  cpee:instance: 872771ec-30fc-4bf6-bbe3-0d311437115a
+  lifecycle:transition: start
+  ptv:lifecycle:transition: start
+  data: 'Verifying Requirement R0: precedence (tree, ''obtain consent'', ''provide
+    information'') and data_value_alternative_directly_follows (tree, ''not data.consented'',
+    ''terminate'') '
+  time:timestamp: 2026-07-20 11:34:48,318.318
+---
+event:
+  concept:instance: R0
+  concept:name: precedence
+  id:id: annotated_verification
+  ptv:call_uuid: 1e89e5a8-e479-400e-a38b-b49485e9e7d1
+  ptv:activity_uuid: 1767230041680668462
+  cpee:instance: 872771ec-30fc-4bf6-bbe3-0d311437115a
+  lifecycle:transition: unknown
+  ptv:lifecycle:transition: unknown
+  data: Activity "provide information" was found before "obtain consent". Ensuring
+    that provide information is not on an exclusive branch which could lead to violations
+    in some traces
+  time:timestamp: 2026-07-20 11:34:48,318.318
+---
+event:
+  concept:instance: R0
+  concept:name: precedence
+  id:id: annotated_verification
+  ptv:call_uuid: 1e89e5a8-e479-400e-a38b-b49485e9e7d1
+  ptv:activity_uuid: 1767230041680668462
+  cpee:instance: 872771ec-30fc-4bf6-bbe3-0d311437115a
+  lifecycle:transition: unknown
+  ptv:lifecycle:transition: unknown
+  data: Activity "provide information" was found before "obtain consent", and "provide
+    information" is not on an exclusive branch, so precedence "obtain consent" requires
+    "provide information" before is True
+  time:timestamp: 2026-07-20 11:34:48,318.318
+---
+event:
+  concept:instance: R0
+  concept:name: warning
+  id:id: utils.data_util
+  ptv:call_uuid: 1e89e5a8-e479-400e-a38b-b49485e9e7d1
+  ptv:activity_uuid: 1846335375737065846
+  cpee:instance: 872771ec-30fc-4bf6-bbe3-0d311437115a
+  lifecycle:transition: unknown
+  ptv:lifecycle:transition: unknown
+  data: Branch default was found which matches to notdata.consented, lower assurance
+  time:timestamp: 2026-07-20 11:34:48,318.318
+---
+event:
+  concept:instance: R0
+  concept:name: condition_directly_follows
+  id:id: annotated_verification
+  ptv:call_uuid: 1e89e5a8-e479-400e-a38b-b49485e9e7d1
+  ptv:activity_uuid: 5727851474278815547
+  cpee:instance: 872771ec-30fc-4bf6-bbe3-0d311437115a
+  lifecycle:transition: unknown
+  ptv:lifecycle:transition: unknown
+  data: Activity "terminate" directly followed the data_condition "not data.consented"
+  time:timestamp: 2026-07-20 11:34:48,318.318
+---
+event:
+  concept:instance: R0
+  concept:name: condition_directly_follows
+  id:id: annotated_verification
+  ptv:call_uuid: 1e89e5a8-e479-400e-a38b-b49485e9e7d1
+  ptv:activity_uuid: 5727851474278815547
+  cpee:instance: 872771ec-30fc-4bf6-bbe3-0d311437115a
+  lifecycle:transition: unknown
+  ptv:lifecycle:transition: unknown
+  data: Comparing if the branch directly follows after the condition is impacted
+  time:timestamp: 2026-07-20 11:34:48,318.318
+---
+event:
+  concept:instance: R0
+  concept:name: _handle_subscription
+  id:id: subscriber
+  ptv:call_uuid: 1e89e5a8-e479-400e-a38b-b49485e9e7d1
+  ptv:activity_uuid: 9006093296029597988
+  cpee:instance: 872771ec-30fc-4bf6-bbe3-0d311437115a
+  lifecycle:transition: complete
+  ptv:lifecycle:transition: complete
+  data: Requirement R0 is True with assurance level 90
+  time:timestamp: 2026-07-20 11:34:48,318.318
+---
+event:
+  concept:instance: R1
+  concept:name: _handle_subscription
+  id:id: subscriber
+  ptv:call_uuid: 1e89e5a8-e479-400e-a38b-b49485e9e7d1
+  ptv:activity_uuid: -210818977917904257
+  cpee:instance: 872771ec-30fc-4bf6-bbe3-0d311437115a
+  lifecycle:transition: start
+  ptv:lifecycle:transition: start
+  data: 'Verifying Requirement R1: executed_by (tree, ''conduct interview and questionnaire'',
+    ''physician'') or executed_by (tree, ''conduct interview and questionnaire'',
+    ''trained assistant'')'
+  time:timestamp: 2026-07-20 11:34:48,318.318
+---
+event:
+  concept:instance: R1
+  concept:name: executed_by
+  id:id: annotated_verification
+  ptv:call_uuid: 1e89e5a8-e479-400e-a38b-b49485e9e7d1
+  ptv:activity_uuid: 6069144232002548675
+  cpee:instance: 872771ec-30fc-4bf6-bbe3-0d311437115a
+  lifecycle:transition: unknown
+  ptv:lifecycle:transition: unknown
+  data: Activity "conduct interview and questionnaire" is executed by Resource "physician"
+  time:timestamp: 2026-07-20 11:34:48,319.319
+---
+event:
+  concept:instance: R1
+  concept:name: _handle_subscription
+  id:id: subscriber
+  ptv:call_uuid: 1e89e5a8-e479-400e-a38b-b49485e9e7d1
+  ptv:activity_uuid: -210818977917904257
+  cpee:instance: 872771ec-30fc-4bf6-bbe3-0d311437115a
+  lifecycle:transition: complete
+  ptv:lifecycle:transition: complete
+  data: Requirement R1 is True with assurance level 100
+  time:timestamp: 2026-07-20 11:34:48,319.319
+---
+event:
+  concept:instance: R2
+  concept:name: _handle_subscription
+  id:id: subscriber
+  ptv:call_uuid: 1e89e5a8-e479-400e-a38b-b49485e9e7d1
+  ptv:activity_uuid: 4745992847178548988
+  cpee:instance: 872771ec-30fc-4bf6-bbe3-0d311437115a
+  lifecycle:transition: start
+  ptv:lifecycle:transition: start
+  data: 'Verifying Requirement R2: parallel (tree, ''retract consent'', ''direct questions'')
+    and directly_follows (tree, ''retract consent'', ''terminate'') '
+  time:timestamp: 2026-07-20 11:34:48,319.319
+---
+event:
+  concept:instance: R2
+  concept:name: parallel
+  id:id: annotated_verification
+  ptv:call_uuid: 1e89e5a8-e479-400e-a38b-b49485e9e7d1
+  ptv:activity_uuid: -2223498418354909489
+  cpee:instance: 872771ec-30fc-4bf6-bbe3-0d311437115a
+  lifecycle:transition: unknown
+  ptv:lifecycle:transition: unknown
+  data: Activities "retract consent" and "direct questions" are in parallel
+  time:timestamp: 2026-07-20 11:34:48,319.319
+---
+event:
+  concept:instance: R2
+  concept:name: directly_follows
+  id:id: annotated_verification
+  ptv:call_uuid: 1e89e5a8-e479-400e-a38b-b49485e9e7d1
+  ptv:activity_uuid: 3570263697739867995
+  cpee:instance: 872771ec-30fc-4bf6-bbe3-0d311437115a
+  lifecycle:transition: unknown
+  ptv:lifecycle:transition: unknown
+  data: Found a terminate that directly follows "retract consent"
+  time:timestamp: 2026-07-20 11:34:48,319.319
+---
+event:
+  concept:instance: R2
+  concept:name: _handle_subscription
+  id:id: subscriber
+  ptv:call_uuid: 1e89e5a8-e479-400e-a38b-b49485e9e7d1
+  ptv:activity_uuid: 4745992847178548988
+  cpee:instance: 872771ec-30fc-4bf6-bbe3-0d311437115a
+  lifecycle:transition: complete
+  ptv:lifecycle:transition: complete
+  data: Requirement R2 is True with assurance level 100
+  time:timestamp: 2026-07-20 11:34:48,319.319
+---
+event:
+  concept:instance: R3
+  concept:name: _handle_subscription
+  id:id: subscriber
+  ptv:call_uuid: 1e89e5a8-e479-400e-a38b-b49485e9e7d1
+  ptv:activity_uuid: -5265406345084853435
+  cpee:instance: 872771ec-30fc-4bf6-bbe3-0d311437115a
+  lifecycle:transition: start
+  ptv:lifecycle:transition: start
+  data: 'Verifying Requirement R3: timed_alternative (tree, ''monitor patient'', ''assess
+    donor'', 900) and executed_by (tree, ''assess donor'', ''physician'')'
+  time:timestamp: 2026-07-20 11:34:48,319.319
+---
+event:
+  concept:instance: R3
+  concept:name: timed_alternative
+  id:id: annotated_verification
+  ptv:call_uuid: 1e89e5a8-e479-400e-a38b-b49485e9e7d1
+  ptv:activity_uuid: -3403013396418914219
+  cpee:instance: 872771ec-30fc-4bf6-bbe3-0d311437115a
+  lifecycle:transition: unknown
+  ptv:lifecycle:transition: unknown
+  data: Identified a timeout in a parallal cancel with "assess donor"
+  time:timestamp: 2026-07-20 11:34:48,319.319
+---
+event:
+  concept:instance: R3
+  concept:name: timed_alternative
+  id:id: annotated_verification
+  ptv:call_uuid: 1e89e5a8-e479-400e-a38b-b49485e9e7d1
+  ptv:activity_uuid: -3403013396418914219
+  cpee:instance: 872771ec-30fc-4bf6-bbe3-0d311437115a
+  lifecycle:transition: unknown
+  ptv:lifecycle:transition: unknown
+  data: Verifying existence of "monitor patient in <Element '{http://cpee.org/ns/description/1.0}parallel'
+    at 0x7f368ffde610>
+  time:timestamp: 2026-07-20 11:34:48,319.319
+---
+event:
+  concept:instance: R3
+  concept:name: executed_by
+  id:id: annotated_verification
+  ptv:call_uuid: 1e89e5a8-e479-400e-a38b-b49485e9e7d1
+  ptv:activity_uuid: -195637754203145261
+  cpee:instance: 872771ec-30fc-4bf6-bbe3-0d311437115a
+  lifecycle:transition: unknown
+  ptv:lifecycle:transition: unknown
+  data: Activity "assess donor" is executed by Resource "physician"
+  time:timestamp: 2026-07-20 11:34:48,319.319
+---
+event:
+  concept:instance: R3
+  concept:name: _handle_subscription
+  id:id: subscriber
+  ptv:call_uuid: 1e89e5a8-e479-400e-a38b-b49485e9e7d1
+  ptv:activity_uuid: -5265406345084853435
+  cpee:instance: 872771ec-30fc-4bf6-bbe3-0d311437115a
+  lifecycle:transition: complete
+  ptv:lifecycle:transition: complete
+  data: Requirement R3 is True with assurance level 100
+  time:timestamp: 2026-07-20 11:34:48,319.319
+---
+event:
+  concept:instance: R4
+  concept:name: _handle_subscription
+  id:id: subscriber
+  ptv:call_uuid: 1e89e5a8-e479-400e-a38b-b49485e9e7d1
+  ptv:activity_uuid: 3870743312800048449
+  cpee:instance: 872771ec-30fc-4bf6-bbe3-0d311437115a
+  lifecycle:transition: start
+  ptv:lifecycle:transition: start
+  data: 'Verifying Requirement R4: data_value_alternative_eventually_follows (tree,
+    ''assessment_status == "rejected" '', ''inform of rejection'') and directly_follows
+    (tree, ''inform of rejection'', ''terminate'') '
+  time:timestamp: 2026-07-20 11:34:48,319.319
+---
+event:
+  concept:instance: R4
+  concept:name: warning
+  id:id: utils.data_util
+  ptv:call_uuid: 1e89e5a8-e479-400e-a38b-b49485e9e7d1
+  ptv:activity_uuid: 5667556063319734972
+  cpee:instance: 872771ec-30fc-4bf6-bbe3-0d311437115a
+  lifecycle:transition: unknown
+  ptv:lifecycle:transition: unknown
+  data: Condition mapped via in compared to ==, lower assurances
+  time:timestamp: 2026-07-20 11:34:48,320.320
+---
+event:
+  concept:instance: R4
+  concept:name: condition_eventually_follows
+  id:id: annotated_verification
+  ptv:call_uuid: 1e89e5a8-e479-400e-a38b-b49485e9e7d1
+  ptv:activity_uuid: 2731522102767212856
+  cpee:instance: 872771ec-30fc-4bf6-bbe3-0d311437115a
+  lifecycle:transition: unknown
+  ptv:lifecycle:transition: unknown
+  data: Activity "inform of rejection" was found on branch following condition "assessment_status
+    == "rejected" "
+  time:timestamp: 2026-07-20 11:34:48,320.320
+---
+event:
+  concept:instance: R4
+  concept:name: condition_eventually_follows
+  id:id: annotated_verification
+  ptv:call_uuid: 1e89e5a8-e479-400e-a38b-b49485e9e7d1
+  ptv:activity_uuid: 2731522102767212856
+  cpee:instance: 872771ec-30fc-4bf6-bbe3-0d311437115a
+  lifecycle:transition: unknown
+  ptv:lifecycle:transition: unknown
+  data: Found 2 calls that influence condition "assessment_status == "rejected" .
+    Checking if both are prior to branch"
+  time:timestamp: 2026-07-20 11:34:48,320.320
+---
+event:
+  concept:instance: R4
+  concept:name: leads_to
+  id:id: annotated_verification
+  ptv:call_uuid: 1e89e5a8-e479-400e-a38b-b49485e9e7d1
+  ptv:activity_uuid: -6952163890019407211
+  cpee:instance: 872771ec-30fc-4bf6-bbe3-0d311437115a
+  lifecycle:transition: unknown
+  ptv:lifecycle:transition: unknown
+  data: Activity "<Element '{http://cpee.org/ns/description/1.0}call' at 0x7f368fe1af20>"
+    is before Activity "<Element '{http://cpee.org/ns/description/1.0}alternative'
+    at 0x7f368fe18450>, checking if <Element '{http://cpee.org/ns/description/1.0}alternative'
+    at 0x7f368fe18450> is on a different exclusive branch"
+  time:timestamp: 2026-07-20 11:34:48,320.320
+---
+event:
+  concept:instance: R4
+  concept:name: leads_to
+  id:id: annotated_verification
+  ptv:call_uuid: 1e89e5a8-e479-400e-a38b-b49485e9e7d1
+  ptv:activity_uuid: -6952163890019407211
+  cpee:instance: 872771ec-30fc-4bf6-bbe3-0d311437115a
+  lifecycle:transition: unknown
+  ptv:lifecycle:transition: unknown
+  data: Activity "<Element '{http://cpee.org/ns/description/1.0}call' at 0x7f368fe1af20>
+    was found before "<Element '{http://cpee.org/ns/description/1.0}alternative' at
+    0x7f368fe18450>, but it is in a different exclusive branch, so leads_to can not
+    be guaranteed in every trace
+  time:timestamp: 2026-07-20 11:34:48,320.320
+---
+event:
+  concept:instance: R4
+  concept:name: warning
+  id:id: annotated_verification
+  ptv:call_uuid: 1e89e5a8-e479-400e-a38b-b49485e9e7d1
+  ptv:activity_uuid: 4740780345246861883
+  cpee:instance: 872771ec-30fc-4bf6-bbe3-0d311437115a
+  lifecycle:transition: unknown
+  ptv:lifecycle:transition: unknown
+  data: Found a call <Element '{http://cpee.org/ns/description/1.0}call' at 0x7f368fe1af20>
+    that is not prior to the identified branch, so compliance can be violated if said
+    call can cause the condition to evaluate to true
+  time:timestamp: 2026-07-20 11:34:48,320.320
+---
+event:
+  concept:instance: R4
+  concept:name: _handle_subscription
+  id:id: subscriber
+  ptv:call_uuid: 1e89e5a8-e479-400e-a38b-b49485e9e7d1
+  ptv:activity_uuid: 3870743312800048449
+  cpee:instance: 872771ec-30fc-4bf6-bbe3-0d311437115a
+  lifecycle:transition: complete
+  ptv:lifecycle:transition: complete
+  data: Requirement R4 is False with assurance level 80
+  time:timestamp: 2026-07-20 11:34:48,320.320
+---
+event:
+  concept:instance: R5
+  concept:name: _handle_subscription
+  id:id: subscriber
+  ptv:call_uuid: 1e89e5a8-e479-400e-a38b-b49485e9e7d1
+  ptv:activity_uuid: 9149859932005380350
+  cpee:instance: 872771ec-30fc-4bf6-bbe3-0d311437115a
+  lifecycle:transition: start
+  ptv:lifecycle:transition: start
+  data: 'Verifying Requirement R5: activity_receives (tree, ''conduct interview and
+    questionnaire'', ''assessment_status'') and activity_receives (tree, ''direct
+    questions'', ''assessment_status'')'
+  time:timestamp: 2026-07-20 11:34:48,320.320
+---
+event:
+  concept:instance: R5
+  concept:name: activity_receives
+  id:id: annotated_verification
+  ptv:call_uuid: 1e89e5a8-e479-400e-a38b-b49485e9e7d1
+  ptv:activity_uuid: 5850369365328109057
+  cpee:instance: 872771ec-30fc-4bf6-bbe3-0d311437115a
+  lifecycle:transition: unknown
+  ptv:lifecycle:transition: unknown
+  data: data object "assessment_status" is finalized from Activity "conduct interview
+    and questionnaire"
+  time:timestamp: 2026-07-20 11:34:48,320.320
+---
+event:
+  concept:instance: R5
+  concept:name: activity_receives
+  id:id: annotated_verification
+  ptv:call_uuid: 1e89e5a8-e479-400e-a38b-b49485e9e7d1
+  ptv:activity_uuid: 5850369365328109057
+  cpee:instance: 872771ec-30fc-4bf6-bbe3-0d311437115a
+  lifecycle:transition: unknown
+  ptv:lifecycle:transition: unknown
+  data: data object "assessment_status" is finalized from Activity "direct questions"
+  time:timestamp: 2026-07-20 11:34:48,320.320
+---
+event:
+  concept:instance: R5
+  concept:name: _handle_subscription
+  id:id: subscriber
+  ptv:call_uuid: 1e89e5a8-e479-400e-a38b-b49485e9e7d1
+  ptv:activity_uuid: 9149859932005380350
+  cpee:instance: 872771ec-30fc-4bf6-bbe3-0d311437115a
+  lifecycle:transition: complete
+  ptv:lifecycle:transition: complete
+  data: Requirement R5 is True with assurance level 100
+  time:timestamp: 2026-07-20 11:34:48,320.320
+---
+event:
+  concept:instance: R5
+  concept:name: _handle_subscription
+  id:id: subscriber
+  ptv:call_uuid: 1e89e5a8-e479-400e-a38b-b49485e9e7d1
+  ptv:activity_uuid: 9149859932005380350
+  cpee:instance: 872771ec-30fc-4bf6-bbe3-0d311437115a
+  lifecycle:transition: unknown
+  ptv:lifecycle:transition: unknown
+  data: 'Currently required activities for the process are: {''monitor patient'',
+    ''retract consent'', ''direct questions'', ''conduct interview and questionnaire'',
+    ''inform of rejection'', ''obtain consent'', ''provide information'', ''assess
+    donor''}'
+  time:timestamp: 2026-07-20 11:34:48,320.320
+---
+event:
+  concept:instance: R5
+  concept:name: _handle_subscription
+  id:id: subscriber
+  ptv:call_uuid: 1e89e5a8-e479-400e-a38b-b49485e9e7d1
+  ptv:activity_uuid: 9149859932005380350
+  cpee:instance: 872771ec-30fc-4bf6-bbe3-0d311437115a
+  lifecycle:transition: unknown
+  ptv:lifecycle:transition: unknown
+  data: 'Currently missing activities for the process are: set()'
+  time:timestamp: 2026-07-20 11:34:48,320.320
