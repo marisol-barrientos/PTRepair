@@ -62,7 +62,7 @@ Returns the current service status.
 
 ### `POST /comprepair/violations`
 
-Identifies compliance violations from an event log.
+Identifies compliance violations from a compliance log.
 
 #### Input
 
@@ -70,9 +70,9 @@ Send a `multipart/form-data` request containing one file:
 
 | Field | Required content |
 |---|---|
-| `file` | YAML event log with a `.yaml` or `.yml` extension |
+| `file` | YAML compliance log with a `.yaml` or `.yml` extension |
 
-The YAML file contains the event log that will be checked against the configured compliance requirements.
+The YAML file contains the compliance log that will be checked against the configured compliance requirements.
 
 #### Example request
 
