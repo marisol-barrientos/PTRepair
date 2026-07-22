@@ -428,14 +428,10 @@ def validate_updated_pst(
     structural_validator: StructuralValidator,
 ) -> dict[str, Any]:
     """
-    Validate an updated PST.
-
-    Validation failures are returned as warnings because the change
-    operations may still have been applied successfully.
+    Validate an updated PST and return each validator outcome.
     """
 
     validation: dict[str, Any] = {
-        "status": "success",
         "behavioral_validator": "success",
         "pst_validator": "success",
         "structural_validator": "success",
@@ -448,7 +444,6 @@ def validate_updated_pst(
         )
 
     except Exception as error:
-        validation["status"] = "warning"
         validation["behavioral_validator"] = "warning"
         validation["warnings"].append(
             f"BehavioralValidator: {error}"
@@ -460,7 +455,6 @@ def validate_updated_pst(
         )
 
     except Exception as error:
-        validation["status"] = "warning"
         validation["pst_validator"] = "warning"
         validation["warnings"].append(
             f"PSTValidator: {error}"
@@ -474,7 +468,6 @@ def validate_updated_pst(
         )
 
         if structural_warnings:
-            validation["status"] = "warning"
             validation["structural_validator"] = "warning"
 
             for warning in structural_warnings:
@@ -483,14 +476,12 @@ def validate_updated_pst(
                 )
 
     except Exception as error:
-        validation["status"] = "warning"
         validation["structural_validator"] = "warning"
         validation["warnings"].append(
             f"StructuralValidator: {error}"
         )
 
     return validation
-
 
 # ============================================================
 # LOG CONSTRUCTION
@@ -511,52 +502,30 @@ def build_result_log(
         "resolution_strategy_id"
     ]
 
-    status = result.get(
-        "status",
-        "error",
+    validation = result.get(
+        "validation",
+        {},
+    )
+
+    has_error = result.get(
+        "error_message"
+    ) is not None
+
+    has_warnings = bool(
+        validation.get(
+            "warnings",
+            [],
+        )
     )
 
     lines = [
         f"requirement_id: {requirement_id}",
         f"resolution_strategy_id: {strategy_id}",
-        f"status: {status}",
     ]
 
-    if status == "success":
+    if has_error:
         lines.append(
-            "message: Strategy applied successfully. "
-            "No validation warnings were detected."
-        )
-
-    elif status == "warning":
-        lines.append(
-            "message: Strategy was applied, but validation "
-            "reported warnings."
-        )
-
-        warnings = (
-            result
-            .get("validation", {})
-            .get("warnings", [])
-        )
-
-        if warnings:
-            lines.append("warnings:")
-
-            for warning in warnings:
-                lines.append(
-                    f"- {warning}"
-                )
-
-        else:
-            lines.append(
-                "warnings: No detailed warning message "
-                "was provided."
-            )
-
-    else:
-        lines.append(
-            "message: The strategy could not be applied."
+            "result: error"
         )
 
         failed_operation = result.get(
@@ -583,6 +552,26 @@ def build_result_log(
 
         lines.append(
             f"error: {error_message or 'Unknown error'}"
+        )
+
+    elif has_warnings:
+        lines.append(
+            "result: applied_with_validation_warnings"
+        )
+
+        lines.append("warnings:")
+
+        for warning in validation.get(
+            "warnings",
+            [],
+        ):
+            lines.append(
+                f"- {warning}"
+            )
+
+    else:
+        lines.append(
+            "result: applied_successfully"
         )
 
     return "\n".join(lines) + "\n"
@@ -619,10 +608,8 @@ def apply_one_strategy(
     result: dict[str, Any] = {
         "requirement_id": requirement_id,
         "resolution_strategy_id": strategy_id,
-        "status": "error",
         "pst_xml": None,
         "validation": {
-            "status": "not_executed",
             "behavioral_validator": "not_executed",
             "pst_validator": "not_executed",
             "structural_validator": "not_executed",
@@ -744,7 +731,21 @@ def apply_one_strategy(
         )
 
         result["validation"] = validation
-        result["status"] = validation["status"]
+
+        has_warnings = any(
+            validator_status == "warning"
+            for validator_status in (
+                validation["behavioral_validator"],
+                validation["pst_validator"],
+                validation["structural_validator"],
+            )
+        )
+
+        result["status"] = (
+            "warning"
+            if has_warnings
+            else "success"
+        )
 
     except Exception as error:
         if result["error_type"] is None:
@@ -845,10 +846,21 @@ def apply_resolution_strategies(
             "resolution_strategy_id"
         ]
 
+        if result.get("error_message") is not None:
+            outcome = "error"
+
+        elif result.get(
+                "validation",
+                {},
+        ).get("warnings"):
+            outcome = "warning"
+
+        else:
+            outcome = "success"
+
         print(
             f"[{index}/{total}] "
-            f"Applying {strategy_id} "
-            f"for {requirement_id}..."
+            f"Outcome: {outcome}"
         )
 
         result = apply_one_strategy(

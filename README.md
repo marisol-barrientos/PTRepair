@@ -10,6 +10,7 @@ PTRepair generates, applies, and validates repair strategies for compliance viol
 - Support for control-flow, data, resource, and temporal requirements
 
 The prototype is currently being extended into:
+
 > **PC-VERA: Process Compliance Verification, Extraction, and Repair Architecture**
 
 PC-VERA brings requirement extraction, compliance verification, and process repair together in a web-based architecture.
@@ -85,7 +86,6 @@ curl -X POST \
 
 ```json
 {
-  "status": "success",
   "violations": [],
   "context": []
 }
@@ -144,16 +144,6 @@ The file may contain the complete JSON response returned by `/comprepair/violati
 
 ```json
 {
-  "status": "success",
-  "violations": [...],
-  "context": [...]
-}
-```
-
-It may also contain only the `violations` and `context` fields:
-
-```json
-{
   "violations": [...],
   "context": [...]
 }
@@ -185,10 +175,8 @@ curl -X POST \
     {
       "requirement_id": "R2",
       "resolution_strategy_id": "R2_RS1",
-      "status": "success",
       "pst_xml": "<?xml version=\"1.0\" encoding=\"utf-8\"?>...",
       "validation": {
-        "status": "success",
         "behavioral_validator": "success",
         "pst_validator": "success",
         "structural_validator": "success",
@@ -203,15 +191,27 @@ curl -X POST \
 }
 ```
 
-Possible result statuses:
+Validation outcomes are reported explicitly through:
 
-- `success`: the strategy was applied and validation passed.
-- `warning`: the strategy was applied, but one or more validators produced warnings.
-- `error`: the strategy could not be applied.
+```json
+{
+  "behavioral_validator": "success",
+  "pst_validator": "success",
+  "structural_validator": "success"
+}
+```
 
-For successful and warning results, `pst_xml` contains the repaired PST as a UTF-8 XML string.
+If a validator reports a warning, its value changes to `"warning"` and the details are included in `validation.warnings`.
 
-For error results, `pst_xml` is `null`, and the response may include `failed_operation`, `error_type`, and `error_message`.
+If a strategy cannot be applied:
+
+- `pst_xml` is `null`
+- `failed_operation` may identify the operation that failed
+- `error_type` contains the exception type
+- `error_message` contains the error description
+- validator values remain `"not_executed"`
+
+For applied strategies, `pst_xml` contains the repaired PST as a UTF-8 XML string.
 
 Each strategy is applied independently to a fresh copy of the original PST. An error in one strategy does not stop the remaining strategies.
 

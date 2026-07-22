@@ -88,9 +88,9 @@ def create_api_results(
     """
     Convert internal repair results into JSON-serializable values.
 
-    Successful and warning results may contain ``pst_xml`` as bytes.
-    Those bytes are decoded to UTF-8 strings so the result can be
-    returned directly by a JSON endpoint and displayed in JavaScript.
+    Results may contain ``pst_xml`` as bytes. Those bytes are decoded
+    to UTF-8 strings so the result can be returned directly by a JSON
+    endpoint and displayed in JavaScript.
 
     The input result dictionaries are not modified.
     """
@@ -135,6 +135,50 @@ def create_api_results(
         )
 
     return api_results
+
+
+# ============================================================
+# RESULT CLASSIFICATION
+# ============================================================
+
+def has_result_error(
+    result: dict[str, Any],
+) -> bool:
+    """
+    Return whether a repair result contains an application error.
+    """
+
+    return result.get(
+        "error_message"
+    ) is not None
+
+
+def has_validation_warnings(
+    result: dict[str, Any],
+) -> bool:
+    """
+    Return whether a non-error result contains validation warnings.
+    """
+
+    if has_result_error(result):
+        return False
+
+    validation = result.get(
+        "validation",
+        {},
+    )
+
+    if not isinstance(validation, dict):
+        return False
+
+    warnings = validation.get(
+        "warnings",
+        [],
+    )
+
+    return isinstance(warnings, list) and bool(
+        warnings
+    )
 
 
 # ============================================================
@@ -187,6 +231,15 @@ def repair(
         string instead of bytes so it can be serialized as JSON and
         displayed directly in JavaScript.
 
+        Results do not require a general ``status`` field. Outcomes
+        are represented through:
+
+        - explicit validator values in ``validation``
+        - ``validation.warnings``
+        - ``failed_operation``
+        - ``error_type``
+        - ``error_message``
+
     Notes
     -----
     This function does not save generated strategies, repaired PSTs,
@@ -229,19 +282,20 @@ def repair(
         internal_results
     )
 
-    successful = sum(
-        result.get("status") == "success"
+    errors = sum(
+        has_result_error(result)
         for result in internal_results
     )
 
     warnings = sum(
-        result.get("status") == "warning"
+        has_validation_warnings(result)
         for result in internal_results
     )
 
-    errors = sum(
-        result.get("status") == "error"
-        for result in internal_results
+    successful = (
+        len(internal_results)
+        - warnings
+        - errors
     )
 
     print("\n================================================")

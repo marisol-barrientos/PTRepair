@@ -122,6 +122,9 @@ async def identify_endpoint(
 ):
     """
     Upload a YAML event log and identify violations and context.
+
+    Returns the detected violations and the requirements that are
+    currently satisfied.
     """
 
     filename = file.filename or ""
@@ -166,10 +169,12 @@ async def identify_endpoint(
 
         return JSONResponse(
             content={
-                "status": "success",
                 "violations": violations,
                 "context": context,
-            }
+            },
+            headers={
+                "Cache-Control": "no-store",
+            },
         )
 
     except (
@@ -202,10 +207,13 @@ async def repair_endpoint(
     """
     Upload an original PST XML and a compliance-result JSON file.
 
-    Returns a JSON response containing generated resolution
-    strategies and detailed repair results.
+    Returns generated resolution strategies and detailed repair
+    results as JSON.
 
-    Each successful or warning result contains ``pst_xml`` as a
+    Each repair result contains explicit validator outcomes under
+    ``validation``. No general result status field is required.
+
+    When a repaired PST is available, ``pst_xml`` is returned as a
     UTF-8 string so it can be displayed directly in JavaScript.
     """
 
