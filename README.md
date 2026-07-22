@@ -118,7 +118,7 @@ The `original_pst` file contains the process model to repair.
 </process>
 ```
 
-The `compliance_result` file contains the violations to repair and the satisfied requirements that should be preserved.
+The `compliance_result` file must contain a JSON object with two arrays:
 
 ```json
 {
@@ -140,7 +140,26 @@ The `compliance_result` file contains the violations to repair and the satisfied
 }
 ```
 
-The `violations` and `context` values can be taken from the response of `/comprepair/violations`.
+The file may contain the complete JSON response returned by `/comprepair/violations`:
+
+```json
+{
+  "status": "success",
+  "violations": [...],
+  "context": [...]
+}
+```
+
+It may also contain only the `violations` and `context` fields:
+
+```json
+{
+  "violations": [...],
+  "context": [...]
+}
+```
+
+Additional top-level fields are accepted, but `violations` and `context` must both be present as arrays.
 
 #### Example request
 
@@ -170,6 +189,9 @@ curl -X POST \
       "pst_xml": "<?xml version=\"1.0\" encoding=\"utf-8\"?>...",
       "validation": {
         "status": "success",
+        "behavioral_validator": "success",
+        "pst_validator": "success",
+        "structural_validator": "success",
         "warnings": []
       },
       "failed_operation": null,
@@ -184,12 +206,16 @@ curl -X POST \
 Possible result statuses:
 
 - `success`: the strategy was applied and validation passed.
-- `warning`: the strategy was applied, but validation produced warnings.
+- `warning`: the strategy was applied, but one or more validators produced warnings.
 - `error`: the strategy could not be applied.
+
+For successful and warning results, `pst_xml` contains the repaired PST as a UTF-8 XML string.
+
+For error results, `pst_xml` is `null`, and the response may include `failed_operation`, `error_type`, and `error_message`.
 
 Each strategy is applied independently to a fresh copy of the original PST. An error in one strategy does not stop the remaining strategies.
 
-Repaired PSTs are returned as UTF-8 XML strings and can be displayed or downloaded by the web interface.
+The endpoint returns JSON. Repaired PSTs can be displayed or downloaded by the web interface.
 
 ---
 
