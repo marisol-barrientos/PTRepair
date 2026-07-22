@@ -1,6 +1,7 @@
+import io
 import json
+import os
 import sys
-import time
 from pathlib import Path
 from typing import Any
 
@@ -11,23 +12,30 @@ import requests
 # Configuration
 # ==========================================================
 
-SCENARIO_NAME = "06_BPMQ"
-MODEL = "openai/gpt-5.5"
-REQUEST_TIMEOUT_SECONDS = 300
+MODEL = os.getenv(
+    "OPENROUTER_MODEL",
+    "openai/gpt-5.5",
+)
+
+REQUEST_TIMEOUT_SECONDS = int(
+    os.getenv(
+        "OPENROUTER_TIMEOUT_SECONDS",
+        "300",
+    )
+)
 
 
 # ==========================================================
 # Project paths and imports
 # ==========================================================
 
-# This file is expected to be located at:
+# Expected location:
 #
 # PTRepair/
 # └── src/
 #     └── step_1_generate_resolution_strategies/
 #         └── generate_resolution_strategies_demo.py
 #
-# parents[2] therefore resolves to the PTRepair project root.
 BASE_DIR = Path(__file__).resolve().parents[2]
 SRC_DIR = BASE_DIR / "src"
 
@@ -35,110 +43,113 @@ if str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
 
 
-# IMPORTANT:
-# Change this import only if simplify_ast.py is located in another package.
-#
-# Example location:
-# src/step_0_preprocessing/simplify_ast.py
-#
-# In that case, this import is correct:
-from step_0_preprocessing.simplify_pst_demo import simplify_pst
+from step_0_preprocessing.simplify_pst_demo import (
+    simplify_pst,
+)
+
+
+DEFAULT_PROMPT_FILE = (
+    BASE_DIR
+    / "data"
+    / "input"
+    / "prompts"
+    / "generate_resolution_strategies_demo.txt"
+)
 
 
 # ==========================================================
-# File loading utilities
+# Configuration loading
 # ==========================================================
 
-def load_json(path: Path) -> Any:
+def load_prompt(
+    prompt: str | None = None,
+    prompt_file: str | Path | None = None,
+) -> str:
     """
-    Load a JSON file with clear validation errors.
+    Return the prompt used for strategy generation.
 
-    Parameters
-    ----------
-    path : Path
-        Path to the JSON file.
+    The prompt can be provided directly as a string. When omitted,
+    it is loaded from a server-side prompt file.
 
-    Returns
-    -------
-    Any
-        Parsed JSON content.
+    The prompt file is configuration input; no generated output is
+    written to disk.
     """
 
-    if not path.exists():
-        raise FileNotFoundError(
-            f"JSON file not found: {path}"
-        )
+    if prompt is not None:
+        prompt = prompt.strip()
+
+        if not prompt:
+            raise ValueError(
+                "The provided prompt cannot be empty."
+            )
+
+        return prompt
+
+    path = (
+        Path(prompt_file).expanduser().resolve()
+        if prompt_file is not None
+        else DEFAULT_PROMPT_FILE
+    )
 
     if not path.is_file():
-        raise ValueError(
-            f"Expected a JSON file, received: {path}"
-        )
-
-    raw_content = path.read_text(encoding="utf-8")
-
-    if not raw_content.strip():
-        raise ValueError(
-            f"JSON file is empty: {path}"
-        )
-
-    try:
-        return json.loads(raw_content)
-
-    except json.JSONDecodeError as error:
-        raise ValueError(
-            f"Invalid JSON in {path}\n"
-            f"Line: {error.lineno}\n"
-            f"Column: {error.colno}\n"
-            f"Reason: {error.msg}"
-        ) from error
-
-
-def load_text(path: Path) -> str:
-    """
-    Load a non-empty text file.
-
-    Parameters
-    ----------
-    path : Path
-        Path to the text file.
-
-    Returns
-    -------
-    str
-        File content.
-    """
-
-    if not path.exists():
         raise FileNotFoundError(
-            f"Text file not found: {path}"
+            f"Prompt file not found: {path}"
         )
 
-    if not path.is_file():
-        raise ValueError(
-            f"Expected a text file, received: {path}"
-        )
+    content = path.read_text(
+        encoding="utf-8",
+    ).strip()
 
-    content = path.read_text(encoding="utf-8")
-
-    if not content.strip():
+    if not content:
         raise ValueError(
-            f"Text file is empty: {path}"
+            f"Prompt file is empty: {path}"
         )
 
     return content
 
 
-# ==========================================================
-# Compliance result loading
-# ==========================================================
-
-def load_compliance_result(
-    path: Path,
-) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+def get_openrouter_api_key(
+    api_key: str | None = None,
+) -> str:
     """
-    Load violations and compliant requirements.
+    Return the OpenRouter API key.
 
-    Expected input structure:
+    The preferred deployment configuration is the
+    OPENROUTER_API_KEY environment variable.
+    """
+
+    resolved_key = (
+        api_key
+        or os.getenv("OPENROUTER_API_KEY")
+    )
+
+    if (
+        not isinstance(resolved_key, str)
+        or not resolved_key.strip()
+    ):
+        raise ValueError(
+            "OpenRouter API key is missing. Set the "
+            "OPENROUTER_API_KEY environment variable or pass "
+            "api_key directly."
+        )
+
+    return resolved_key.strip()
+
+
+# ==========================================================
+# Input validation
+# ==========================================================
+
+def validate_compliance_result(
+    compliance_result: dict[str, Any],
+) -> tuple[
+    list[dict[str, Any]],
+    list[dict[str, Any]],
+]:
+    """
+    Validate and return violations and compliant context.
+
+    Expected input:
 
     {
         "violations": [
@@ -157,70 +168,148 @@ def load_compliance_result(
             }
         ]
     }
-
-    Parameters
-    ----------
-    path : Path
-        Path to the compliance result JSON file.
-
-    Returns
-    -------
-    tuple
-        A tuple containing:
-        - violations
-        - compliant requirement context
     """
 
-    compliance_result = load_json(path)
-
-    if not isinstance(compliance_result, dict):
+    if not isinstance(
+        compliance_result,
+        dict,
+    ):
         raise TypeError(
-            "The compliance result file must contain a JSON object "
-            "with 'violations' and 'context' fields."
+            "The compliance result must be a dictionary."
         )
 
-    violations = compliance_result.get("violations", [])
-    resolution_context = compliance_result.get("context", [])
+    violations = compliance_result.get(
+        "violations",
+        [],
+    )
+
+    resolution_context = compliance_result.get(
+        "context",
+        [],
+    )
 
     if not isinstance(violations, list):
         raise TypeError(
-            "The 'violations' field must contain a JSON array."
+            "The 'violations' field must contain a list."
         )
 
-    if not isinstance(resolution_context, list):
+    if not isinstance(
+        resolution_context,
+        list,
+    ):
         raise TypeError(
-            "The 'context' field must contain a JSON array."
+            "The 'context' field must contain a list."
         )
 
-    for index, violation in enumerate(violations):
+    for index, violation in enumerate(
+        violations
+    ):
         if not isinstance(violation, dict):
             raise TypeError(
-                f"Violation at index {index} must be a JSON object."
+                f"Violation at index {index} must be "
+                "a dictionary."
             )
 
-        requirement_id = violation.get("requirement_id")
+        requirement_id = violation.get(
+            "requirement_id"
+        )
 
-        if not requirement_id:
+        if (
+            not isinstance(requirement_id, str)
+            or not requirement_id.strip()
+        ):
             raise ValueError(
-                f"Violation at index {index} has no 'requirement_id'."
+                f"Violation at index {index} has no valid "
+                "'requirement_id'."
             )
 
-    for index, context_requirement in enumerate(resolution_context):
-        if not isinstance(context_requirement, dict):
+    for index, requirement in enumerate(
+        resolution_context
+    ):
+        if not isinstance(requirement, dict):
             raise TypeError(
                 f"Context requirement at index {index} "
-                "must be a JSON object."
+                "must be a dictionary."
             )
 
-        requirement_id = context_requirement.get("requirement_id")
+        requirement_id = requirement.get(
+            "requirement_id"
+        )
 
-        if not requirement_id:
+        if (
+            not isinstance(requirement_id, str)
+            or not requirement_id.strip()
+        ):
             raise ValueError(
                 f"Context requirement at index {index} "
-                "has no 'requirement_id'."
+                "has no valid 'requirement_id'."
             )
 
     return violations, resolution_context
+
+
+def validate_original_pst(
+    original_pst: bytes,
+) -> bytes:
+    """
+    Validate uploaded PST bytes.
+    """
+
+    if not isinstance(
+        original_pst,
+        bytes,
+    ):
+        raise TypeError(
+            "The original PST must be provided as bytes."
+        )
+
+    if not original_pst.strip():
+        raise ValueError(
+            "The original PST is empty."
+        )
+
+    return original_pst
+
+
+# ==========================================================
+# PST simplification
+# ==========================================================
+
+def simplify_pst_in_memory(
+    original_pst: bytes,
+) -> str:
+    """
+    Simplify an XML PST without creating an output file.
+
+    BytesIO provides a file-like object backed entirely by memory.
+
+    This assumes simplify_pst() accepts a path-like or file-like
+    object supported by the XML parser it uses.
+    """
+
+    pst_stream = io.BytesIO(
+        original_pst
+    )
+
+    simplified_pst = simplify_pst(
+        pst_stream
+    )
+
+    if not isinstance(
+        simplified_pst,
+        str,
+    ):
+        raise TypeError(
+            "simplify_pst() must return the simplified PST "
+            "as a string."
+        )
+
+    if not simplified_pst.strip():
+        raise ValueError(
+            "simplify_pst() returned an empty PST."
+        )
+
+    return simplified_pst
 
 
 # ==========================================================
@@ -234,27 +323,7 @@ def build_prompt(
     resolution_context: list[dict[str, Any]],
 ) -> str:
     """
-    Build a complete model prompt for one violation.
-
-    Parameters
-    ----------
-    base_prompt : str
-        General resolution strategy instructions.
-
-    pst : str
-        Simplified PST generated in memory.
-
-    violation : dict
-        The violation being repaired.
-
-    resolution_context : list
-        Requirements that are currently compliant and should remain
-        compliant.
-
-    Returns
-    -------
-    str
-        Complete model prompt.
+    Build the model prompt for one violation.
     """
 
     return f"""{base_prompt}
@@ -306,26 +375,18 @@ def generate_resolution_strategy(
     prompt: str,
 ) -> Any:
     """
-    Generate one resolution strategy using OpenRouter.
-
-    Parameters
-    ----------
-    api_key : str
-        OpenRouter API key.
-
-    prompt : str
-        Complete prompt for the model.
-
-    Returns
-    -------
-    Any
-        Parsed JSON returned by the model.
+    Generate one resolution strategy through OpenRouter.
     """
 
     response = requests.post(
-        url="https://openrouter.ai/api/v1/chat/completions",
+        url=(
+            "https://openrouter.ai/api/v1/"
+            "chat/completions"
+        ),
         headers={
-            "Authorization": f"Bearer {api_key}",
+            "Authorization": (
+                f"Bearer {api_key}"
+            ),
             "Content-Type": "application/json",
         },
         json={
@@ -359,21 +420,32 @@ def generate_resolution_strategy(
 
     except requests.JSONDecodeError as error:
         raise ValueError(
-            "OpenRouter returned a response that was not valid JSON.\n"
-            f"Response content:\n{response.text}"
+            "OpenRouter returned a response that was not "
+            "valid JSON.\n"
+            f"Response:\n{response.text}"
         ) from error
 
     try:
-        generated_text = response_json["choices"][0]["message"]["content"]
+        generated_text = (
+            response_json["choices"][0]
+            ["message"]["content"]
+        )
 
-    except (KeyError, IndexError, TypeError) as error:
+    except (
+        KeyError,
+        IndexError,
+        TypeError,
+    ) as error:
         raise ValueError(
-            "The OpenRouter response does not contain model output.\n"
-            f"Response:\n"
+            "The OpenRouter response does not contain "
+            "model output.\n"
             f"{json.dumps(response_json, indent=2, ensure_ascii=False)}"
         ) from error
 
-    if not isinstance(generated_text, str):
+    if not isinstance(
+        generated_text,
+        str,
+    ):
         raise ValueError(
             "The model output is not a string."
         )
@@ -386,14 +458,16 @@ def generate_resolution_strategy(
         )
 
     try:
-        return json.loads(generated_text)
+        return json.loads(
+            generated_text
+        )
 
     except json.JSONDecodeError as error:
         raise ValueError(
             "The model output is not valid JSON.\n"
-            f"Line: {error.lineno}\n"
-            f"Column: {error.colno}\n"
-            f"Reason: {error.msg}\n\n"
+            f"Line {error.lineno}, "
+            f"column {error.colno}: "
+            f"{error.msg}\n\n"
             f"Model output:\n{generated_text}"
         ) from error
 
@@ -407,95 +481,62 @@ def normalize_resolution_strategies(
     generated_result: Any,
 ) -> list[dict[str, Any]]:
     """
-    Normalize a generated result into a flat list.
-
-    Supported model output formats include:
-
-    A single strategy:
-
-    {
-        "requirement_id": "R2",
-        "resolution_strategy_id": "R2_RS1",
-        "change_description": "...",
-        "change_risk": {...},
-        "change_operations": [...]
-    }
-
-    A nested strategy list:
-
-    {
-        "resolution_strategies": [
-            {
-                "requirement_id": "R2",
-                "resolution_strategy_id": "R2_RS1",
-                ...
-            }
-        ]
-    }
-
-    A direct list:
-
-    [
-        {
-            "resolution_strategy_id": "R2_RS1",
-            ...
-        }
-    ]
-
-    The returned result is always flat and contains exactly one trusted
-    requirement_id per strategy.
-
-    Parameters
-    ----------
-    requirement_id : str
-        Requirement associated with the model request.
-
-    generated_result : Any
-        Parsed model response.
-
-    Returns
-    -------
-    list
-        Flat list of normalized strategy objects.
+    Normalize model output into a flat strategy list.
     """
 
-    if isinstance(generated_result, dict):
-        nested_strategies = generated_result.get(
-            "resolution_strategies"
+    if isinstance(
+        generated_result,
+        dict,
+    ):
+        nested_strategies = (
+            generated_result.get(
+                "resolution_strategies"
+            )
         )
 
-        if isinstance(nested_strategies, list):
-            raw_strategies = nested_strategies
+        if isinstance(
+            nested_strategies,
+            list,
+        ):
+            raw_strategies = (
+                nested_strategies
+            )
         else:
-            raw_strategies = [generated_result]
+            raw_strategies = [
+                generated_result
+            ]
 
-    elif isinstance(generated_result, list):
+    elif isinstance(
+        generated_result,
+        list,
+    ):
         raw_strategies = generated_result
 
     else:
         raw_strategies = [
             {
-                "resolution_strategy": generated_result,
+                "resolution_strategy":
+                    generated_result
             }
         ]
 
-    normalized_strategies: list[dict[str, Any]] = []
+    normalized: list[
+        dict[str, Any]
+    ] = []
 
-    for strategy_index, strategy in enumerate(
+    for index, strategy in enumerate(
         raw_strategies,
         start=1,
     ):
-        if not isinstance(strategy, dict):
-            normalized_strategies.append(
-                {
-                    "requirement_id": requirement_id,
-                    "resolution_strategy": strategy,
-                }
-            )
-            continue
+        if not isinstance(
+            strategy,
+            dict,
+        ):
+            strategy = {
+                "resolution_strategy":
+                    strategy
+            }
 
-        # Remove values that would duplicate or override the trusted
-        # requirement identifier.
         cleaned_strategy = {
             key: value
             for key, value in strategy.items()
@@ -506,246 +547,144 @@ def normalize_resolution_strategies(
             }
         }
 
-        # Add a strategy ID when the model did not provide one.
-        if not cleaned_strategy.get("resolution_strategy_id"):
-            cleaned_strategy["resolution_strategy_id"] = (
-                f"{requirement_id}_RS{strategy_index}"
-            )
+        strategy_id = cleaned_strategy.get(
+            "resolution_strategy_id"
+        )
 
-        normalized_strategies.append(
+        if (
+            not isinstance(strategy_id, str)
+            or not strategy_id.strip()
+        ):
+            cleaned_strategy[
+                "resolution_strategy_id"
+            ] = f"{requirement_id}_RS{index}"
+
+        normalized.append(
             {
-                "requirement_id": requirement_id,
+                "requirement_id":
+                    requirement_id,
                 **cleaned_strategy,
             }
         )
 
-    return normalized_strategies
+    return normalized
 
 
 # ==========================================================
-# Main execution
+# Public in-memory function
 # ==========================================================
 
-def main() -> None:
+def generate_resolution_strategies(
+    original_pst: bytes,
+    compliance_result: dict[str, Any],
+    api_key: str | None = None,
+    prompt: str | None = None,
+    prompt_file: str | Path | None = None,
+) -> list[dict[str, Any]]:
     """
-    Load inputs, simplify the original PST in memory, generate repair
-    strategies, and save a flat JSON result.
+    Generate resolution strategies completely in memory.
+
+    Parameters
+    ----------
+    original_pst : bytes
+        Original XML PST content.
+
+    compliance_result : dict
+        Parsed compliance result containing violations and context.
+
+    api_key : str | None
+        Optional OpenRouter API key. When omitted, the
+        OPENROUTER_API_KEY environment variable is used.
+
+    prompt : str | None
+        Optional prompt content supplied directly.
+
+    prompt_file : str | Path | None
+        Optional server-side prompt file. Used only when prompt is
+        not supplied directly.
+
+    Returns
+    -------
+    list[dict[str, Any]]
+        Generated normalized resolution strategies.
+
+    Notes
+    -----
+    No generated output is written to disk.
     """
 
-    start_time = time.time()
-
-    print(f"Project root: {BASE_DIR}")
-    print(f"Scenario: {SCENARIO_NAME}")
-
-    # ------------------------------------------------------
-    # Input paths
-    # ------------------------------------------------------
-
-    api_key_file = (
-        BASE_DIR
-        / "config"
-        / "api_keys.json"
+    validated_pst = validate_original_pst(
+        original_pst
     )
 
-    prompt_file = (
-        BASE_DIR
-        / "data"
-        / "input"
-        / "prompts"
-        / "generate_resolution_strategies_demo.txt"
-    )
-
-    original_pst_file = (
-        BASE_DIR
-        / "data"
-        / "input"
-        / "process_models"
-        / "cpee_trees"
-        / f"{SCENARIO_NAME}.xml"
-    )
-
-    compliance_result_file = (
-        BASE_DIR
-        / "data"
-        / "output"
-        / "compliance_result_file"
-        / f"{SCENARIO_NAME}_resolution_context.json"
-    )
-
-    # ------------------------------------------------------
-    # Output path
-    # ------------------------------------------------------
-
-    output_dir = (
-        BASE_DIR
-        / "data"
-        / "output"
-        / "generated_resolution_strategies"
-        / SCENARIO_NAME
-        / "resolution_strategies_clean"
-    )
-
-    output_file = (
-        output_dir
-        / f"{SCENARIO_NAME}_resolution_strategies.json"
-    )
-
-    # ------------------------------------------------------
-    # Load API key
-    # ------------------------------------------------------
-
-    api_key_config = load_json(api_key_file)
-
-    if not isinstance(api_key_config, dict):
-        raise TypeError(
-            f"The API key file must contain a JSON object: "
-            f"{api_key_file}"
+    violations, resolution_context = (
+        validate_compliance_result(
+            compliance_result
         )
-
-    api_key = api_key_config.get("OPENROUTER_API_KEY")
-
-    if not isinstance(api_key, str) or not api_key.strip():
-        raise ValueError(
-            f"'OPENROUTER_API_KEY' is missing or empty in "
-            f"{api_key_file}."
-        )
-
-    api_key = api_key.strip()
-
-    # ------------------------------------------------------
-    # Load prompt and compliance data
-    # ------------------------------------------------------
-
-    base_prompt = load_text(prompt_file)
-
-    violations, resolution_context = load_compliance_result(
-        compliance_result_file
     )
 
-    print(f"Violations found: {len(violations)}")
-    print(
-        f"Compliant context requirements: "
-        f"{len(resolution_context)}"
+    resolved_api_key = (
+        get_openrouter_api_key(
+            api_key
+        )
     )
 
-    # ------------------------------------------------------
-    # Simplify the original PST in memory
-    # ------------------------------------------------------
-
-    if not original_pst_file.exists():
-        raise FileNotFoundError(
-            f"Original process model not found: "
-            f"{original_pst_file}"
-        )
-
-    print(f"Original process model: {original_pst_file}")
-    print("Simplifying original PST in memory...")
-
-    simplified_pst = simplify_pst(original_pst_file)
-
-    if not isinstance(simplified_pst, str):
-        raise TypeError(
-            "simplify_pst() must return the simplified PST as a string."
-        )
-
-    if not simplified_pst.strip():
-        raise ValueError(
-            "simplify_pst() returned an empty PST."
-        )
-
-    print(
-        "PST simplified successfully: "
-        f"{len(simplified_pst.splitlines())} lines"
+    base_prompt = load_prompt(
+        prompt=prompt,
+        prompt_file=prompt_file,
     )
 
-    # The simplified PST is not saved to disk. It remains only in the
-    # simplified_pst variable.
+    simplified_pst = simplify_pst_in_memory(
+        validated_pst
+    )
 
-    # ------------------------------------------------------
-    # Generate strategies
-    # ------------------------------------------------------
-
-    accumulated_strategies: list[dict[str, Any]] = []
-
-    if not violations:
-        print(
-            "No violations were found. "
-            "An empty strategy list will be written."
-        )
+    accumulated_strategies: list[
+        dict[str, Any]
+    ] = []
 
     for index, violation in enumerate(
         violations,
         start=1,
     ):
-        requirement_id = violation["requirement_id"]
+        requirement_id = violation[
+            "requirement_id"
+        ]
 
         print(
             f"[{index}/{len(violations)}] "
-            f"Generating strategy for {requirement_id}..."
+            f"Generating strategy for "
+            f"{requirement_id}..."
         )
 
-        prompt = build_prompt(
+        complete_prompt = build_prompt(
             base_prompt=base_prompt,
             pst=simplified_pst,
             violation=violation,
-            resolution_context=resolution_context,
+            resolution_context=(
+                resolution_context
+            ),
         )
 
-        generated_result = generate_resolution_strategy(
-            api_key=api_key,
-            prompt=prompt,
+        generated_result = (
+            generate_resolution_strategy(
+                api_key=resolved_api_key,
+                prompt=complete_prompt,
+            )
         )
 
-        normalized_strategies = normalize_resolution_strategies(
-            requirement_id=requirement_id,
-            generated_result=generated_result,
+        normalized = (
+            normalize_resolution_strategies(
+                requirement_id=(
+                    requirement_id
+                ),
+                generated_result=(
+                    generated_result
+                ),
+            )
         )
 
         accumulated_strategies.extend(
-            normalized_strategies
+            normalized
         )
 
-        print(
-            f"[{index}/{len(violations)}] "
-            f"Generated {len(normalized_strategies)} normalized "
-            f"strategy entry."
-        )
-
-    # ------------------------------------------------------
-    # Save flat output without scenario_name
-    # ------------------------------------------------------
-
-    consolidated_output = {
-        "resolution_strategies": accumulated_strategies,
-    }
-
-    output_dir.mkdir(
-        parents=True,
-        exist_ok=True,
-    )
-
-    with output_file.open(
-        "w",
-        encoding="utf-8",
-    ) as file:
-        json.dump(
-            consolidated_output,
-            file,
-            indent=2,
-            ensure_ascii=False,
-        )
-
-    elapsed_seconds = round(
-        time.time() - start_time,
-        2,
-    )
-
-    print(
-        f"Saved {len(accumulated_strategies)} strategies to:"
-    )
-    print(output_file)
-    print(f"Execution time: {elapsed_seconds} seconds")
-
-
-if __name__ == "__main__":
-    main()
+    return accumulated_strategies

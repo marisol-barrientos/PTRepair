@@ -3,37 +3,73 @@ import os
 import signal
 import subprocess
 import sys
+import time
 
 import uvicorn
 
 
-PID_FILE = "comprepair.pid"
-LOG_FILE = "comprepair.log"
+BASE_DIR = os.path.dirname(
+    os.path.abspath(__file__)
+)
+
+PID_FILE = os.path.join(
+    BASE_DIR,
+    "comprepair.pid",
+)
+
+LOG_FILE = os.path.join(
+    BASE_DIR,
+    "comprepair.log",
+)
+
 PORT = 3592
 
 
-def run_server():
+def run_server() -> None:
+    """
+    Run CompRepair in the foreground.
+    """
+
     uvicorn.run(
         "api:app",
         host="0.0.0.0",
         port=PORT,
         log_level="info",
+        app_dir=BASE_DIR,
     )
 
 
-def _read_pid():
+def _read_pid() -> int | None:
+    """
+    Read the stored server PID.
+    """
 
     if not os.path.exists(PID_FILE):
         return None
 
     try:
-        with open(PID_FILE, "r") as f:
-            return int(f.read().strip())
-    except Exception:
+        with open(
+            PID_FILE,
+            "r",
+            encoding="utf-8",
+        ) as file:
+            return int(
+                file.read().strip()
+            )
+
+    except (
+        OSError,
+        ValueError,
+    ):
         return None
 
 
-def _is_running(pid):
+def _is_running(
+    pid: int | None,
+) -> bool:
+    """
+    Check whether a process exists.
+    """
 
     if pid is None:
         return False
@@ -41,34 +77,41 @@ def _is_running(pid):
     try:
         os.kill(pid, 0)
         return True
+
     except OSError:
         return False
 
 
-def _start_daemon():
+def _start_daemon() -> None:
+    """
+    Start CompRepair as a background process.
+    """
 
     existing_pid = _read_pid()
 
     if _is_running(existing_pid):
-        print(f"CompRepair already running (PID {existing_pid})")
+        print(
+            "CompRepair already running "
+            f"(PID {existing_pid})"
+        )
         return
 
-    if existing_pid and os.path.exists(PID_FILE):
+    if os.path.exists(PID_FILE):
         os.remove(PID_FILE)
 
-    log_path = os.path.join(
-        os.path.dirname(__file__),
+    with open(
         LOG_FILE,
-    )
-
-    with open(log_path, "a") as log_file:
-
+        "a",
+        encoding="utf-8",
+    ) as log_file:
         process = subprocess.Popen(
             [
                 sys.executable,
                 "-m",
                 "uvicorn",
                 "api:app",
+                "--app-dir",
+                BASE_DIR,
                 "--host",
                 "0.0.0.0",
                 "--port",
@@ -76,77 +119,132 @@ def _start_daemon():
                 "--log-level",
                 "info",
             ],
-            cwd=os.path.dirname(__file__),
+            cwd=BASE_DIR,
             stdout=log_file,
             stderr=log_file,
             start_new_session=True,
         )
 
-    with open(PID_FILE, "w") as f:
-        f.write(str(process.pid))
+    with open(
+        PID_FILE,
+        "w",
+        encoding="utf-8",
+    ) as file:
+        file.write(
+            str(process.pid)
+        )
 
-    print(f"Started CompRepair (PID {process.pid})")
+    print(
+        "Started CompRepair "
+        f"(PID {process.pid}, port {PORT})"
+    )
 
 
-def _stop_daemon():
+def _stop_daemon() -> None:
+    """
+    Stop the background service gracefully.
+    """
 
     pid = _read_pid()
 
     if pid is None:
-        print("CompRepair is not running.")
+        print(
+            "CompRepair is not running."
+        )
         return
 
     if not _is_running(pid):
+        print(
+            "Removing stale PID file."
+        )
 
-        print("Removing stale PID file.")
-
-        if os.path.exists(PID_FILE):
-            os.remove(PID_FILE)
-
+        os.remove(PID_FILE)
         return
 
-    print(f"Stopping CompRepair (PID {pid})")
+    print(
+        f"Stopping CompRepair (PID {pid})"
+    )
 
-    os.kill(pid, signal.SIGINT)
+    try:
+        os.kill(
+            pid,
+            signal.SIGINT,
+        )
+
+    except OSError as error:
+        print(
+            f"Could not stop CompRepair: {error}"
+        )
+        return
+
+    for _ in range(50):
+        if not _is_running(pid):
+            break
+
+        time.sleep(0.1)
+
+    if _is_running(pid):
+        print(
+            "CompRepair did not stop gracefully."
+        )
+        return
 
     if os.path.exists(PID_FILE):
         os.remove(PID_FILE)
 
+    print(
+        "CompRepair stopped."
+    )
 
-def _status_daemon():
+
+def _status_daemon() -> None:
+    """
+    Display the service status.
+    """
 
     pid = _read_pid()
 
     if _is_running(pid):
-        print(f"CompRepair is running (PID {pid})")
-    elif pid:
-        print(f"CompRepair is not running (stale PID {pid})")
+        print(
+            "CompRepair is running "
+            f"(PID {pid}, port {PORT})"
+        )
+
+    elif pid is not None:
+        print(
+            "CompRepair is not running "
+            f"(stale PID {pid})"
+        )
+
     else:
-        print("CompRepair is not running")
+        print(
+            "CompRepair is not running."
+        )
 
 
 if __name__ == "__main__":
-
     parser = argparse.ArgumentParser(
-        description="Manage the CompRepair service."
+        description=(
+            "Manage the CompRepair service."
+        )
     )
 
     parser.add_argument(
         "--stop",
         action="store_true",
-        help="Stop the background service",
+        help="Stop the background service.",
     )
 
     parser.add_argument(
         "--status",
         action="store_true",
-        help="Show service status",
+        help="Show service status.",
     )
 
     parser.add_argument(
         "--foreground",
         action="store_true",
-        help="Run in foreground",
+        help="Run in the foreground.",
     )
 
     args = parser.parse_args()
