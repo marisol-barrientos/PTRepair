@@ -79,6 +79,137 @@ def validate_compliance_result(
 
 
 # ============================================================
+# STRATEGY AND RESULT COMBINATION
+# ============================================================
+
+def create_resolution_strategy_results(
+    strategies: list[dict[str, Any]],
+    results: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    """
+    Combine each generated resolution strategy with its application
+    and validation result.
+
+    Strategies and results are matched through
+    ``resolution_strategy_id``.
+    """
+
+    if not isinstance(strategies, list):
+        raise TypeError(
+            "Strategies must be provided as a list."
+        )
+
+    if not isinstance(results, list):
+        raise TypeError(
+            "Results must be provided as a list."
+        )
+
+    strategies_by_id: dict[
+        str,
+        dict[str, Any],
+    ] = {}
+
+    for index, strategy in enumerate(strategies):
+        if not isinstance(strategy, dict):
+            raise TypeError(
+                f"Strategy at index {index} must be a dictionary."
+            )
+
+        strategy_id = strategy.get(
+            "resolution_strategy_id"
+        )
+
+        if (
+            not isinstance(strategy_id, str)
+            or not strategy_id.strip()
+        ):
+            raise ValueError(
+                f"Strategy at index {index} has no valid "
+                "'resolution_strategy_id'."
+            )
+
+        strategy_id = strategy_id.strip()
+
+        if strategy_id in strategies_by_id:
+            raise ValueError(
+                "Duplicate resolution strategy ID: "
+                f"{strategy_id}"
+            )
+
+        strategies_by_id[
+            strategy_id
+        ] = strategy
+
+    combined_strategies: list[
+        dict[str, Any]
+    ] = []
+
+    seen_result_ids: set[str] = set()
+
+    for index, result in enumerate(results):
+        if not isinstance(result, dict):
+            raise TypeError(
+                f"Result at index {index} must be a dictionary."
+            )
+
+        strategy_id = result.get(
+            "resolution_strategy_id"
+        )
+
+        if (
+            not isinstance(strategy_id, str)
+            or not strategy_id.strip()
+        ):
+            raise ValueError(
+                f"Result at index {index} has no valid "
+                "'resolution_strategy_id'."
+            )
+
+        strategy_id = strategy_id.strip()
+
+        strategy = strategies_by_id.get(
+            strategy_id
+        )
+
+        if strategy is None:
+            raise ValueError(
+                "No generated strategy matches result ID: "
+                f"{strategy_id}"
+            )
+
+        if strategy_id in seen_result_ids:
+            raise ValueError(
+                "Duplicate application result for strategy ID: "
+                f"{strategy_id}"
+            )
+
+        seen_result_ids.add(
+            strategy_id
+        )
+
+        combined_strategies.append(
+            {
+                **strategy,
+                **result,
+            }
+        )
+
+    missing_result_ids = [
+        strategy_id
+        for strategy_id in strategies_by_id
+        if strategy_id not in seen_result_ids
+    ]
+
+    if missing_result_ids:
+        raise ValueError(
+            "No application result was returned for strategy IDs: "
+            + ", ".join(missing_result_ids)
+        )
+
+    return combined_strategies
+
+
+# ============================================================
 # API RESULT SERIALIZATION
 # ============================================================
 
@@ -86,7 +217,8 @@ def create_api_results(
     results: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
     """
-    Convert internal repair results into JSON-serializable values.
+    Convert combined resolution strategy results into
+    JSON-serializable values.
 
     Results may contain ``pst_xml`` as bytes. Those bytes are decoded
     to UTF-8 strings so the result can be returned directly by a JSON
@@ -192,7 +324,7 @@ def repair(
     prompt: str | None = None,
 ) -> dict[str, Any]:
     """
-    Generate and apply resolution strategies entirely in memory.
+    Generate, apply, and validate resolution strategies in memory.
 
     Parameters
     ----------
@@ -222,23 +354,23 @@ def repair(
     Returns
     -------
     dict[str, Any]
-        JSON-serializable repair result containing:
+        JSON-serializable result containing one top-level field:
 
         - resolution_strategies
-        - results
 
-        In each detailed result, ``pst_xml`` is returned as a UTF-8
-        string instead of bytes so it can be serialized as JSON and
-        displayed directly in JavaScript.
+        Each item combines:
 
-        Results do not require a general ``status`` field. Outcomes
-        are represented through:
+        - the generated strategy
+        - its change operations
+        - the repaired PST
+        - explicit validator outcomes
+        - warnings
+        - error details
+        - the processing log
 
-        - explicit validator values in ``validation``
-        - ``validation.warnings``
-        - ``failed_operation``
-        - ``error_type``
-        - ``error_message``
+        ``pst_xml`` is returned as a UTF-8 string instead of bytes.
+
+        No general result ``status`` field is required.
 
     Notes
     -----
@@ -278,8 +410,15 @@ def repair(
         resolution_strategies=strategies,
     )
 
-    api_results = create_api_results(
-        internal_results
+    combined_strategies = (
+        create_resolution_strategy_results(
+            strategies=strategies,
+            results=internal_results,
+        )
+    )
+
+    api_resolution_strategies = create_api_results(
+        combined_strategies
     )
 
     errors = sum(
@@ -319,6 +458,6 @@ def repair(
     )
 
     return {
-        "resolution_strategies": strategies,
-        "results": api_results,
+        "resolution_strategies":
+            api_resolution_strategies,
     }

@@ -207,11 +207,20 @@ async def repair_endpoint(
     """
     Upload an original PST XML and a compliance-result JSON file.
 
-    Returns generated resolution strategies and detailed repair
-    results as JSON.
+    Returns one ``resolution_strategies`` array as JSON.
 
-    Each repair result contains explicit validator outcomes under
-    ``validation``. No general result status field is required.
+    Each item combines the generated strategy with its application
+    and validation result, including:
+
+    - change operations
+    - repaired PST XML
+    - explicit validator outcomes
+    - validation warnings
+    - error information
+    - processing log
+
+    No separate ``results`` array or general result status field is
+    returned.
 
     When a repaired PST is available, ``pst_xml`` is returned as a
     UTF-8 string so it can be displayed directly in JavaScript.

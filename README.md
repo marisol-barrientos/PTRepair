@@ -168,13 +168,7 @@ curl -X POST \
     {
       "requirement_id": "R2",
       "resolution_strategy_id": "R2_RS1",
-      "change_operations": []
-    }
-  ],
-  "results": [
-    {
-      "requirement_id": "R2",
-      "resolution_strategy_id": "R2_RS1",
+      "change_operations": [],
       "pst_xml": "<?xml version=\"1.0\" encoding=\"utf-8\"?>...",
       "validation": {
         "behavioral_validator": "success",
@@ -190,6 +184,16 @@ curl -X POST \
   ]
 }
 ```
+
+Each item in `resolution_strategies` combines:
+
+- the generated strategy
+- its change operations
+- the repaired PST
+- explicit validator outcomes
+- validation warnings
+- error information
+- the processing log
 
 Validation outcomes are reported explicitly through:
 
