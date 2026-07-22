@@ -79,68 +79,62 @@ def validate_compliance_result(
 
 
 # ============================================================
-# RESULT SUMMARY
+# API RESULT SERIALIZATION
 # ============================================================
 
-def create_repair_summary(
+def create_api_results(
     results: list[dict[str, Any]],
-) -> dict[str, Any]:
+) -> list[dict[str, Any]]:
     """
-    Create a JSON-serializable repair summary.
+    Convert internal repair results into JSON-serializable values.
 
-    XML bytes and log content remain in the detailed results and are
-    not duplicated in the summary.
+    Successful and warning results may contain ``pst_xml`` as bytes.
+    Those bytes are decoded to UTF-8 strings so the result can be
+    returned directly by a JSON endpoint and displayed in JavaScript.
+
+    The input result dictionaries are not modified.
     """
 
-    entries = []
+    api_results: list[dict[str, Any]] = []
 
-    for result in results:
-        entry = {
-            "requirement_id": result.get(
-                "requirement_id"
-            ),
-            "resolution_strategy_id": result.get(
-                "resolution_strategy_id"
-            ),
-            "status": result.get(
-                "status"
-            ),
-            "validation": result.get(
-                "validation"
-            ),
-        }
-
-        if result.get("status") == "error":
-            entry["failed_operation"] = result.get(
-                "failed_operation"
+    for index, result in enumerate(results):
+        if not isinstance(result, dict):
+            raise TypeError(
+                f"Result at index {index} must be a dictionary."
             )
 
-            entry["error_type"] = result.get(
-                "error_type"
+        api_result = dict(result)
+
+        pst_xml = api_result.get(
+            "pst_xml"
+        )
+
+        if isinstance(pst_xml, bytes):
+            try:
+                api_result["pst_xml"] = pst_xml.decode(
+                    "utf-8"
+                )
+
+            except UnicodeDecodeError as error:
+                raise ValueError(
+                    "The generated PST XML for result at index "
+                    f"{index} is not valid UTF-8."
+                ) from error
+
+        elif pst_xml is not None and not isinstance(
+            pst_xml,
+            str,
+        ):
+            raise TypeError(
+                "The 'pst_xml' value for result at index "
+                f"{index} must be bytes, a string, or None."
             )
 
-            entry["error_message"] = result.get(
-                "error_message"
-            )
+        api_results.append(
+            api_result
+        )
 
-        entries.append(entry)
-
-    return {
-        "total": len(results),
-        "successful": sum(
-            result.get("status") == "success"
-            for result in results
-        ),
-        "warnings": sum(
-            result.get("status") == "warning"
-            for result in results
-        ),
-        "errors": sum(
-            result.get("status") == "error"
-            for result in results
-        ),
-        "results": entries,
-    }
+    return api_results
 
 
 # ============================================================
@@ -184,11 +178,14 @@ def repair(
     Returns
     -------
     dict[str, Any]
-        In-memory repair result containing:
+        JSON-serializable repair result containing:
 
         - resolution_strategies
         - results
-        - summary
+
+        In each detailed result, ``pst_xml`` is returned as a UTF-8
+        string instead of bytes so it can be serialized as JSON and
+        displayed directly in JavaScript.
 
     Notes
     -----
@@ -223,13 +220,28 @@ def repair(
     print("STEP 2: APPLY AND VALIDATE STRATEGIES")
     print("================================================")
 
-    results = apply_resolution_strategies(
+    internal_results = apply_resolution_strategies(
         original_pst=validated_pst,
         resolution_strategies=strategies,
     )
 
-    summary = create_repair_summary(
-        results
+    api_results = create_api_results(
+        internal_results
+    )
+
+    successful = sum(
+        result.get("status") == "success"
+        for result in internal_results
+    )
+
+    warnings = sum(
+        result.get("status") == "warning"
+        for result in internal_results
+    )
+
+    errors = sum(
+        result.get("status") == "error"
+        for result in internal_results
     )
 
     print("\n================================================")
@@ -241,19 +253,18 @@ def repair(
     )
     print(
         f"Successful: "
-        f"{summary['successful']}"
+        f"{successful}"
     )
     print(
         f"Warnings: "
-        f"{summary['warnings']}"
+        f"{warnings}"
     )
     print(
         f"Errors: "
-        f"{summary['errors']}"
+        f"{errors}"
     )
 
     return {
         "resolution_strategies": strategies,
-        "results": results,
-        "summary": summary,
+        "results": api_results,
     }

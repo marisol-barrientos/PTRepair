@@ -1,6 +1,5 @@
 import io
 import json
-import zipfile
 from typing import Any
 
 from fastapi import (
@@ -14,7 +13,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import (
     HTMLResponse,
     JSONResponse,
-    StreamingResponse,
 )
 
 from src.repair_demo import repair
@@ -37,26 +35,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-def make_safe_filename(
-    value: str,
-) -> str:
-    """
-    Convert an identifier into a safe filename.
-    """
-
-    safe_value = "".join(
-        character
-        if (
-            character.isalnum()
-            or character in {"-", "_"}
-        )
-        else "_"
-        for character in value
-    )
-
-    return safe_value.strip("_") or "unnamed"
 
 
 def parse_compliance_result(
@@ -95,108 +73,6 @@ def parse_compliance_result(
         )
 
     return result
-
-
-def create_repair_zip(
-    repair_result: dict[str, Any],
-) -> io.BytesIO:
-    """
-    Create the complete repair output as an in-memory ZIP archive.
-    """
-
-    zip_buffer = io.BytesIO()
-
-    strategies = repair_result.get(
-        "resolution_strategies",
-        [],
-    )
-
-    results = repair_result.get(
-        "results",
-        [],
-    )
-
-    summary = repair_result.get(
-        "summary",
-        {},
-    )
-
-    with zipfile.ZipFile(
-        zip_buffer,
-        mode="w",
-        compression=zipfile.ZIP_DEFLATED,
-    ) as archive:
-        archive.writestr(
-            "generated_resolution_strategies.json",
-            json.dumps(
-                {
-                    "resolution_strategies": strategies,
-                },
-                indent=2,
-                ensure_ascii=False,
-            ),
-        )
-
-        archive.writestr(
-            "repair_summary.json",
-            json.dumps(
-                summary,
-                indent=2,
-                ensure_ascii=False,
-            ),
-        )
-
-        for result in results:
-            requirement_id = str(
-                result.get(
-                    "requirement_id",
-                    "unknown_requirement",
-                )
-            )
-
-            strategy_id = str(
-                result.get(
-                    "resolution_strategy_id",
-                    "unknown_strategy",
-                )
-            )
-
-            filename = (
-                f"{make_safe_filename(requirement_id)}_"
-                f"{make_safe_filename(strategy_id)}"
-            )
-
-            pst_xml = result.get(
-                "pst_xml"
-            )
-
-            if isinstance(pst_xml, bytes):
-                archive.writestr(
-                    f"psts/{filename}.xml",
-                    pst_xml,
-                )
-
-            log_content = result.get(
-                "log",
-                "",
-            )
-
-            if not isinstance(
-                log_content,
-                str,
-            ):
-                log_content = str(
-                    log_content
-                )
-
-            archive.writestr(
-                f"logs/{filename}.log",
-                log_content,
-            )
-
-    zip_buffer.seek(0)
-
-    return zip_buffer
 
 
 @app.get(
@@ -326,8 +202,11 @@ async def repair_endpoint(
     """
     Upload an original PST XML and a compliance-result JSON file.
 
-    Returns an in-memory ZIP archive containing generated strategies,
-    repaired PSTs, validation metrics, and logs.
+    Returns a JSON response containing generated resolution
+    strategies and detailed repair results.
+
+    Each successful or warning result contains ``pst_xml`` as a
+    UTF-8 string so it can be displayed directly in JavaScript.
     """
 
     pst_filename = (
@@ -383,18 +262,9 @@ async def repair_endpoint(
             compliance_data,
         )
 
-        zip_buffer = create_repair_zip(
-            repair_result
-        )
-
-        return StreamingResponse(
-            zip_buffer,
-            media_type="application/zip",
+        return JSONResponse(
+            content=repair_result,
             headers={
-                "Content-Disposition": (
-                    'attachment; '
-                    'filename="comprepair_results.zip"'
-                ),
                 "Cache-Control": "no-store",
             },
         )
