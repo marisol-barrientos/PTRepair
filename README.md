@@ -14,10 +14,11 @@ The prototype is currently being extended into:
 
 PC-VERA brings requirement extraction, compliance verification, and process repair together in a web-based architecture.
 
+---
 
 ## Run the API
 
-Install dependencies:
+Install the dependencies:
 
 ```bash
 pip install -r requirements.txt
@@ -35,7 +36,7 @@ Start the FastAPI server:
 uvicorn main:app --reload
 ```
 
-Open the API documentation at:
+Open the interactive API documentation:
 
 ```text
 http://localhost:8000/docs
@@ -47,7 +48,7 @@ http://localhost:8000/docs
 
 ### `GET /health`
 
-Returns the service status.
+Returns the current service status.
 
 ```json
 {
@@ -60,17 +61,19 @@ Returns the service status.
 
 ### `POST /comprepair/violations`
 
-Identifies compliance violations from a YAML event log.
+Identifies compliance violations from an event log.
 
 #### Input
 
-`multipart/form-data`
+Send a `multipart/form-data` request containing one file:
 
-| Field | Description |
+| Field | Required content |
 |---|---|
-| `file` | YAML event log (`.yaml` or `.yml`) |
+| `file` | YAML event log with a `.yaml` or `.yml` extension |
 
-#### Example
+The YAML file contains the event log that will be checked against the configured compliance requirements.
+
+#### Example request
 
 ```bash
 curl -X POST \
@@ -83,10 +86,13 @@ curl -X POST \
 ```json
 {
   "status": "success",
-  "violations": ["..."],
-  "context": ["..."]
+  "violations": [],
+  "context": []
 }
 ```
+
+- `violations` contains requirements that were not satisfied.
+- `context` contains requirements that were satisfied.
 
 ---
 
@@ -96,23 +102,47 @@ Generates, applies, and validates repair strategies.
 
 #### Input
 
-`multipart/form-data`
+Send a `multipart/form-data` request containing two files:
 
-| Field | Description |
+| Field | Required content |
 |---|---|
-| `original_pst` | Original PST XML file (`.xml`) |
-| `compliance_result` | UTF-8 compliance-result file (`.json`) |
+| `original_pst` | Original Process Structured Tree as an `.xml` file |
+| `compliance_result` | Compliance verification result as a UTF-8 `.json` file |
 
-Expected JSON structure:
+The `original_pst` file contains the process model to repair.
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<process>
+  ...
+</process>
+```
+
+The `compliance_result` file contains the violations to repair and the satisfied requirements that should be preserved.
 
 ```json
 {
-  "violations": ["..."],
-  "context": ["..."]
+  "violations": [
+    {
+      "requirement_id": "R2",
+      "requirement": "Example violated requirement",
+      "assurance": 80,
+      "evidence": []
+    }
+  ],
+  "context": [
+    {
+      "requirement_id": "R1",
+      "requirement": "Example satisfied requirement",
+      "assurance": 100
+    }
+  ]
 }
 ```
 
-#### Example
+The `violations` and `context` values can be taken from the response of `/comprepair/violations`.
+
+#### Example request
 
 ```bash
 curl -X POST \
@@ -129,7 +159,7 @@ curl -X POST \
     {
       "requirement_id": "R2",
       "resolution_strategy_id": "R2_RS1",
-      "change_operations": ["..."]
+      "change_operations": []
     }
   ],
   "results": [
@@ -153,24 +183,24 @@ curl -X POST \
 
 Possible result statuses:
 
-- `success`: strategy applied and validation passed
-- `warning`: strategy applied, but validation produced warnings
-- `error`: strategy could not be applied
+- `success`: the strategy was applied and validation passed.
+- `warning`: the strategy was applied, but validation produced warnings.
+- `error`: the strategy could not be applied.
 
-Each strategy is applied to a fresh copy of the original PST. An error in one strategy does not stop the remaining strategies.
+Each strategy is applied independently to a fresh copy of the original PST. An error in one strategy does not stop the remaining strategies.
 
-The endpoint returns JSON. Repaired PSTs are included as UTF-8 XML strings and can be displayed or downloaded directly in JavaScript.
+Repaired PSTs are returned as UTF-8 XML strings and can be displayed or downloaded by the web interface.
 
 ---
 
 ## Error Responses
 
-Typical responses:
+Typical HTTP status codes:
 
-- `400`: invalid file or input data
-- `422`: missing multipart field
+- `400`: invalid file or input content
+- `422`: required multipart field is missing
 - `500`: unexpected server error
-- `502`: external strategy-generation failure
+- `502`: external strategy-generation request failed
 
 Example:
 
@@ -184,4 +214,4 @@ Example:
 
 ## Current Status
 
-The repository is under active development. Ongoing work includes frontend integration, documentation, deployment configuration, examples, and demonstration scenarios.
+The repository is under active development as part of the PC-VERA demonstration architecture.
