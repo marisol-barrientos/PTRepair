@@ -316,14 +316,18 @@ def simplify_pst_in_memory(
 # Prompt construction
 # ==========================================================
 
-def build_prompt(
+def build_batch_prompt(
     base_prompt: str,
     pst: str,
-    violation: dict[str, Any],
+    violations: list[dict[str, Any]],
     resolution_context: list[dict[str, Any]],
 ) -> str:
     """
-    Build the model prompt for one violation.
+    Build one model prompt containing the PST once and all detected
+    violations.
+
+    The model is instructed to generate exactly one resolution
+    strategy for each violation.
     """
 
     return f"""{base_prompt}
@@ -335,10 +339,10 @@ PROCESS STRUCTURED TREE
 {pst}
 
 ============================================================
-DETECTED VIOLATION
+DETECTED VIOLATIONS
 ============================================================
 
-{json.dumps(violation, indent=2, ensure_ascii=False)}
+{json.dumps(violations, indent=2, ensure_ascii=False)}
 
 ============================================================
 RESOLUTION CONTEXT REQUIREMENTS
@@ -346,7 +350,7 @@ RESOLUTION CONTEXT REQUIREMENTS
 
 The following requirements are currently satisfied.
 
-The generated repair should preserve these requirements whenever
+The generated repairs should preserve these requirements whenever
 possible and should avoid introducing new violations.
 
 {json.dumps(resolution_context, indent=2, ensure_ascii=False)}
@@ -357,12 +361,27 @@ OUTPUT REQUIREMENTS
 
 IMPORTANT:
 
-- Generate exactly ONE resolution strategy for the detected violation
+- Generate exactly ONE resolution strategy for EACH detected violation
+- Return one strategy for every requirement_id listed above
+- Preserve the exact requirement_id from each violation
+- Do not generate strategies for unknown requirement IDs
 - Return ONLY valid JSON
 - Do not use markdown
 - Do not use code fences
 - Do not add explanatory text outside the JSON
 - Ensure the response is parseable using json.loads()
+
+Return a JSON object using exactly this top-level structure:
+
+{{
+  "resolution_strategies": [
+    {{
+      "requirement_id": "R2",
+      "resolution_strategy_id": "R2_RS1",
+      "resolution_strategy": "Description of the repair strategy"
+    }}
+  ]
+}}
 """
 
 
@@ -476,66 +495,94 @@ def generate_resolution_strategy(
 # Output normalization
 # ==========================================================
 
-def normalize_resolution_strategies(
-    requirement_id: str,
+def normalize_batch_resolution_strategies(
+    violations: list[dict[str, Any]],
     generated_result: Any,
 ) -> list[dict[str, Any]]:
     """
-    Normalize model output into a flat strategy list.
+    Normalize and validate strategies generated for a batch of
+    violations.
+
+    Exactly one strategy must be returned for every expected
+    requirement ID.
     """
 
-    if isinstance(
-        generated_result,
-        dict,
-    ):
-        nested_strategies = (
-            generated_result.get(
-                "resolution_strategies"
-            )
+    if not isinstance(generated_result, dict):
+        raise TypeError(
+            "The model output must be a JSON object."
         )
 
-        if isinstance(
-            nested_strategies,
-            list,
-        ):
-            raw_strategies = (
-                nested_strategies
-            )
-        else:
-            raw_strategies = [
-                generated_result
-            ]
+    raw_strategies = generated_result.get(
+        "resolution_strategies"
+    )
 
-    elif isinstance(
-        generated_result,
-        list,
+    if not isinstance(raw_strategies, list):
+        raise ValueError(
+            "The model output must contain a "
+            "'resolution_strategies' list."
+        )
+
+    expected_requirement_ids = [
+        violation["requirement_id"].strip()
+        for violation in violations
+    ]
+
+    expected_requirement_id_set = set(
+        expected_requirement_ids
+    )
+
+    if len(expected_requirement_id_set) != len(
+        expected_requirement_ids
     ):
-        raw_strategies = generated_result
+        raise ValueError(
+            "The violations list contains duplicate "
+            "requirement IDs."
+        )
 
-    else:
-        raw_strategies = [
-            {
-                "resolution_strategy":
-                    generated_result
-            }
-        ]
-
-    normalized: list[
-        dict[str, Any]
-    ] = []
+    normalized_by_requirement_id: dict[
+        str,
+        dict[str, Any],
+    ] = {}
 
     for index, strategy in enumerate(
-        raw_strategies,
-        start=1,
+        raw_strategies
     ):
-        if not isinstance(
-            strategy,
-            dict,
+        if not isinstance(strategy, dict):
+            raise TypeError(
+                f"Resolution strategy at index {index} must "
+                "be a JSON object."
+            )
+
+        requirement_id = strategy.get(
+            "requirement_id"
+        )
+
+        if (
+            not isinstance(requirement_id, str)
+            or not requirement_id.strip()
         ):
-            strategy = {
-                "resolution_strategy":
-                    strategy
-            }
+            raise ValueError(
+                f"Resolution strategy at index {index} has "
+                "no valid 'requirement_id'."
+            )
+
+        requirement_id = requirement_id.strip()
+
+        if requirement_id not in (
+            expected_requirement_id_set
+        ):
+            raise ValueError(
+                "The model returned a strategy for an unknown "
+                f"requirement ID: {requirement_id!r}."
+            )
+
+        if requirement_id in (
+            normalized_by_requirement_id
+        ):
+            raise ValueError(
+                "The model returned more than one strategy for "
+                f"requirement ID {requirement_id!r}."
+            )
 
         cleaned_strategy = {
             key: value
@@ -557,17 +604,39 @@ def normalize_resolution_strategies(
         ):
             cleaned_strategy[
                 "resolution_strategy_id"
-            ] = f"{requirement_id}_RS{index}"
+            ] = f"{requirement_id}_RS1"
+        else:
+            cleaned_strategy[
+                "resolution_strategy_id"
+            ] = strategy_id.strip()
 
-        normalized.append(
-            {
-                "requirement_id":
-                    requirement_id,
-                **cleaned_strategy,
-            }
+        normalized_by_requirement_id[
+            requirement_id
+        ] = {
+            "requirement_id": requirement_id,
+            **cleaned_strategy,
+        }
+
+    missing_requirement_ids = [
+        requirement_id
+        for requirement_id in expected_requirement_ids
+        if requirement_id
+        not in normalized_by_requirement_id
+    ]
+
+    if missing_requirement_ids:
+        raise ValueError(
+            "The model did not return a strategy for the "
+            "following requirement IDs: "
+            + ", ".join(missing_requirement_ids)
         )
 
-    return normalized
+    return [
+        normalized_by_requirement_id[
+            requirement_id
+        ]
+        for requirement_id in expected_requirement_ids
+    ]
 
 
 # ==========================================================
@@ -582,7 +651,11 @@ def generate_resolution_strategies(
     prompt_file: str | Path | None = None,
 ) -> list[dict[str, Any]]:
     """
-    Generate resolution strategies completely in memory.
+    Generate one resolution strategy per violation using one model
+    request.
+
+    The simplified PST is included only once in the model prompt,
+    rather than once for every violation.
 
     Parameters
     ----------
@@ -590,7 +663,8 @@ def generate_resolution_strategies(
         Original XML PST content.
 
     compliance_result : dict
-        Parsed compliance result containing violations and context.
+        Parsed compliance result containing violations and compliant
+        context requirements.
 
     api_key : str | None
         Optional OpenRouter API key. When omitted, the
@@ -606,7 +680,7 @@ def generate_resolution_strategies(
     Returns
     -------
     list[dict[str, Any]]
-        Generated normalized resolution strategies.
+        One normalized resolution strategy for every violation.
 
     Notes
     -----
@@ -623,10 +697,11 @@ def generate_resolution_strategies(
         )
     )
 
-    resolved_api_key = (
-        get_openrouter_api_key(
-            api_key
-        )
+    if not violations:
+        return []
+
+    resolved_api_key = get_openrouter_api_key(
+        api_key
     )
 
     base_prompt = load_prompt(
@@ -638,53 +713,24 @@ def generate_resolution_strategies(
         validated_pst
     )
 
-    accumulated_strategies: list[
-        dict[str, Any]
-    ] = []
+    complete_prompt = build_batch_prompt(
+        base_prompt=base_prompt,
+        pst=simplified_pst,
+        violations=violations,
+        resolution_context=resolution_context,
+    )
 
-    for index, violation in enumerate(
-        violations,
-        start=1,
-    ):
-        requirement_id = violation[
-            "requirement_id"
-        ]
+    print(
+        "Generating resolution strategies for "
+        f"{len(violations)} violation(s) in one request..."
+    )
 
-        print(
-            f"[{index}/{len(violations)}] "
-            f"Generating strategy for "
-            f"{requirement_id}..."
-        )
+    generated_result = generate_resolution_strategy(
+        api_key=resolved_api_key,
+        prompt=complete_prompt,
+    )
 
-        complete_prompt = build_prompt(
-            base_prompt=base_prompt,
-            pst=simplified_pst,
-            violation=violation,
-            resolution_context=(
-                resolution_context
-            ),
-        )
-
-        generated_result = (
-            generate_resolution_strategy(
-                api_key=resolved_api_key,
-                prompt=complete_prompt,
-            )
-        )
-
-        normalized = (
-            normalize_resolution_strategies(
-                requirement_id=(
-                    requirement_id
-                ),
-                generated_result=(
-                    generated_result
-                ),
-            )
-        )
-
-        accumulated_strategies.extend(
-            normalized
-        )
-
-    return accumulated_strategies
+    return normalize_batch_resolution_strategies(
+        violations=violations,
+        generated_result=generated_result,
+    )
