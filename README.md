@@ -13,8 +13,7 @@ The prototype is currently being extended into:
 
 > **PC-VERA: Process Compliance Verification, Extraction, and Repair Architecture**
 
-PC-VERA integrates violation identification, repair generation, process transformation, and validation into a web-based demonstration architecture.
-
+PC-VERA brings requirement extraction, compliance verification, and process repair together in a web-based architecture.
 ---
 
 ## Run the API
