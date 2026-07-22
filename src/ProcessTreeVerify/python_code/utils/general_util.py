@@ -24,15 +24,11 @@ def readable(node):
     """
     Converts XML elements into readable labels for logging.
     """
-
     if node is None:
         return "None"
-
     if isinstance(node, str):
         return node
-
     if isinstance(node, ET.Element):
-
         #
         # Search label without namespace dependency
         #
@@ -40,17 +36,11 @@ def readable(node):
             if elem.tag.endswith("label"):
                 if elem.text and elem.text.strip():
                     return elem.text.strip()
-
         condition = node.attrib.get("condition")
-
         if condition:
             return f'condition="{condition}"'
-
         return node.tag.split("}")[-1]
-
     return str(node)
-
-
 
 def transform_log(log, call_id = "local testing", cpee_instance = "local testing"):
     instance = None
