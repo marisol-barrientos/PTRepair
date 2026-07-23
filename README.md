@@ -15,8 +15,6 @@ The prototype is currently being extended into:
 
 PC-VERA brings requirement extraction, compliance verification, and process repair together in a web-based architecture.
 
----
-
 ## Run the API
 
 Install the dependencies:
@@ -43,18 +41,21 @@ Open the interactive API documentation:
 http://localhost:8000/docs
 ```
 
+
 ---
 
 ## Endpoints
 
 ### `GET /health`
 
-Returns the current service status.
+Returns the current service status and API version.
+
+#### Example response
 
 ```json
 {
   "status": "running",
-  "version": "1.3.0"
+  "version": "1.4.0"
 }
 ```
 
@@ -72,7 +73,6 @@ Send a `multipart/form-data` request containing one file:
 |---|---|
 | `file` | YAML compliance log with a `.yaml` or `.yml` extension |
 
-
 #### Example request
 
 ```bash
@@ -82,6 +82,8 @@ curl -X POST \
 ```
 
 #### Output
+
+The endpoint returns a JSON object with two arrays:
 
 ```json
 {
@@ -93,11 +95,15 @@ curl -X POST \
 - `violations` contains requirements that were not satisfied.
 - `context` contains requirements that were satisfied.
 
+The exact fields inside each violation or context item depend on the compliance-verification component.
+
 ---
 
 ### `POST /comprepair/repair`
 
 Generates, applies, and validates repair strategies.
+
+Each generated strategy is applied independently to a fresh in-memory copy of the original PST. A failure in one strategy does not stop the remaining strategies.
 
 #### Input
 
@@ -117,7 +123,7 @@ The `original_pst` file contains the process model to repair.
 </process>
 ```
 
-The `compliance_result` file must contain a JSON object with two arrays:
+The `compliance_result` file must contain a JSON object with both `violations` and `context` arrays:
 
 ```json
 {
@@ -139,16 +145,20 @@ The `compliance_result` file must contain a JSON object with two arrays:
 }
 ```
 
-The file may contain the complete JSON response returned by `/comprepair/violations`:
+The complete JSON response returned by `/comprepair/violations` can be used directly:
 
 ```json
 {
-  "violations": [...],
-  "context": [...]
+  "violations": ["..."],
+  "context": ["..."]
 }
 ```
 
-Additional top-level fields are accepted, but `violations` and `context` must both be present as arrays.
+Additional top-level fields are accepted, but:
+
+- `violations` must be present and must be an array.
+- `context` must be present and must be an array.
+- The JSON file must use UTF-8 encoding.
 
 #### Example request
 
@@ -159,7 +169,64 @@ curl -X POST \
   -F "compliance_result=@compliance_result.json"
 ```
 
-#### Output
+---
+
+## Resolution Strategy Schema
+
+The strategy-generation component produces resolution strategies with the following structure:
+
+```json
+{
+  "resolution_strategies": [
+    {
+      "requirement_id": "Identifier of the violated requirement.",
+      "resolution_strategy_id": "Unique identifier of the resolution strategy.",
+      "change_description": "Brief summary of the proposed process changes.",
+      "change_risk": {
+        "value": "very_low",
+        "reason": "Explanation of the assigned risk level and its possible impact."
+      },
+      "change_operations": [
+        {
+          "operation": "Name of the change operation.",
+          "parameters": {
+            "parameter_name": "Parameter value required by the operation."
+          }
+        }
+      ]
+    }
+  ]
+}
+```
+
+`change_risk.value` must be one of:
+
+```text
+very_low
+low
+medium
+high
+very_high
+```
+
+Each `resolution_strategy_id` must be unique within one repair request.
+
+Every change operation must contain:
+
+- `operation`: a supported operation name
+- `parameters`: an object containing the parameters required by that operation
+
+The required parameter names depend on the selected operation.
+
+---
+
+## Repair Output
+
+The endpoint returns one JSON object containing a `resolution_strategies` array.
+
+Each item combines the generated resolution strategy with its application and validation result.
+
+#### Example successful result
 
 ```json
 {
@@ -167,7 +234,21 @@ curl -X POST \
     {
       "requirement_id": "R2",
       "resolution_strategy_id": "R2_RS1",
-      "change_operations": [],
+      "change_description": "Insert a review activity after the approval activity.",
+      "change_risk": {
+        "value": "low",
+        "reason": "The change adds one activity without restructuring the surrounding control flow."
+      },
+      "change_operations": [
+        {
+          "operation": "insert_after",
+          "parameters": {
+            "target_activity_label": "Approve request",
+            "new_activity_label": "Review approval"
+          }
+        }
+      ],
+      "status": "success",
       "pst_xml": "<?xml version=\"1.0\" encoding=\"utf-8\"?>...",
       "validation": {
         "behavioral_validator": "success",
@@ -184,29 +265,112 @@ curl -X POST \
 }
 ```
 
-Each item in `resolution_strategies` combines:
+Each result can contain the following fields:
 
-- the generated strategy
-- its change operations
-- the repaired PST
-- explicit validator outcomes
-- validation warnings
-- error information
-- the processing log
+| Field | Description |
+|---|---|
+| `requirement_id` | Identifier of the violated requirement |
+| `resolution_strategy_id` | Unique identifier of the strategy |
+| `change_description` | Summary of the proposed repair |
+| `change_risk` | Assigned risk value and explanation |
+| `change_operations` | Ordered operations used to repair the PST |
+| `status` | Overall result: `success`, `warning`, or `error` |
+| `pst_xml` | Repaired PST as a UTF-8 XML string, or `null` |
+| `validation` | Individual validator outcomes and warnings |
+| `failed_operation` | Name of the operation that failed, when available |
+| `error_type` | Exception type for an application failure |
+| `error_message` | Description of the application failure |
+| `log` | Text log for the strategy |
 
-If a strategy cannot be applied:
+---
 
-- `pst_xml` is `null`
-- `failed_operation` may identify the operation that failed
-- `error_type` contains the exception type
-- `error_message` contains the error description
-- validator values remain `"not_executed"`
+## Result Statuses
 
-For applied strategies, `pst_xml` contains the repaired PST as a UTF-8 XML string.
+### `success`
 
-Each strategy is applied independently to a fresh copy of the original PST. An error in one strategy does not stop the remaining strategies.
+The strategy was applied and all validators completed without warnings.
 
-The endpoint returns JSON. Repaired PSTs can be displayed or downloaded by the web interface.
+```json
+{
+  "status": "success",
+  "validation": {
+    "behavioral_validator": "success",
+    "pst_validator": "success",
+    "structural_validator": "success",
+    "warnings": []
+  }
+}
+```
+
+### `warning`
+
+The strategy was applied and a repaired PST was generated, but one or more validators reported warnings.
+
+```json
+{
+  "status": "warning",
+  "pst_xml": "<?xml version=\"1.0\" encoding=\"utf-8\"?>...",
+  "validation": {
+    "behavioral_validator": "warning",
+    "pst_validator": "success",
+    "structural_validator": "success",
+    "warnings": [
+      "BehavioralValidator: Example validation warning"
+    ]
+  }
+}
+```
+
+Results with warnings still contain `pst_xml`.
+
+### `error`
+
+The strategy could not be applied.
+
+```json
+{
+  "status": "error",
+  "pst_xml": null,
+  "validation": {
+    "behavioral_validator": "not_executed",
+    "pst_validator": "not_executed",
+    "structural_validator": "not_executed",
+    "warnings": []
+  },
+  "failed_operation": "insert_after",
+  "error_type": "ValueError",
+  "error_message": "Target activity was not found.",
+  "log": "..."
+}
+```
+
+For failed strategies:
+
+- `status` is `error`.
+- `pst_xml` is `null`.
+- `failed_operation` may identify the operation that failed.
+- `error_type` contains the exception type.
+- `error_message` contains the error description.
+- Validator values remain `not_executed`.
+
+---
+
+## Processing Behavior
+
+The repair pipeline performs the following steps:
+
+1. Validate the original PST input.
+2. Validate the compliance result.
+3. Generate resolution strategies.
+4. Validate the complete resolution-strategy schema.
+5. Apply each strategy to a fresh copy of the original PST.
+6. Run behavioral, PST, and structural validation.
+7. Combine the original strategy metadata with the application result.
+8. Convert repaired PST bytes to UTF-8 strings for the API response.
+
+All processing is performed in memory. The repair pipeline does not write generated strategies, repaired PSTs, or logs to disk.
+
+The endpoint returns JSON. Repaired PST strings can be displayed directly or saved as XML files by a client application.
 
 ---
 
@@ -214,12 +378,12 @@ The endpoint returns JSON. Repaired PSTs can be displayed or downloaded by the w
 
 Typical HTTP status codes:
 
-- `400`: invalid file or input content
-- `422`: required multipart field is missing
-- `500`: unexpected server error
+- `400`: invalid file extension, malformed input, invalid schema, or unsupported content
+- `422`: a required multipart field is missing
+- `500`: unexpected server or processing error
 - `502`: external strategy-generation request failed
 
-Example:
+#### Example
 
 ```json
 {
@@ -227,7 +391,22 @@ Example:
 }
 ```
 
+Other input errors may include:
+
+```json
+{
+  "detail": "The compliance result field 'violations' must be a list."
+}
+```
+
+```json
+{
+  "detail": "The compliance result is not valid JSON. Line 4, column 2: Expecting property name enclosed in double quotes"
+}
+```
+
 ---
+
 
 ## Current Status
 

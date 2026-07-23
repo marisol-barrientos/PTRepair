@@ -1,5 +1,6 @@
 import io
 import json
+from functools import partial
 from typing import Any
 
 from fastapi import (
@@ -21,10 +22,13 @@ from src.step_0_preprocessing.identify_violations import (
 )
 
 
+API_VERSION = "1.4.0"
+
+
 app = FastAPI(
     title="CompRepair API",
     description="Compliance Repair Web Service",
-    version="1.3.0",
+    version=API_VERSION,
 )
 
 
@@ -37,12 +41,21 @@ app.add_middleware(
 )
 
 
+# ============================================================
+# INPUT PARSING
+# ============================================================
+
 def parse_compliance_result(
     content: bytes,
 ) -> dict[str, Any]:
     """
     Decode and parse an uploaded compliance-result JSON file.
     """
+
+    if not isinstance(content, bytes):
+        raise TypeError(
+            "The compliance result content must be provided as bytes."
+        )
 
     if not content.strip():
         raise ValueError(
@@ -72,15 +85,36 @@ def parse_compliance_result(
             "The compliance result must contain a JSON object."
         )
 
+    violations = result.get("violations")
+    context = result.get("context")
+
+    if not isinstance(violations, list):
+        raise TypeError(
+            "The compliance result field 'violations' must be a list."
+        )
+
+    if not isinstance(context, list):
+        raise TypeError(
+            "The compliance result field 'context' must be a list."
+        )
+
     return result
 
+
+# ============================================================
+# BASIC ENDPOINTS
+# ============================================================
 
 @app.get(
     "/",
     response_class=HTMLResponse,
 )
-async def root():
-    return """
+async def root() -> str:
+    """
+    Return a minimal service landing page.
+    """
+
+    return f"""
     <html>
         <head>
             <title>CompRepair API</title>
@@ -90,6 +124,7 @@ async def root():
             <h2>CompRepair API</h2>
 
             <p><b>Status:</b> Running</p>
+            <p><b>Version:</b> {API_VERSION}</p>
 
             <h3>Available endpoints</h3>
 
@@ -109,22 +144,32 @@ async def root():
 
 
 @app.get("/health")
-async def health():
+async def health() -> dict[str, str]:
+    """
+    Return the current API status and version.
+    """
+
     return {
         "status": "running",
-        "version": "1.3.0",
+        "version": API_VERSION,
     }
 
+
+# ============================================================
+# VIOLATION IDENTIFICATION
+# ============================================================
 
 @app.post("/comprepair/violations")
 async def identify_endpoint(
     file: UploadFile = File(...),
-):
+) -> JSONResponse:
     """
     Upload a YAML event log and identify violations and context.
 
-    Returns the detected violations and the requirements that are
-    currently satisfied.
+    Returns a JSON object containing:
+
+    - violations
+    - context
     """
 
     filename = file.filename or ""
@@ -157,6 +202,11 @@ async def identify_endpoint(
             file_stream,
         )
 
+        if not isinstance(result, dict):
+            raise TypeError(
+                "Violation identification returned an invalid result."
+            )
+
         violations = result.get(
             "violations",
             [],
@@ -166,6 +216,18 @@ async def identify_endpoint(
             "context",
             [],
         )
+
+        if not isinstance(violations, list):
+            raise TypeError(
+                "Violation identification returned an invalid "
+                "'violations' value."
+            )
+
+        if not isinstance(context, list):
+            raise TypeError(
+                "Violation identification returned an invalid "
+                "'context' value."
+            )
 
         return JSONResponse(
             content={
@@ -199,31 +261,44 @@ async def identify_endpoint(
         await file.close()
 
 
+# ============================================================
+# REPAIR
+# ============================================================
+
 @app.post("/comprepair/repair")
 async def repair_endpoint(
     original_pst: UploadFile = File(...),
     compliance_result: UploadFile = File(...),
-):
+) -> JSONResponse:
     """
-    Upload an original PST XML and a compliance-result JSON file.
+    Upload an original PST XML file and a compliance-result JSON file.
 
-    Returns one ``resolution_strategies`` array as JSON.
+    Returns a JSON object containing one ``resolution_strategies``
+    array.
 
-    Each item combines the generated strategy with its application
-    and validation result, including:
+    Each resolution strategy may contain:
 
-    - change operations
+    - requirement_id
+    - resolution_strategy_id
+    - change_description
+    - change_risk
+    - change_operations
+    - status
     - repaired PST XML
-    - explicit validator outcomes
+    - validator outcomes
     - validation warnings
+    - failed-operation details
     - error information
     - processing log
 
-    No separate ``results`` array or general result status field is
-    returned.
+    Possible ``status`` values are:
+
+    - success
+    - warning
+    - error
 
     When a repaired PST is available, ``pst_xml`` is returned as a
-    UTF-8 string so it can be displayed directly in JavaScript.
+    UTF-8 string so it can be consumed directly by a JSON client.
     """
 
     pst_filename = (
@@ -273,11 +348,33 @@ async def repair_endpoint(
             )
         )
 
-        repair_result = await run_in_threadpool(
+        repair_call = partial(
             repair,
-            pst_bytes,
-            compliance_data,
+            original_pst=pst_bytes,
+            compliance_result=compliance_data,
         )
+
+        repair_result = await run_in_threadpool(
+            repair_call
+        )
+
+        if not isinstance(repair_result, dict):
+            raise TypeError(
+                "The repair pipeline returned an invalid result."
+            )
+
+        resolution_strategies = repair_result.get(
+            "resolution_strategies"
+        )
+
+        if not isinstance(
+            resolution_strategies,
+            list,
+        ):
+            raise TypeError(
+                "The repair pipeline result must contain a "
+                "'resolution_strategies' list."
+            )
 
         return JSONResponse(
             content=repair_result,

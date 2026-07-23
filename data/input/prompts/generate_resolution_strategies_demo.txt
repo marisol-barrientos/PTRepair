@@ -378,11 +378,8 @@ not contain additional text outside the JSON structure.
   "resolution_strategies": [
     {
       "requirement_id": "Identifier of the violated requirement.",
-
       "resolution_strategy_id": "Unique identifier of the resolution strategy.",
-
       "change_description": "Brief summary of the proposed process changes.",
-
       "change_risk": {
         "value": "very_low | low | medium | high | very_high",
         "reason": "Explanation of the assigned risk level and its possible impact."
