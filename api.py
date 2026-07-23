@@ -42,20 +42,18 @@ app.add_middleware(
 
 
 # ============================================================
-# INPUT PARSING
+# INPUT HELPERS
 # ============================================================
 
 def parse_compliance_result(
     content: bytes,
 ) -> dict[str, Any]:
     """
-    Decode and parse an uploaded compliance-result JSON file.
-    """
+    Decode an uploaded UTF-8 JSON compliance result.
 
-    if not isinstance(content, bytes):
-        raise TypeError(
-            "The compliance result content must be provided as bytes."
-        )
+    Structural validation of ``violations`` and ``context`` is owned
+    by the repair pipeline.
+    """
 
     if not content.strip():
         raise ValueError(
@@ -63,15 +61,14 @@ def parse_compliance_result(
         )
 
     try:
-        text = content.decode("utf-8")
+        result = json.loads(
+            content.decode("utf-8")
+        )
 
     except UnicodeDecodeError as error:
         raise ValueError(
             "The compliance result must use UTF-8 encoding."
         ) from error
-
-    try:
-        result = json.loads(text)
 
     except json.JSONDecodeError as error:
         raise ValueError(
@@ -85,20 +82,29 @@ def parse_compliance_result(
             "The compliance result must contain a JSON object."
         )
 
-    violations = result.get("violations")
-    context = result.get("context")
-
-    if not isinstance(violations, list):
-        raise TypeError(
-            "The compliance result field 'violations' must be a list."
-        )
-
-    if not isinstance(context, list):
-        raise TypeError(
-            "The compliance result field 'context' must be a list."
-        )
-
     return result
+
+
+def require_extension(
+    upload: UploadFile,
+    allowed_extensions: tuple[str, ...],
+    error_message: str,
+) -> None:
+    """
+    Validate an uploaded filename extension.
+    """
+
+    filename = (
+        upload.filename or ""
+    ).lower()
+
+    if not filename.endswith(
+        allowed_extensions
+    ):
+        raise HTTPException(
+            status_code=400,
+            detail=error_message,
+        )
 
 
 # ============================================================
@@ -165,25 +171,18 @@ async def identify_endpoint(
 ) -> JSONResponse:
     """
     Upload a YAML event log and identify violations and context.
-
-    Returns a JSON object containing:
-
-    - violations
-    - context
     """
 
-    filename = file.filename or ""
-
-    if not filename.lower().endswith(
-        (".yaml", ".yml")
-    ):
-        raise HTTPException(
-            status_code=400,
-            detail=(
-                "The uploaded event log must be "
-                "a YAML file."
-            ),
-        )
+    require_extension(
+        upload=file,
+        allowed_extensions=(
+            ".yaml",
+            ".yml",
+        ),
+        error_message=(
+            "The uploaded event log must be a YAML file."
+        ),
+    )
 
     try:
         file_content = await file.read()
@@ -193,46 +192,21 @@ async def identify_endpoint(
                 "The uploaded event log is empty."
             )
 
-        file_stream = io.BytesIO(
-            file_content
-        )
-
         result = await run_in_threadpool(
             identify_violations,
-            file_stream,
+            io.BytesIO(file_content),
         )
-
-        if not isinstance(result, dict):
-            raise TypeError(
-                "Violation identification returned an invalid result."
-            )
-
-        violations = result.get(
-            "violations",
-            [],
-        )
-
-        context = result.get(
-            "context",
-            [],
-        )
-
-        if not isinstance(violations, list):
-            raise TypeError(
-                "Violation identification returned an invalid "
-                "'violations' value."
-            )
-
-        if not isinstance(context, list):
-            raise TypeError(
-                "Violation identification returned an invalid "
-                "'context' value."
-            )
 
         return JSONResponse(
             content={
-                "violations": violations,
-                "context": context,
+                "violations": result.get(
+                    "violations",
+                    [],
+                ),
+                "context": result.get(
+                    "context",
+                    [],
+                ),
             },
             headers={
                 "Cache-Control": "no-store",
@@ -273,10 +247,13 @@ async def repair_endpoint(
     """
     Upload an original PST XML file and a compliance-result JSON file.
 
-    Returns a JSON object containing one ``resolution_strategies``
-    array.
+    Returns:
 
-    Each resolution strategy may contain:
+    {
+        "resolution_strategies": [...]
+    }
+
+    Each strategy result may include:
 
     - requirement_id
     - resolution_strategy_id
@@ -284,51 +261,33 @@ async def repair_endpoint(
     - change_risk
     - change_operations
     - status
-    - repaired PST XML
-    - validator outcomes
-    - validation warnings
-    - failed-operation details
-    - error information
-    - processing log
-
-    Possible ``status`` values are:
-
-    - success
-    - warning
-    - error
-
-    When a repaired PST is available, ``pst_xml`` is returned as a
-    UTF-8 string so it can be consumed directly by a JSON client.
+    - pst_xml
+    - validation
+    - failed_operation
+    - error_type
+    - error_message
+    - log
     """
 
-    pst_filename = (
-        original_pst.filename or ""
+    require_extension(
+        upload=original_pst,
+        allowed_extensions=(
+            ".xml",
+        ),
+        error_message=(
+            "The original PST must be an XML file."
+        ),
     )
 
-    result_filename = (
-        compliance_result.filename or ""
+    require_extension(
+        upload=compliance_result,
+        allowed_extensions=(
+            ".json",
+        ),
+        error_message=(
+            "The compliance result must be a JSON file."
+        ),
     )
-
-    if not pst_filename.lower().endswith(
-        ".xml"
-    ):
-        raise HTTPException(
-            status_code=400,
-            detail=(
-                "The original PST must be an XML file."
-            ),
-        )
-
-    if not result_filename.lower().endswith(
-        ".json"
-    ):
-        raise HTTPException(
-            status_code=400,
-            detail=(
-                "The compliance result must be "
-                "a JSON file."
-            ),
-        )
 
     try:
         pst_bytes = await original_pst.read()
@@ -338,43 +297,17 @@ async def repair_endpoint(
                 "The uploaded PST is empty."
             )
 
-        compliance_bytes = (
+        compliance_data = parse_compliance_result(
             await compliance_result.read()
         )
 
-        compliance_data = (
-            parse_compliance_result(
-                compliance_bytes
-            )
-        )
-
-        repair_call = partial(
-            repair,
-            original_pst=pst_bytes,
-            compliance_result=compliance_data,
-        )
-
         repair_result = await run_in_threadpool(
-            repair_call
-        )
-
-        if not isinstance(repair_result, dict):
-            raise TypeError(
-                "The repair pipeline returned an invalid result."
+            partial(
+                repair,
+                original_pst=pst_bytes,
+                compliance_result=compliance_data,
             )
-
-        resolution_strategies = repair_result.get(
-            "resolution_strategies"
         )
-
-        if not isinstance(
-            resolution_strategies,
-            list,
-        ):
-            raise TypeError(
-                "The repair pipeline result must contain a "
-                "'resolution_strategies' list."
-            )
 
         return JSONResponse(
             content=repair_result,

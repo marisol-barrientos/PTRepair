@@ -1,7 +1,8 @@
 import io
-from typing import Any
+from typing import Any, Callable
 
 from lxml import etree
+
 
 # ============================================================
 # PROJECT IMPORTS
@@ -58,11 +59,12 @@ from src.step_2_apply_validate_resolution_strategies.change_operations.operation
     swap,
 )
 
+
 # ============================================================
-# CHANGE OPERATION MAPPING
+# CHANGE OPERATION CONFIGURATION
 # ============================================================
 
-OPERATION_MAPPING = {
+OPERATION_MAPPING: dict[str, Callable[..., Any]] = {
     "insert_after": insert_after,
     "insert_before": insert_before,
     "delete": delete,
@@ -93,11 +95,8 @@ OPERATION_MAPPING = {
     "modify_timeout": modify_timeout,
 }
 
-# ============================================================
-# OPERATION PARAMETER ORDER
-# ============================================================
 
-OPERATION_PARAMETERS = {
+OPERATION_PARAMETERS: dict[str, tuple[str, ...]] = {
     "insert_after": (
         "target_activity_label",
         "new_activity_label",
@@ -213,12 +212,21 @@ OPERATION_PARAMETERS = {
 }
 
 
+ALLOWED_RISK_VALUES = {
+    "very_low",
+    "low",
+    "medium",
+    "high",
+    "very_high",
+}
+
+
 # ============================================================
 # INPUT VALIDATION
 # ============================================================
 
 def validate_original_pst(
-        original_pst: bytes,
+    original_pst: bytes,
 ) -> bytes:
     """
     Validate the original PST byte content.
@@ -237,11 +245,13 @@ def validate_original_pst(
     return original_pst
 
 
-def _require_non_empty_string(
-        value: Any,
-        field_path: str,
+def require_non_empty_string(
+    value: Any,
+    field_path: str,
 ) -> str:
-    """Validate and normalize a required non-empty string."""
+    """
+    Validate and normalize a required non-empty string.
+    """
 
     if not isinstance(value, str) or not value.strip():
         raise ValueError(
@@ -251,42 +261,131 @@ def _require_non_empty_string(
     return value.strip()
 
 
-def validate_resolution_strategies(
-        resolution_strategies: (
-                list[dict[str, Any]]
-                | dict[str, Any]
-        ),
+def normalize_resolution_strategies(
+    resolution_strategies: (
+        list[dict[str, Any]]
+        | dict[str, Any]
+    ),
 ) -> list[dict[str, Any]]:
     """
-    Validate generated resolution strategies supplied in memory.
-
-    Both of the following input forms are accepted:
-
-    1. A plain list of strategy dictionaries.
-    2. The complete schema envelope::
-
-           {"resolution_strategies": [...]}
-
-    Every strategy is validated against the complete expected schema.
+    Normalize the supported strategy input forms to a plain list.
     """
 
     if isinstance(resolution_strategies, dict):
-        resolution_strategies = (
-            resolution_strategies.get(
+        try:
+            resolution_strategies = resolution_strategies[
                 "resolution_strategies"
-            )
-        )
+            ]
+
+        except KeyError as error:
+            raise ValueError(
+                "The strategy object is missing "
+                "'resolution_strategies'."
+            ) from error
 
     if not isinstance(resolution_strategies, list):
         raise TypeError(
-            "Resolution strategies must be provided as a list "
-            "or as {'resolution_strategies': [...]}."
+            "Resolution strategies must be a list."
         )
+
+    return resolution_strategies
+
+
+def validate_change_risk(
+    change_risk: Any,
+    field_path: str,
+) -> None:
+    """
+    Validate one change-risk object.
+    """
+
+    if not isinstance(change_risk, dict):
+        raise TypeError(
+            f"'{field_path}' must be a dictionary."
+        )
+
+    risk_value = require_non_empty_string(
+        change_risk.get("value"),
+        f"{field_path}.value",
+    )
+
+    if risk_value not in ALLOWED_RISK_VALUES:
+        raise ValueError(
+            f"'{field_path}.value' has unsupported value "
+            f"'{risk_value}'."
+        )
+
+    require_non_empty_string(
+        change_risk.get("reason"),
+        f"{field_path}.reason",
+    )
+
+
+def build_operation_arguments(
+    operation_name: str,
+    parameters: Any,
+    field_path: str,
+) -> list[Any]:
+    """
+    Validate operation parameters and return positional arguments.
+    """
+
+    if not isinstance(parameters, dict):
+        raise TypeError(
+            f"'{field_path}' must be a dictionary."
+        )
+
+    required_parameters = OPERATION_PARAMETERS[
+        operation_name
+    ]
+
+    arguments: list[Any] = []
+
+    for parameter_name in required_parameters:
+        if parameter_name not in parameters:
+            raise ValueError(
+                f"'{field_path}' is missing required parameter "
+                f"'{parameter_name}'."
+            )
+
+        value = parameters[parameter_name]
+
+        if value is None:
+            raise ValueError(
+                f"'{field_path}.{parameter_name}' must not be null."
+            )
+
+        if isinstance(value, str) and not value.strip():
+            raise ValueError(
+                f"'{field_path}.{parameter_name}' must not be empty."
+            )
+
+        arguments.append(value)
+
+    return arguments
+
+
+def validate_resolution_strategies(
+    resolution_strategies: (
+        list[dict[str, Any]]
+        | dict[str, Any]
+    ),
+) -> list[dict[str, Any]]:
+    """
+    Validate the complete resolution-strategy schema.
+
+    Operation parameter validation is delegated to
+    ``build_operation_arguments`` so parameter rules have one owner.
+    """
+
+    strategies = normalize_resolution_strategies(
+        resolution_strategies
+    )
 
     seen_strategy_ids: set[str] = set()
 
     for strategy_index, strategy in enumerate(
-            resolution_strategies
+        strategies
     ):
         strategy_path = (
             f"resolution_strategies[{strategy_index}]"
@@ -297,32 +396,12 @@ def validate_resolution_strategies(
                 f"'{strategy_path}' must be a dictionary."
             )
 
-        required_strategy_fields = {
-            "requirement_id",
-            "resolution_strategy_id",
-            "change_description",
-            "change_risk",
-            "change_operations",
-        }
-
-        missing_strategy_fields = (
-                required_strategy_fields - set(strategy)
-        )
-
-        if missing_strategy_fields:
-            raise ValueError(
-                f"'{strategy_path}' is missing required fields: "
-                + ", ".join(
-                    sorted(missing_strategy_fields)
-                )
-            )
-
-        requirement_id = _require_non_empty_string(
+        requirement_id = require_non_empty_string(
             strategy.get("requirement_id"),
             f"{strategy_path}.requirement_id",
         )
 
-        strategy_id = _require_non_empty_string(
+        strategy_id = require_non_empty_string(
             strategy.get("resolution_strategy_id"),
             f"{strategy_path}.resolution_strategy_id",
         )
@@ -335,76 +414,34 @@ def validate_resolution_strategies(
 
         seen_strategy_ids.add(strategy_id)
 
-        _require_non_empty_string(
+        require_non_empty_string(
             strategy.get("change_description"),
             f"{strategy_path}.change_description",
         )
 
-        change_risk = strategy.get("change_risk")
-
-        if not isinstance(change_risk, dict):
-            raise TypeError(
-                f"'{strategy_path}.change_risk' must be "
-                "a dictionary."
-            )
-
-        missing_risk_fields = {
-                                  "value",
-                                  "reason",
-                              } - set(change_risk)
-
-        if missing_risk_fields:
-            raise ValueError(
-                f"'{strategy_path}.change_risk' is missing "
-                "required fields: "
-                + ", ".join(sorted(missing_risk_fields))
-            )
-
-        risk_value = _require_non_empty_string(
-            change_risk.get("value"),
-            f"{strategy_path}.change_risk.value",
+        validate_change_risk(
+            strategy.get("change_risk"),
+            f"{strategy_path}.change_risk",
         )
 
-        allowed_risk_values = {
-            "very_low",
-            "low",
-            "medium",
-            "high",
-            "very_high",
-        }
-
-        if risk_value not in allowed_risk_values:
-            raise ValueError(
-                f"'{strategy_path}.change_risk.value' has "
-                f"unsupported value '{risk_value}'. Allowed "
-                "values: "
-                + ", ".join(sorted(allowed_risk_values))
-                + "."
-            )
-
-        _require_non_empty_string(
-            change_risk.get("reason"),
-            f"{strategy_path}.change_risk.reason",
-        )
-
-        change_operations = strategy.get(
+        operations = strategy.get(
             "change_operations"
         )
 
-        if not isinstance(change_operations, list):
+        if not isinstance(operations, list):
             raise TypeError(
-                f"'{strategy_path}.change_operations' must "
-                "be a list."
+                f"'{strategy_path}.change_operations' "
+                "must be a list."
             )
 
-        if not change_operations:
+        if not operations:
             raise ValueError(
-                f"'{strategy_path}.change_operations' must "
-                "contain at least one operation."
+                f"'{strategy_path}.change_operations' "
+                "must contain at least one operation."
             )
 
         for operation_index, operation_data in enumerate(
-                change_operations
+            operations
         ):
             operation_path = (
                 f"{strategy_path}.change_operations"
@@ -416,113 +453,47 @@ def validate_resolution_strategies(
                     f"'{operation_path}' must be a dictionary."
                 )
 
-            missing_operation_fields = {
-                                           "operation",
-                                           "parameters",
-                                       } - set(operation_data)
-
-            if missing_operation_fields:
-                raise ValueError(
-                    f"'{operation_path}' is missing required "
-                    "fields: "
-                    + ", ".join(
-                        sorted(missing_operation_fields)
-                    )
-                )
-
-            operation_name = _require_non_empty_string(
+            operation_name = require_non_empty_string(
                 operation_data.get("operation"),
                 f"{operation_path}.operation",
             )
 
             if operation_name not in OPERATION_MAPPING:
                 raise ValueError(
-                    f"'{operation_path}.operation' contains "
-                    f"unsupported operation '{operation_name}'. "
-                    "Supported operations: "
-                    + ", ".join(sorted(OPERATION_MAPPING))
-                    + "."
+                    f"Unsupported operation '{operation_name}' "
+                    f"at '{operation_path}'."
                 )
 
-            parameters = operation_data.get("parameters")
-
-            if not isinstance(parameters, dict):
-                raise TypeError(
-                    f"'{operation_path}.parameters' must be "
-                    "a dictionary."
-                )
-
-            required_parameters = OPERATION_PARAMETERS.get(
-                operation_name
+            build_operation_arguments(
+                operation_name=operation_name,
+                parameters=operation_data.get("parameters"),
+                field_path=f"{operation_path}.parameters",
             )
 
-            if required_parameters is None:
-                raise ValueError(
-                    "Parameter mapping is missing for operation: "
-                    f"'{operation_name}'."
-                )
-
-            missing_parameters = [
-                parameter_name
-                for parameter_name in required_parameters
-                if parameter_name not in parameters
-            ]
-
-            if missing_parameters:
-                raise ValueError(
-                    f"'{operation_path}.parameters' is missing "
-                    "required parameters: "
-                    + ", ".join(missing_parameters)
-                    + "."
-                )
-
-            for parameter_name in required_parameters:
-                parameter_value = parameters[parameter_name]
-
-                if parameter_value is None:
-                    raise ValueError(
-                        f"'{operation_path}.parameters."
-                        f"{parameter_name}' must not be null."
-                    )
-
-                if (
-                        isinstance(parameter_value, str)
-                        and not parameter_value.strip()
-                ):
-                    raise ValueError(
-                        f"'{operation_path}.parameters."
-                        f"{parameter_name}' must not be empty."
-                    )
-
-    return resolution_strategies
+    return strategies
 
 
 # ============================================================
-# IN-MEMORY XML HANDLING
+# XML HANDLING
 # ============================================================
 
 def load_process_from_bytes(
-        xml_bytes: bytes,
+    xml_bytes: bytes,
 ) -> tuple[
     etree._ElementTree,
     etree._Element,
 ]:
     """
-    Parse an XML process model entirely in memory.
-
-    A new tree is created each time this function is called, ensuring
-    that every strategy starts from the unchanged original PST.
+    Parse one fresh in-memory PST tree.
     """
 
     try:
-        parser = etree.XMLParser(
-            remove_blank_text=True,
-            recover=False,
-        )
-
         tree = etree.parse(
             io.BytesIO(xml_bytes),
-            parser,
+            etree.XMLParser(
+                remove_blank_text=True,
+                recover=False,
+            ),
         )
 
     except etree.XMLSyntaxError as error:
@@ -541,7 +512,7 @@ def load_process_from_bytes(
 
 
 def serialize_pst(
-        tree: etree._ElementTree,
+    tree: etree._ElementTree,
 ) -> bytes:
     """
     Serialize an updated PST to XML bytes.
@@ -556,260 +527,121 @@ def serialize_pst(
 
 
 # ============================================================
-# OPERATION ARGUMENTS
+# UPDATED PST VALIDATION
 # ============================================================
 
-def build_operation_arguments(
-        operation_name: str,
-        parameters: dict[str, Any],
-) -> list[Any]:
+def run_validator(
+    validator_name: str,
+    validator: Any,
+    current_root: Any,
+) -> tuple[str, list[str]]:
     """
-    Build positional arguments required by a change operation.
+    Run one validator and normalize its output.
+
+    Validators may either:
+    - return no warnings,
+    - return an iterable of warnings,
+    - raise an exception.
     """
 
-    required_parameters = OPERATION_PARAMETERS.get(
-        operation_name
+    try:
+        returned_warnings = (
+            validator.validate(current_root)
+            or []
+        )
+
+    except Exception as error:
+        return (
+            "warning",
+            [f"{validator_name}: {error}"],
+        )
+
+    if isinstance(returned_warnings, str):
+        returned_warnings = [
+            returned_warnings
+        ]
+
+    warnings = [
+        f"{validator_name}: {warning}"
+        for warning in returned_warnings
+    ]
+
+    return (
+        "warning" if warnings else "success",
+        warnings,
     )
 
-    if required_parameters is None:
-        raise ValueError(
-            f"Argument mapping is missing for operation: "
-            f"{operation_name}"
-        )
-
-    missing_parameters = [
-        parameter_name
-        for parameter_name in required_parameters
-        if parameter_name not in parameters
-    ]
-
-    if missing_parameters:
-        raise ValueError(
-            f"Operation '{operation_name}' is missing "
-            f"required parameters: "
-            f"{', '.join(missing_parameters)}"
-        )
-
-    return [
-        parameters[parameter_name]
-        for parameter_name in required_parameters
-    ]
-
-
-# ============================================================
-# VALIDATION
-# ============================================================
 
 def validate_updated_pst(
-        current_root: Any,
-        behavioral_validator: BehavioralValidator,
-        pst_validator: PSTValidator,
-        structural_validator: StructuralValidator,
+    current_root: Any,
+    behavioral_validator: BehavioralValidator,
+    pst_validator: PSTValidator,
+    structural_validator: StructuralValidator,
 ) -> dict[str, Any]:
     """
-    Validate an updated PST and return each validator outcome.
+    Run all PST validators and return normalized outcomes.
     """
 
     validation: dict[str, Any] = {
-        "behavioral_validator": "success",
-        "pst_validator": "success",
-        "structural_validator": "success",
         "warnings": [],
     }
 
-    try:
-        behavioral_validator.validate(
-            current_root
+    validators = (
+        (
+            "behavioral_validator",
+            "BehavioralValidator",
+            behavioral_validator,
+        ),
+        (
+            "pst_validator",
+            "PSTValidator",
+            pst_validator,
+        ),
+        (
+            "structural_validator",
+            "StructuralValidator",
+            structural_validator,
+        ),
+    )
+
+    for result_key, display_name, validator in validators:
+        status, warnings = run_validator(
+            validator_name=display_name,
+            validator=validator,
+            current_root=current_root,
         )
 
-    except Exception as error:
-        validation["behavioral_validator"] = "warning"
-        validation["warnings"].append(
-            f"BehavioralValidator: {error}"
-        )
-
-    try:
-        pst_validator.validate(
-            current_root
-        )
-
-    except Exception as error:
-        validation["pst_validator"] = "warning"
-        validation["warnings"].append(
-            f"PSTValidator: {error}"
-        )
-
-    try:
-        structural_warnings = (
-            structural_validator.validate(
-                current_root
-            )
-        )
-
-        if structural_warnings:
-            validation["structural_validator"] = "warning"
-
-            for warning in structural_warnings:
-                validation["warnings"].append(
-                    f"StructuralValidator: {warning}"
-                )
-
-    except Exception as error:
-        validation["structural_validator"] = "warning"
-        validation["warnings"].append(
-            f"StructuralValidator: {error}"
+        validation[result_key] = status
+        validation["warnings"].extend(
+            warnings
         )
 
     return validation
 
 
 # ============================================================
-# LOG CONSTRUCTION
+# RESULT CONSTRUCTION
 # ============================================================
 
-def build_result_log(
-        result: dict[str, Any],
-) -> str:
-    """
-    Build a simple in-memory log for one strategy.
-    """
-
-    requirement_id = result[
-        "requirement_id"
-    ]
-
-    strategy_id = result[
-        "resolution_strategy_id"
-    ]
-
-    validation = result.get(
-        "validation",
-        {},
-    )
-
-    has_error = result.get(
-        "error_message"
-    ) is not None
-
-    has_warnings = bool(
-        validation.get(
-            "warnings",
-            [],
-        )
-    )
-
-    change_description = result.get(
-        "change_description",
-        "",
-    )
-
-    change_risk = result.get(
-        "change_risk",
-        {},
-    )
-
-    lines = [
-        f"requirement_id: {requirement_id}",
-        f"resolution_strategy_id: {strategy_id}",
-        f"change_description: {change_description}",
-        f"change_risk: {change_risk.get('value', '')}",
-        f"change_risk_reason: {change_risk.get('reason', '')}",
-    ]
-
-    if has_error:
-        lines.append(
-            "result: error"
-        )
-
-        failed_operation = result.get(
-            "failed_operation"
-        )
-
-        error_type = result.get(
-            "error_type"
-        )
-
-        error_message = result.get(
-            "error_message"
-        )
-
-        if failed_operation:
-            lines.append(
-                f"failed_operation: {failed_operation}"
-            )
-
-        if error_type:
-            lines.append(
-                f"error_type: {error_type}"
-            )
-
-        lines.append(
-            f"error: {error_message or 'Unknown error'}"
-        )
-
-    elif has_warnings:
-        lines.append(
-            "result: applied_with_validation_warnings"
-        )
-
-        lines.append("warnings:")
-
-        for warning in validation.get(
-                "warnings",
-                [],
-        ):
-            lines.append(
-                f"- {warning}"
-            )
-
-    else:
-        lines.append(
-            "result: applied_successfully"
-        )
-
-    return "\n".join(lines) + "\n"
-
-
-# ============================================================
-# APPLY ONE STRATEGY
-# ============================================================
-
-def apply_one_strategy(
-        original_pst: bytes,
-        strategy: dict[str, Any],
-        applier: ChangeApplier,
-        operation_validator: ChangeOperationValidator,
-        behavioral_validator: BehavioralValidator,
-        pst_validator: PSTValidator,
-        structural_validator: StructuralValidator,
+def create_result(
+    strategy: dict[str, Any],
 ) -> dict[str, Any]:
     """
-    Apply one strategy to a fresh in-memory copy of the original PST.
-
-    Application errors are returned in the result and do not stop
-    the processing of remaining strategies.
+    Create the initial result object for one strategy.
     """
 
-    requirement_id = strategy[
-        "requirement_id"
-    ]
-
-    strategy_id = strategy[
-        "resolution_strategy_id"
-    ]
-
-    result: dict[str, Any] = {
-        "requirement_id": requirement_id,
-        "resolution_strategy_id": strategy_id,
-        "change_description": strategy[
-            "change_description"
-        ],
-        "change_risk": strategy[
-            "change_risk"
-        ],
-        "change_operations": strategy[
-            "change_operations"
-        ],
+    return {
+        "requirement_id": strategy["requirement_id"],
+        "resolution_strategy_id": (
+            strategy["resolution_strategy_id"]
+        ),
+        "change_description": (
+            strategy["change_description"]
+        ),
+        "change_risk": strategy["change_risk"],
+        "change_operations": (
+            strategy["change_operations"]
+        ),
         "status": "error",
         "pst_xml": None,
         "validation": {
@@ -824,77 +656,136 @@ def apply_one_strategy(
         "log": "",
     }
 
-    try:
-        tree, current_root = (
-            load_process_from_bytes(
-                original_pst
+
+def set_result_error(
+    result: dict[str, Any],
+    error: Exception,
+    failed_operation: str | None = None,
+) -> None:
+    """
+    Store one application error in a strategy result.
+    """
+
+    result["status"] = "error"
+    result["failed_operation"] = failed_operation
+    result["error_type"] = type(error).__name__
+    result["error_message"] = str(error)
+
+
+def build_result_log(
+    result: dict[str, Any],
+) -> str:
+    """
+    Build an in-memory text log for one strategy.
+    """
+
+    change_risk = result.get(
+        "change_risk",
+        {},
+    )
+
+    lines = [
+        f"requirement_id: {result['requirement_id']}",
+        (
+            "resolution_strategy_id: "
+            f"{result['resolution_strategy_id']}"
+        ),
+        (
+            "change_description: "
+            f"{result.get('change_description', '')}"
+        ),
+        (
+            "change_risk: "
+            f"{change_risk.get('value', '')}"
+        ),
+        (
+            "change_risk_reason: "
+            f"{change_risk.get('reason', '')}"
+        ),
+        f"result: {result['status']}",
+    ]
+
+    if result["status"] == "error":
+        if result.get("failed_operation"):
+            lines.append(
+                "failed_operation: "
+                f"{result['failed_operation']}"
             )
+
+        if result.get("error_type"):
+            lines.append(
+                f"error_type: {result['error_type']}"
+            )
+
+        lines.append(
+            "error: "
+            f"{result.get('error_message') or 'Unknown error'}"
         )
 
-        for operation_index, operation_data in enumerate(
-                strategy["change_operations"],
-                start=1,
-        ):
-            operation_name = None
+    elif result["status"] == "warning":
+        lines.append("warnings:")
+
+        for warning in result["validation"]["warnings"]:
+            lines.append(
+                f"- {warning}"
+            )
+
+    return "\n".join(lines) + "\n"
+
+
+# ============================================================
+# APPLY ONE STRATEGY
+# ============================================================
+
+def apply_one_strategy(
+    original_pst: bytes,
+    strategy: dict[str, Any],
+    applier: ChangeApplier,
+    operation_validator: ChangeOperationValidator,
+    behavioral_validator: BehavioralValidator,
+    pst_validator: PSTValidator,
+    structural_validator: StructuralValidator,
+) -> dict[str, Any]:
+    """
+    Apply one strategy to a fresh copy of the original PST.
+
+    Application failures are returned in the result so remaining
+    strategies continue to run.
+    """
+
+    result = create_result(
+        strategy
+    )
+
+    try:
+        tree, current_root = load_process_from_bytes(
+            original_pst
+        )
+
+        for operation_data in strategy[
+            "change_operations"
+        ]:
+            operation_name = operation_data[
+                "operation"
+            ]
 
             try:
-                if not isinstance(
-                        operation_data,
-                        dict,
-                ):
-                    raise TypeError(
-                        f"Operation {operation_index} "
-                        "must be a dictionary."
-                    )
-
-                operation_name = operation_data.get(
-                    "operation"
-                )
-
-                parameters = operation_data.get(
-                    "parameters"
-                )
-
-                if (
-                        not isinstance(operation_name, str)
-                        or not operation_name.strip()
-                ):
-                    raise ValueError(
-                        f"Operation {operation_index} has "
-                        "no valid 'operation' name."
-                    )
-
-                if not isinstance(
-                        parameters,
-                        dict,
-                ):
-                    raise TypeError(
-                        f"Parameters for operation "
-                        f"'{operation_name}' must be "
-                        "a dictionary."
-                    )
-
-                operation_function = (
-                    OPERATION_MAPPING.get(
-                        operation_name
-                    )
-                )
-
-                if operation_function is None:
-                    raise ValueError(
-                        f"Unsupported operation: "
-                        f"{operation_name}"
-                    )
+                operation_function = OPERATION_MAPPING[
+                    operation_name
+                ]
 
                 operation_validator.validate(
                     operation_function
                 )
 
-                arguments = (
-                    build_operation_arguments(
-                        operation_name=operation_name,
-                        parameters=parameters,
-                    )
+                arguments = build_operation_arguments(
+                    operation_name=operation_name,
+                    parameters=operation_data[
+                        "parameters"
+                    ],
+                    field_path=(
+                        f"operation '{operation_name}' parameters"
+                    ),
                 )
 
                 current_root, _ = applier.apply(
@@ -904,61 +795,44 @@ def apply_one_strategy(
                 )
 
             except Exception as error:
-                result["failed_operation"] = (
-                    operation_name
+                set_result_error(
+                    result=result,
+                    error=error,
+                    failed_operation=operation_name,
                 )
 
-                result["error_type"] = (
-                    type(error).__name__
-                )
+                break
 
-                result["error_message"] = str(
-                    error
-                )
-
-                raise
-
-        tree._setroot(
-            current_root
-        )
-
-        validation = validate_updated_pst(
-            current_root=current_root,
-            behavioral_validator=behavioral_validator,
-            pst_validator=pst_validator,
-            structural_validator=structural_validator,
-        )
-
-        result["pst_xml"] = serialize_pst(
-            tree
-        )
-
-        result["validation"] = validation
-
-        has_warnings = any(
-            validator_status == "warning"
-            for validator_status in (
-                validation["behavioral_validator"],
-                validation["pst_validator"],
-                validation["structural_validator"],
+        if result["status"] != "error" or (
+            result["error_message"] is None
+        ):
+            tree._setroot(
+                current_root
             )
-        )
 
-        result["status"] = (
-            "warning"
-            if has_warnings
-            else "success"
-        )
+            validation = validate_updated_pst(
+                current_root=current_root,
+                behavioral_validator=behavioral_validator,
+                pst_validator=pst_validator,
+                structural_validator=structural_validator,
+            )
+
+            result["pst_xml"] = serialize_pst(
+                tree
+            )
+
+            result["validation"] = validation
+            result["status"] = (
+                "warning"
+                if validation["warnings"]
+                else "success"
+            )
 
     except Exception as error:
-        if result["error_type"] is None:
-            result["error_type"] = (
-                type(error).__name__
-            )
-
         if result["error_message"] is None:
-            result["error_message"] = str(
-                error
+            set_result_error(
+                result=result,
+                error=error,
             )
 
     result["log"] = build_result_log(
@@ -973,77 +847,38 @@ def apply_one_strategy(
 # ============================================================
 
 def apply_resolution_strategies(
-        original_pst: bytes,
-        resolution_strategies: (
-                list[dict[str, Any]]
-                | dict[str, Any]
-        ),
+    original_pst: bytes,
+    resolution_strategies: (
+        list[dict[str, Any]]
+        | dict[str, Any]
+    ),
 ) -> list[dict[str, Any]]:
     """
-    Apply all resolution strategies entirely in memory.
+    Apply and validate all resolution strategies in memory.
 
-    Each strategy starts from a fresh copy of the original PST.
-
-    Parameters
-    ----------
-    original_pst : bytes
-        Original XML PST content.
-
-    resolution_strategies : list[dict[str, Any]] | dict[str, Any]
-        Strategies returned directly by
-        generate_resolution_strategies(). Both a plain list and the
-        {"resolution_strategies": [...]} envelope are accepted.
-
-    Returns
-    -------
-    list[dict[str, Any]]
-        One result per strategy.
-
-        Successful and warning results contain ``pst_xml`` bytes.
-        Every result contains an in-memory ``log`` string.
-
-    Notes
-    -----
-    This function performs no output file creation.
+    Every strategy starts from a fresh copy of the original PST.
     """
 
     validated_pst = validate_original_pst(
         original_pst
     )
 
-    validated_strategies = (
-        validate_resolution_strategies(
-            resolution_strategies
-        )
+    strategies = validate_resolution_strategies(
+        resolution_strategies
     )
 
     applier = ChangeApplier()
-
-    operation_validator = (
-        ChangeOperationValidator()
-    )
-
-    behavioral_validator = (
-        BehavioralValidator()
-    )
-
+    operation_validator = ChangeOperationValidator()
+    behavioral_validator = BehavioralValidator()
     pst_validator = PSTValidator()
+    structural_validator = StructuralValidator()
 
-    structural_validator = (
-        StructuralValidator()
-    )
-
-    results: list[
-        dict[str, Any]
-    ] = []
-
-    total = len(
-        validated_strategies
-    )
+    results: list[dict[str, Any]] = []
+    total = len(strategies)
 
     for index, strategy in enumerate(
-            validated_strategies,
-            start=1,
+        strategies,
+        start=1,
     ):
         result = apply_one_strategy(
             original_pst=validated_pst,
@@ -1057,19 +892,9 @@ def apply_resolution_strategies(
 
         results.append(result)
 
-        if result.get("error_message") is not None:
-            outcome = "error"
-        elif result.get(
-                "validation",
-                {},
-        ).get("warnings"):
-            outcome = "warning"
-        else:
-            outcome = "success"
-
         print(
             f"[{index}/{total}] "
-            f"Outcome: {outcome}"
+            f"Outcome: {result['status']}"
         )
 
     return results

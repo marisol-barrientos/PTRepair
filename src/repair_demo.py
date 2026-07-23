@@ -21,7 +21,9 @@ from src.step_2_apply_validate_resolution_strategies.apply_validate_resolution_s
 def validate_original_pst(
     original_pst: bytes,
 ) -> bytes:
-    """Validate the original PST content."""
+    """
+    Validate the original PST content.
+    """
 
     if not isinstance(original_pst, bytes):
         raise TypeError(
@@ -40,14 +42,7 @@ def validate_compliance_result(
     compliance_result: dict[str, Any],
 ) -> dict[str, Any]:
     """
-    Validate the compliance result structure.
-
-    Expected structure::
-
-        {
-            "violations": [...],
-            "context": [...]
-        }
+    Validate the compliance-result structure.
     """
 
     if not isinstance(compliance_result, dict):
@@ -55,28 +50,15 @@ def validate_compliance_result(
             "The compliance result must be a dictionary."
         )
 
-    required_fields = {
-        "violations",
-        "context",
-    }
+    try:
+        violations = compliance_result["violations"]
+        context = compliance_result["context"]
 
-    missing_fields = required_fields - set(
-        compliance_result
-    )
-
-    if missing_fields:
+    except KeyError as error:
         raise ValueError(
-            "The compliance result is missing required fields: "
-            + ", ".join(sorted(missing_fields))
-        )
-
-    violations = compliance_result.get(
-        "violations"
-    )
-
-    context = compliance_result.get(
-        "context"
-    )
+            "The compliance result is missing required field: "
+            f"'{error.args[0]}'."
+        ) from error
 
     if not isinstance(violations, list):
         raise TypeError(
@@ -102,313 +84,141 @@ def extract_resolution_strategies(
     ),
 ) -> list[dict[str, Any]]:
     """
-    Extract the strategy list from the generation result.
+    Return the generated resolution-strategy list.
 
-    Both supported generator return forms are accepted:
+    Accepted generator return forms:
 
     1. A plain list of strategy dictionaries.
-    2. The complete schema envelope::
-
-           {"resolution_strategies": [...]}
+    2. An object containing ``resolution_strategies``.
     """
 
     if isinstance(generated_value, dict):
-        if "resolution_strategies" not in generated_value:
+        try:
+            generated_value = generated_value[
+                "resolution_strategies"
+            ]
+
+        except KeyError as error:
             raise ValueError(
-                "The generated strategy object is missing the "
-                "'resolution_strategies' field."
-            )
+                "The generated strategy object is missing "
+                "'resolution_strategies'."
+            ) from error
 
-        strategies = generated_value.get(
-            "resolution_strategies"
-        )
-
-    else:
-        strategies = generated_value
-
-    if not isinstance(strategies, list):
+    if not isinstance(generated_value, list):
         raise TypeError(
-            "Generated resolution strategies must be a list or "
-            "an object containing a 'resolution_strategies' list."
+            "Generated resolution strategies must be a list."
         )
 
-    return strategies
+    return generated_value
 
 
 # ============================================================
 # STRATEGY AND RESULT COMBINATION
 # ============================================================
 
-def create_resolution_strategy_results(
+def combine_strategy_results(
     strategies: list[dict[str, Any]],
     results: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
     """
-    Combine generated strategies with their application results.
+    Combine generated strategies with application results.
 
-    Strategies and results are matched through
-    ``resolution_strategy_id``. Result values take precedence for
-    application-specific fields such as ``status``, ``pst_xml``,
-    validation output, errors, and logs.
+    The application layer is responsible for validating strategy
+    structure and returning exactly one result per strategy.
     """
 
-    if not isinstance(strategies, list):
-        raise TypeError(
-            "Strategies must be provided as a list."
-        )
+    results_by_id = {
+        result["resolution_strategy_id"]: result
+        for result in results
+    }
 
-    if not isinstance(results, list):
-        raise TypeError(
-            "Results must be provided as a list."
-        )
-
-    strategies_by_id: dict[
-        str,
-        dict[str, Any],
-    ] = {}
-
-    strategy_order: list[str] = []
-
-    for index, strategy in enumerate(strategies):
-        if not isinstance(strategy, dict):
-            raise TypeError(
-                f"Strategy at index {index} must be a dictionary."
-            )
-
-        strategy_id = strategy.get(
-            "resolution_strategy_id"
-        )
-
-        if (
-            not isinstance(strategy_id, str)
-            or not strategy_id.strip()
-        ):
-            raise ValueError(
-                f"Strategy at index {index} has no valid "
-                "'resolution_strategy_id'."
-            )
-
-        normalized_strategy_id = strategy_id.strip()
-
-        if normalized_strategy_id in strategies_by_id:
-            raise ValueError(
-                "Duplicate resolution strategy ID: "
-                f"{normalized_strategy_id}"
-            )
-
-        strategies_by_id[
-            normalized_strategy_id
-        ] = strategy
-
-        strategy_order.append(
-            normalized_strategy_id
-        )
-
-    results_by_id: dict[
-        str,
-        dict[str, Any],
-    ] = {}
-
-    for index, result in enumerate(results):
-        if not isinstance(result, dict):
-            raise TypeError(
-                f"Result at index {index} must be a dictionary."
-            )
-
-        strategy_id = result.get(
-            "resolution_strategy_id"
-        )
-
-        if (
-            not isinstance(strategy_id, str)
-            or not strategy_id.strip()
-        ):
-            raise ValueError(
-                f"Result at index {index} has no valid "
-                "'resolution_strategy_id'."
-            )
-
-        normalized_strategy_id = strategy_id.strip()
-
-        if normalized_strategy_id not in strategies_by_id:
-            raise ValueError(
-                "No generated strategy matches result ID: "
-                f"{normalized_strategy_id}"
-            )
-
-        if normalized_strategy_id in results_by_id:
-            raise ValueError(
-                "Duplicate application result for strategy ID: "
-                f"{normalized_strategy_id}"
-            )
-
-        results_by_id[
-            normalized_strategy_id
-        ] = result
-
-    missing_result_ids = [
-        strategy_id
-        for strategy_id in strategy_order
-        if strategy_id not in results_by_id
-    ]
-
-    if missing_result_ids:
-        raise ValueError(
-            "No application result was returned for strategy IDs: "
-            + ", ".join(missing_result_ids)
-        )
-
-    combined_strategies: list[
-        dict[str, Any]
-    ] = []
-
-    for strategy_id in strategy_order:
-        strategy = strategies_by_id[
-            strategy_id
-        ]
-
-        result = results_by_id[
-            strategy_id
-        ]
-
-        combined_strategies.append(
+    try:
+        return [
             {
                 **strategy,
-                **result,
+                **results_by_id[
+                    strategy["resolution_strategy_id"]
+                ],
             }
-        )
+            for strategy in strategies
+        ]
 
-    return combined_strategies
+    except KeyError as error:
+        raise RuntimeError(
+            "Could not match a generated strategy with its "
+            f"application result: '{error.args[0]}'."
+        ) from error
 
 
 # ============================================================
 # API RESULT SERIALIZATION
 # ============================================================
 
-def create_api_results(
+def serialize_results(
     results: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
     """
-    Convert combined resolution-strategy results into
-    JSON-serializable values.
+    Convert repaired PST byte values to UTF-8 strings.
 
-    ``pst_xml`` bytes are decoded to UTF-8 strings. The input result
-    dictionaries are not modified.
+    Input dictionaries are not modified.
     """
 
-    if not isinstance(results, list):
-        raise TypeError(
-            "Results must be provided as a list."
+    serialized_results: list[
+        dict[str, Any]
+    ] = []
+
+    for result in results:
+        serialized_result = dict(
+            result
         )
 
-    api_results: list[dict[str, Any]] = []
-
-    for index, result in enumerate(results):
-        if not isinstance(result, dict):
-            raise TypeError(
-                f"Result at index {index} must be a dictionary."
-            )
-
-        api_result = dict(result)
-
-        pst_xml = api_result.get(
+        pst_xml = serialized_result.get(
             "pst_xml"
         )
 
         if isinstance(pst_xml, bytes):
-            try:
-                api_result["pst_xml"] = pst_xml.decode(
-                    "utf-8"
-                )
-
-            except UnicodeDecodeError as error:
-                raise ValueError(
-                    "The generated PST XML for result at index "
-                    f"{index} is not valid UTF-8."
-                ) from error
-
-        elif pst_xml is not None and not isinstance(
-            pst_xml,
-            str,
-        ):
-            raise TypeError(
-                "The 'pst_xml' value for result at index "
-                f"{index} must be bytes, a string, or None."
+            serialized_result["pst_xml"] = (
+                pst_xml.decode("utf-8")
             )
 
-        api_results.append(
-            api_result
+        serialized_results.append(
+            serialized_result
         )
 
-    return api_results
+    return serialized_results
 
 
 # ============================================================
 # RESULT CLASSIFICATION
 # ============================================================
 
-def has_result_error(
-    result: dict[str, Any],
-) -> bool:
-    """Return whether a repair result contains an application error."""
-
-    return (
-        result.get("status") == "error"
-        or result.get("error_message") is not None
-    )
-
-
-def has_validation_warnings(
-    result: dict[str, Any],
-) -> bool:
-    """Return whether a non-error result has validation warnings."""
-
-    if has_result_error(result):
-        return False
-
-    if result.get("status") == "warning":
-        return True
-
-    validation = result.get(
-        "validation",
-        {},
-    )
-
-    if not isinstance(validation, dict):
-        return False
-
-    warnings = validation.get(
-        "warnings",
-        [],
-    )
-
-    return isinstance(warnings, list) and bool(
-        warnings
-    )
-
-
 def count_result_outcomes(
     results: list[dict[str, Any]],
 ) -> dict[str, int]:
-    """Count successful, warning, and error strategy results."""
+    """
+    Count strategy results by their explicit status.
+    """
 
-    errors = sum(
-        has_result_error(result)
-        for result in results
-    )
-
-    warnings = sum(
-        has_validation_warnings(result)
-        for result in results
-    )
-
-    successful = len(results) - warnings - errors
-
-    return {
-        "successful": successful,
-        "warnings": warnings,
-        "errors": errors,
+    counts = {
+        "success": 0,
+        "warning": 0,
+        "error": 0,
     }
+
+    for result in results:
+        status = result.get(
+            "status"
+        )
+
+        if status not in counts:
+            raise RuntimeError(
+                "Application result contains an unsupported "
+                f"status: {status!r}."
+            )
+
+        counts[status] += 1
+
+    return counts
 
 
 # ============================================================
@@ -442,7 +252,7 @@ def repair(
     Returns
     -------
     dict[str, Any]
-        A JSON-serializable object with the full strategy schema:
+        JSON-serializable repair output:
 
         {
             "resolution_strategies": [
@@ -468,6 +278,9 @@ def repair(
 
     Notes
     -----
+    The application layer owns complete resolution-strategy schema
+    validation and operation validation.
+
     This function performs no output-file creation.
     """
 
@@ -511,15 +324,13 @@ def repair(
         resolution_strategies=strategies,
     )
 
-    combined_strategies = (
-        create_resolution_strategy_results(
-            strategies=strategies,
-            results=internal_results,
-        )
+    combined_results = combine_strategy_results(
+        strategies=strategies,
+        results=internal_results,
     )
 
-    api_resolution_strategies = create_api_results(
-        combined_strategies
+    api_results = serialize_results(
+        combined_results
     )
 
     outcome_counts = count_result_outcomes(
@@ -533,17 +344,15 @@ def repair(
         f"Generated strategies: {len(strategies)}"
     )
     print(
-        f"Successful: {outcome_counts['successful']}"
+        f"Successful: {outcome_counts['success']}"
     )
     print(
-        f"Warnings: {outcome_counts['warnings']}"
+        f"Warnings: {outcome_counts['warning']}"
     )
     print(
-        f"Errors: {outcome_counts['errors']}"
+        f"Errors: {outcome_counts['error']}"
     )
 
     return {
-        "resolution_strategies": (
-            api_resolution_strategies
-        ),
+        "resolution_strategies": api_results,
     }
