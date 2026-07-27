@@ -16,7 +16,10 @@ from fastapi.responses import (
     JSONResponse,
 )
 
-from src.repair_demo import repair
+from src.repair_demo import (
+    repair,
+    repair_generate_only,
+)
 from src.step_0_preprocessing.identify_violations import (
     identify_violations,
 )
@@ -138,6 +141,7 @@ async def root() -> str:
                 <li>GET /health</li>
                 <li>POST /comprepair/violations</li>
                 <li>POST /comprepair/repair</li>
+                <li>POST /comprepair/repair_full</li>
             </ul>
 
             <p>
@@ -165,7 +169,7 @@ async def health() -> dict[str, str]:
 # VIOLATION IDENTIFICATION
 # ============================================================
 
-@app.post("/comprepair/violations")
+@app.post("/violations")
 async def identify_endpoint(
     file: UploadFile = File(...),
 ) -> JSONResponse:
@@ -239,8 +243,105 @@ async def identify_endpoint(
 # REPAIR
 # ============================================================
 
-@app.post("/comprepair/repair")
+@app.post("/repair")
 async def repair_endpoint(
+    original_pst: UploadFile = File(...),
+    compliance_result: UploadFile = File(...),
+) -> JSONResponse:
+    """
+    Upload an original PST XML file and a compliance-result JSON file.
+
+    Fast endpoint: generates only essential resolution-strategy fields.
+
+    Returns:
+
+    {
+        "resolution_strategies": [
+            {
+                "requirement_id": "...",
+                "resolution_strategy_id": "...",
+                "resolution_strategy": "...",  # if provided by model
+                "change_description": "..."    # if provided by model
+            }
+        ]
+    }
+    """
+
+    require_extension(
+        upload=original_pst,
+        allowed_extensions=(
+            ".xml",
+        ),
+        error_message=(
+            "The original PST must be an XML file."
+        ),
+    )
+
+    require_extension(
+        upload=compliance_result,
+        allowed_extensions=(
+            ".json",
+        ),
+        error_message=(
+            "The compliance result must be a JSON file."
+        ),
+    )
+
+    try:
+        pst_bytes = await original_pst.read()
+
+        if not pst_bytes.strip():
+            raise ValueError(
+                "The uploaded PST is empty."
+            )
+
+        compliance_data = parse_compliance_result(
+            await compliance_result.read()
+        )
+
+        repair_result = await run_in_threadpool(
+            partial(
+                repair_generate_only,
+                original_pst=pst_bytes,
+                compliance_result=compliance_data,
+            )
+        )
+
+        return JSONResponse(
+            content=repair_result,
+            headers={
+                "Cache-Control": "no-store",
+            },
+        )
+
+    except (
+        ValueError,
+        TypeError,
+    ) as error:
+        raise HTTPException(
+            status_code=400,
+            detail=str(error),
+        ) from error
+
+    except RuntimeError as error:
+        raise HTTPException(
+            status_code=502,
+            detail=str(error),
+        ) from error
+
+    except Exception as error:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Repair failed: {error}",
+        ) from error
+
+    finally:
+        await original_pst.close()
+        await compliance_result.close()
+
+
+@app.post("/repair_full")
+async def repair_full_endpoint(
     original_pst: UploadFile = File(...),
     compliance_result: UploadFile = File(...),
 ) -> JSONResponse:

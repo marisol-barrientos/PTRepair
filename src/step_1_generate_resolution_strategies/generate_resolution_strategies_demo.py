@@ -1,7 +1,7 @@
-import io
 import json
 import os
 import sys
+import tempfile
 from pathlib import Path
 from typing import Any
 
@@ -279,21 +279,35 @@ def simplify_pst_in_memory(
     original_pst: bytes,
 ) -> str:
     """
-    Simplify an XML PST without creating an output file.
+    Simplify an XML PST without persisting generated output files.
 
-    BytesIO provides a file-like object backed entirely by memory.
-
-    This assumes simplify_pst() accepts a path-like or file-like
-    object supported by the XML parser it uses.
+    The underlying simplify_pst() implementation expects a path-like
+    XML input, so a temporary XML file is used for compatibility.
     """
 
-    pst_stream = io.BytesIO(
-        original_pst
-    )
+    temp_xml_path: str | None = None
 
-    simplified_pst = simplify_pst(
-        pst_stream
-    )
+    try:
+        with tempfile.NamedTemporaryFile(
+            mode="wb",
+            suffix=".xml",
+            delete=False,
+        ) as temp_xml:
+            temp_xml.write(original_pst)
+            temp_xml_path = temp_xml.name
+
+        simplified_pst = simplify_pst(
+            temp_xml_path
+        )
+
+    finally:
+        if temp_xml_path:
+            try:
+                Path(temp_xml_path).unlink(
+                    missing_ok=True
+                )
+            except OSError:
+                pass
 
     if not isinstance(
         simplified_pst,

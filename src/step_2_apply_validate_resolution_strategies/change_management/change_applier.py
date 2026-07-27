@@ -1,7 +1,16 @@
 import copy
 
-from utils.sanity_checks import sanitize_process
-from validators.structural_validator import StructuralValidator
+try:
+    from ...utils.sanity_checks import sanitize_process
+    from ..validators.structural_validator import StructuralValidator
+except ImportError as error:
+    if "attempted relative import" not in str(error):
+        raise
+
+    from src.utils.sanity_checks import sanitize_process
+    from src.step_2_apply_validate_resolution_strategies.validators.structural_validator import (
+        StructuralValidator,
+    )
 
 
 class ChangeApplier:

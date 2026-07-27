@@ -1,4 +1,10 @@
-from utils.change_operations_utils import get_label, find_unique_by_label
+try:
+    from ...utils.change_operations_utils import get_label, find_unique_by_label
+except ImportError as error:
+    if "attempted relative import" not in str(error):
+        raise
+
+    from src.utils.change_operations_utils import get_label, find_unique_by_label
 import xml.etree.ElementTree as ET
 from lxml import etree as ET
 import copy

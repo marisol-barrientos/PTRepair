@@ -5,7 +5,7 @@ from typing import Any
 # PROJECT IMPORTS
 # ============================================================
 
-from src.step_1_generate_resolution_strategies.generate_resolution_strategies_demo import (
+from src.step_1_generate_resolution_strategies.generate_resolution_strategies_demo_gemini import (
     generate_resolution_strategies,
 )
 
@@ -355,4 +355,89 @@ def repair(
 
     return {
         "resolution_strategies": api_results,
+    }
+
+
+def _extract_essential_strategy_fields(
+    strategy: dict[str, Any],
+) -> dict[str, Any]:
+    """
+    Keep only the essential strategy fields for lightweight responses.
+    """
+
+    essential = {
+        "requirement_id": strategy.get("requirement_id"),
+        "resolution_strategy_id": strategy.get(
+            "resolution_strategy_id"
+        ),
+    }
+
+    if "resolution_strategy" in strategy:
+        essential["resolution_strategy"] = strategy[
+            "resolution_strategy"
+        ]
+
+    if "change_description" in strategy:
+        essential["change_description"] = strategy[
+            "change_description"
+        ]
+
+    return essential
+
+
+def repair_generate_only(
+    original_pst: bytes,
+    compliance_result: dict[str, Any],
+    api_key: str | None = None,
+    prompt: str | None = None,
+) -> dict[str, Any]:
+    """
+    Generate resolution strategies only, without applying or validating
+    them.
+
+    This path is intentionally lightweight and returns only essential
+    strategy fields.
+    """
+
+    validated_pst = validate_original_pst(
+        original_pst
+    )
+
+    validated_compliance_result = (
+        validate_compliance_result(
+            compliance_result
+        )
+    )
+
+    print("================================================")
+    print("STEP 1: GENERATE RESOLUTION STRATEGIES (FAST)")
+    print("================================================")
+
+    generated_value = generate_resolution_strategies(
+        original_pst=validated_pst,
+        compliance_result=(
+            validated_compliance_result
+        ),
+        api_key=api_key,
+        prompt=prompt,
+    )
+
+    strategies = extract_resolution_strategies(
+        generated_value
+    )
+
+    essential_strategies = [
+        _extract_essential_strategy_fields(
+            strategy
+        )
+        for strategy in strategies
+    ]
+
+    print(
+        "Generated strategies (fast path): "
+        f"{len(essential_strategies)}"
+    )
+
+    return {
+        "resolution_strategies": essential_strategies,
     }

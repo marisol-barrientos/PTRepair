@@ -5,13 +5,17 @@ from typing import Union
 
 try:
     # Used when imported as part of the package.
-    from .utils.xml_loader import load_xml
-    from .converter.cpee_to_simplified_pst import convert
-    from .utils.exporter import pst_to_dict, pst_to_text
+    from ..utils.xml_loader import load_xml
+    from ..step_1_generate_resolution_strategies.converter.cpee_to_simplified_pst import (
+        convert,
+    )
+    from ..utils.exporter import pst_to_dict, pst_to_text
 except ImportError:
     # Used when this file is executed directly.
     from utils.xml_loader import load_xml
-    from converter.cpee_to_simplified_pst import convert
+    from step_1_generate_resolution_strategies.converter.cpee_to_simplified_pst import (
+        convert,
+    )
     from utils.exporter import pst_to_dict, pst_to_text
 
 

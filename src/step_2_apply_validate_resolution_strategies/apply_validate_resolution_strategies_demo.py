@@ -434,11 +434,6 @@ def validate_resolution_strategies(
                 "must be a list."
             )
 
-        if not operations:
-            raise ValueError(
-                f"'{strategy_path}.change_operations' "
-                "must contain at least one operation."
-            )
 
         for operation_index, operation_data in enumerate(
             operations

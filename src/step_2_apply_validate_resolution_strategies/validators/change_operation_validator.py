@@ -1,4 +1,10 @@
-from change_operations.operations import *
+try:
+    from ..change_operations.operations import *
+except ImportError as error:
+    if "attempted relative import" not in str(error):
+        raise
+
+    from src.step_2_apply_validate_resolution_strategies.change_operations.operations import *
 
 
 class ChangeOperationValidator:

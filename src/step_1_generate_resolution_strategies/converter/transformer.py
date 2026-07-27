@@ -1,7 +1,17 @@
-from simplified_pst.simplified_pst import PSTNode
-from converter.data_extractor import extract_data_from_call
-from utils.xml_utils import strip_ns
-from utils.data_utils import parse_data_access
+try:
+    from ..simplified_pst.simplified_pst import PSTNode
+    from .data_extractor import extract_data_from_call
+    from ...utils.xml_utils import strip_ns
+    from ...utils.data_utils import parse_data_access
+except ImportError:
+    from step_1_generate_resolution_strategies.simplified_pst.simplified_pst import (
+        PSTNode,
+    )
+    from step_1_generate_resolution_strategies.converter.data_extractor import (
+        extract_data_from_call,
+    )
+    from utils.xml_utils import strip_ns
+    from utils.data_utils import parse_data_access
 
 
 # ------------------------

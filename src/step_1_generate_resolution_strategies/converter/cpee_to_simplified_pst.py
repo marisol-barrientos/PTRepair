@@ -1,6 +1,13 @@
-from converter.mapping import LEAF_TAGS
-from converter import transformer
-from simplified_pst.simplified_pst import PSTNode
+try:
+    from .mapping import LEAF_TAGS
+    from . import transformer
+    from ..simplified_pst.simplified_pst import PSTNode
+except ImportError:
+    from step_1_generate_resolution_strategies.converter.mapping import LEAF_TAGS
+    from step_1_generate_resolution_strategies.converter import transformer
+    from step_1_generate_resolution_strategies.simplified_pst.simplified_pst import (
+        PSTNode,
+    )
 
 
 def strip_ns(tag):
