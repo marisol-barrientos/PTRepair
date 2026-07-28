@@ -640,30 +640,35 @@ def modify_read(root, target_activity_label, old_variable_name, new_variable_nam
     }
 
 
+PROPERTIES_NS = "http://cpee.org/ns/properties/2.0"
 DESCRIPTION_NS = "http://cpee.org/ns/description/1.0"
+
 
 def get_process_description(root):
     """
-    Return the CPEE process description.
+    Return the inner CPEE process description element.
 
-    Supports either:
-      <description>...</description>
+    Expected structure:
 
-    or:
-      <description>
-        <description xmlns="http://cpee.org/ns/description/1.0">
-          ...
+      <testset xmlns="http://cpee.org/ns/properties/2.0">
+        <description>
+          <description xmlns="http://cpee.org/ns/description/1.0">
+            ...
+          </description>
         </description>
-      </description>
+      </testset>
     """
-    outer = root.find("./description")
+    outer = root.find(f"./{{{PROPERTIES_NS}}}description")
 
     if outer is None:
         raise ValueError("Top-level process description not found")
 
     inner = outer.find(f"./{{{DESCRIPTION_NS}}}description")
 
-    return inner if inner is not None else outer
+    if inner is None:
+        raise ValueError("Inner CPEE process description not found")
+
+    return inner
 
 def parallelize(root, first_activity_label, second_activity_label):
 
