@@ -643,30 +643,37 @@ def modify_read(root, target_activity_label, old_variable_name, new_variable_nam
 PROPERTIES_NS = "http://cpee.org/ns/properties/2.0"
 DESCRIPTION_NS = "http://cpee.org/ns/description/1.0"
 
+PROPERTIES_DESCRIPTION = f"{{{PROPERTIES_NS}}}description"
+PROCESS_DESCRIPTION = f"{{{DESCRIPTION_NS}}}description"
+TESTSET = f"{{{PROPERTIES_NS}}}testset"
 
-def get_process_description(root):
-    """
-    Return the inner CPEE process description element.
 
-    Expected structure:
+def get_process_description(xml):
+    if isinstance(xml, ET.ElementTree):
+        root = xml.getroot()
+    else:
+        root = xml
 
-      <testset xmlns="http://cpee.org/ns/properties/2.0">
-        <description>
-          <description xmlns="http://cpee.org/ns/description/1.0">
-            ...
-          </description>
-        </description>
-      </testset>
-    """
-    outer = root.find(f"./{{{PROPERTIES_NS}}}description")
+    if root is None:
+        raise ValueError("XML root is None")
 
-    if outer is None:
-        raise ValueError("Top-level process description not found")
+    if root.tag == PROCESS_DESCRIPTION:
+        return root
 
-    inner = outer.find(f"./{{{DESCRIPTION_NS}}}description")
+    if root.tag == PROPERTIES_DESCRIPTION:
+        inner = root.find(PROCESS_DESCRIPTION)
+    elif root.tag == TESTSET:
+        inner = root.find(
+            f"./{PROPERTIES_DESCRIPTION}/{PROCESS_DESCRIPTION}"
+        )
+    else:
+        inner = root.find(f".//{PROCESS_DESCRIPTION}")
 
     if inner is None:
-        raise ValueError("Inner CPEE process description not found")
+        raise ValueError(
+            "CPEE process description not found. "
+            f"Received root tag: {root.tag!r}"
+        )
 
     return inner
 
