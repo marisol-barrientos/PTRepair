@@ -640,22 +640,30 @@ def modify_read(root, target_activity_label, old_variable_name, new_variable_nam
     }
 
 
+DESCRIPTION_NS = "http://cpee.org/ns/description/1.0"
+
 def get_process_description(root):
     """
-    Returns the INNER process description node:
-    <description xmlns="http://cpee.org/ns/description/1.0">
+    Return the CPEE process description.
+
+    Supports either:
+      <description>...</description>
+
+    or:
+      <description>
+        <description xmlns="http://cpee.org/ns/description/1.0">
+          ...
+        </description>
+      </description>
     """
+    outer = root.find("./description")
 
-    desc = root.xpath(
-        "./p:description/d:description",
-        namespaces=NS
-    )
+    if outer is None:
+        raise ValueError("Top-level process description not found")
 
-    if not desc:
-        raise ValueError("Process description not found")
+    inner = outer.find(f"./{{{DESCRIPTION_NS}}}description")
 
-    return desc[0]
-
+    return inner if inner is not None else outer
 
 def parallelize(root, first_activity_label, second_activity_label):
 
