@@ -1,0 +1,7 @@
+<PROCESS>
+    <SEQUENCE>
+        <ACTIVITY label="Receive Order"/>
+        <ACTIVITY label="Confirm Order"/>
+        <ACTIVITY label="Ship Item"/>
+    </SEQUENCE>
+</PROCESS>

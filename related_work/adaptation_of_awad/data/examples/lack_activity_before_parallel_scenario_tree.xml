@@ -1,0 +1,15 @@
+<PROCESS>
+  <SEQUENCE label="root" condition="true">
+    <ACTIVITY label="receive application" />
+    <PARALLEL>
+      <SEQUENCE condition="true">
+        <ACTIVITY label="check documents" />
+      </SEQUENCE>
+      <SEQUENCE condition="true">
+        <ACTIVITY label="perform risk assessment" />
+      </SEQUENCE>
+    </PARALLEL>
+
+    <ACTIVITY label="approve request" />
+  </SEQUENCE>
+</PROCESS>

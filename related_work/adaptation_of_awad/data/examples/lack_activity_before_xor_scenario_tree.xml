@@ -1,0 +1,16 @@
+<PROCESS>
+  <SEQUENCE label="root" condition="true">
+    <ACTIVITY label="receive application" />
+
+    <XCHOICE>
+      <SEQUENCE condition="risk_low">
+        <ACTIVITY label="check documents" />
+      </SEQUENCE>
+      <SEQUENCE condition="risk_high">
+        <ACTIVITY label="perform risk assessment" />
+      </SEQUENCE>
+    </XCHOICE>
+
+    <ACTIVITY label="approve request" />
+  </SEQUENCE>
+</PROCESS>

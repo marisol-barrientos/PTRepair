@@ -1,0 +1,32 @@
+You are working in a compliance resolution context.
+
+The resolution context provides:
+- Activities involved in the violation
+- Preconditions and postconditions of these activities
+- Data dependencies between activities
+
+You are given:
+- A compliance violation
+- The violated compliance pattern
+- The resolution context
+
+Your tasks are:
+
+1. Analyze whether the resolution context is:
+   a) incomplete (e.g., missing required activities or data), or
+   b) inconsistent (e.g., contradicts the compliance pattern or required ordering)
+
+2. If needed, update the resolution context:
+   - Add missing activities or data elements
+   - Correct contradictions or invalid dependencies
+   - Ensure consistency with the compliance pattern
+
+Return your answer in the following structure:
+
+- Context status (complete / incomplete / inconsistent):
+- Resolution context update:
+- Justification:
+
+
+
+

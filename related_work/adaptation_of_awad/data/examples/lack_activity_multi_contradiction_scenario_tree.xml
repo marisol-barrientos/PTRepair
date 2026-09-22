@@ -1,0 +1,8 @@
+<PROCESS>
+  <SEQUENCE label="root" condition="true">
+    <ACTIVITY label="Receive Order" />
+    <ACTIVITY label="Confirm Order" />
+    <ACTIVITY label="Return Item" />
+    <ACTIVITY label="Cancel Order" />
+  </SEQUENCE>
+</PROCESS>

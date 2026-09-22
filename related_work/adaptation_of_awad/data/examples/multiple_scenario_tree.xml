@@ -1,0 +1,5 @@
+<PROCESS>
+    <SEQUENCE label="root" condition="true">
+        <ACTIVITY label="register patient" />
+    </SEQUENCE>
+</PROCESS>

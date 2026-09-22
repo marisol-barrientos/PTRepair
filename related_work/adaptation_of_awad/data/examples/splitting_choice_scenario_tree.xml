@@ -1,0 +1,17 @@
+<PROCESS>
+  <SEQUENCE label="root" condition="true">
+    <ACTIVITY label="receive application" />
+
+    <!-- split after A: either allow issuing, or choose the skip world -->
+    <XCHOICE>
+      <SEQUENCE condition="do_issue">
+        <ACTIVITY label="issue certificate" />
+      </SEQUENCE>
+
+      <!-- skip branch: no activities, only condition -->
+      <SEQUENCE condition="skip_issue">
+      </SEQUENCE>
+    </XCHOICE>
+
+  </SEQUENCE>
+</PROCESS>

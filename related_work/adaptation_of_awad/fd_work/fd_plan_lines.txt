@@ -1,0 +1,2 @@
+(execute_perform_clinical_examination1 patient diagnosis)
+(execute_start_treatment1 diagnosis diagnosis)

@@ -1,0 +1,33 @@
+You are working in a compliance resolution context.
+
+You are given:
+- A business process model
+- A compliance violation
+- The violated compliance pattern
+- The updated resolution context
+- A proposed compliant solution
+
+Your task is:
+
+1. Identify whether alternative valid fixes exist.
+2. Briefly compare them in terms of:
+   - modeling explicitness
+   - impact on control-flow
+   - impact on data dependencies
+   - minimality
+
+Return your answer in the following structure:
+
+- Alternative solutions:
+- Comparison:
+
+
+
+
+
+
+
+
+
+
+

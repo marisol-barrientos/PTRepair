@@ -1,0 +1,41 @@
+You are working in a compliance resolution context.
+
+The resolution context provides:
+- Activities involved in the violation
+- Preconditions and postconditions of these activities
+- Data dependencies between activities
+
+You are given:
+- A business process model
+- A compliance violation
+- The violated compliance pattern
+- The updated resolution context
+
+A solution is defined as:
+A minimal process change that restores compliance with the given pattern and is consistent with the resolution context (i.e., no broken data dependencies or invalid preconditions).
+
+Different solutions must differ structurally or semantically (e.g., different placement of activities, different structuring, or implicit vs. explicit realization).
+
+Your tasks are:
+
+1. Identify all valid minimal solutions to resolve the compliance violation, taking into account the resolution context.
+
+2. For each solution:
+   - Specify the required business process change pattern(s) (AP1–AP11)
+   - Indicate precisely where in the process the change should be applied
+
+Ensure that:
+- Each solution satisfies the given compliance pattern
+- Each solution is consistent with the resolution context
+- Each solution is minimal
+- Solutions are meaningfully distinct from each other
+
+Return your answer in the following structure:
+
+- Solutions:
+  1.
+     - Change description:
+     - Change pattern(s):
+     - Consistency with resolution context:
+  2.
+     ...

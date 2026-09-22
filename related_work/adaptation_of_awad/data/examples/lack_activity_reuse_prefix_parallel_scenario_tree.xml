@@ -1,0 +1,17 @@
+<PROCESS>
+  <SEQUENCE label="root" condition="true">
+    <ACTIVITY label="Receive Order" />
+    <ACTIVITY label="Confirm Order" />
+
+    <PARALLEL>
+      <SEQUENCE condition="true">
+        <ACTIVITY label="Receive Payment" />
+      </SEQUENCE>
+      <SEQUENCE condition="true">
+        <ACTIVITY label="Notify Customer" />
+      </SEQUENCE>
+    </PARALLEL>
+
+    <ACTIVITY label="Archive Order" />
+  </SEQUENCE>
+</PROCESS>

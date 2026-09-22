@@ -1,0 +1,25 @@
+<PROCESS>
+  <SEQUENCE label="root" condition="true">
+
+    <ACTIVITY label="start review" />
+
+    <XCHOICE>
+
+      <SEQUENCE condition="true">
+        <ACTIVITY label="reject application" />
+      </SEQUENCE>
+
+      <SEQUENCE condition="true">
+        <ACTIVITY label="manual evaluation" />
+      </SEQUENCE>
+
+      <SEQUENCE condition="true">
+        <ACTIVITY label="automatic evaluation" />
+      </SEQUENCE>
+
+    </XCHOICE>
+
+    <ACTIVITY label="close case" />
+
+  </SEQUENCE>
+</PROCESS>
